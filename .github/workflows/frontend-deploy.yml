@@ -1,0 +1,123 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-deploy.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+
+env:
+  NODE_VERSION: '18.x'
+  AWS_REGION: ap-south-1
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run linter
+        run: yarn lint --if-present
+
+      - name: Run tests
+        run: yarn test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: test
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-out
+          path: frontend/out
+          retention-days: 1
+
+  deploy:
+    name: Deploy to AWS Amplify
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Trigger Amplify deployment
+        run: |
+          # Get the Amplify app ID
+          APP_ID="${{ secrets.AMPLIFY_APP_ID }}"
+          BRANCH_NAME="main"
+          
+          if [ -z "$APP_ID" ]; then
+            echo "⚠️ AMPLIFY_APP_ID secret not set. Amplify will auto-deploy from webhook."
+            echo "ℹ️ Amplify is configured to auto-deploy on push to main branch."
+            exit 0
+          fi
+          
+          # Start a new deployment
+          aws amplify start-job \
+            --app-id "$APP_ID" \
+            --branch-name "$BRANCH_NAME" \
+            --job-type RELEASE
+          
+          echo "🚀 Amplify deployment triggered!"
+
+      - name: Output deployment URL
+        run: |
+          echo "🚀 Frontend deployment initiated!"
+          echo "URL: https://main.d1ojg9qcpef6jk.amplifyapp.com"
