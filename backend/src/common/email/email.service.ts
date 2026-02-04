@@ -330,4 +330,105 @@ Swami Rupeshwaranand Ashram
   generateOtp(): string {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
+
+  /**
+   * Send admin invitation email with temporary password
+   */
+  async sendAdminInviteEmail(
+    to: string,
+    name: string,
+    role: string,
+    temporaryPassword: string,
+    loginUrl: string,
+  ): Promise<boolean> {
+    const roleLabel = role === 'admin' ? 'Administrator' : 
+                      role === 'content_editor' ? 'Content Editor' : role;
+    
+    const html = this.generateInviteEmailTemplate(name, roleLabel, temporaryPassword, loginUrl);
+
+    return this.sendEmail({
+      to,
+      toName: name,
+      subject: `You've been invited to Swami Rupeshwaranand Ashram Portal`,
+      html,
+    });
+  }
+
+  private generateInviteEmailTemplate(
+    name: string,
+    role: string,
+    temporaryPassword: string,
+    loginUrl: string,
+  ): string {
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" style="width: 100%; max-width: 600px; border-collapse: collapse; background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #c87530 0%, #e0a060 100%); padding: 30px; text-align: center;">
+              <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">🙏 Swami Rupeshwaranand Ashram</h1>
+              <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0; font-size: 16px;">Admin Portal Invitation</p>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px 30px;">
+              <h2 style="color: #1f2937; margin: 0 0 20px; font-size: 24px;">Welcome, ${name}!</h2>
+              
+              <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
+                You have been invited to join the Swami Rupeshwaranand Ashram portal as a <strong>${role}</strong>.
+              </p>
+              
+              <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 20px 0; border-radius: 4px;">
+                <p style="color: #92400e; font-size: 14px; margin: 0 0 10px; font-weight: 600;">Your Temporary Password:</p>
+                <p style="color: #1f2937; font-size: 24px; font-weight: bold; margin: 0; font-family: monospace; letter-spacing: 2px;">
+                  ${temporaryPassword}
+                </p>
+              </div>
+              
+              <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
+                Please use your email address and this temporary password to log in. You will be prompted to set a new password after your first login.
+              </p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${loginUrl}" style="background: linear-gradient(135deg, #c87530 0%, #e0a060 100%); color: white; text-decoration: none; padding: 14px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; display: inline-block;">
+                  Login to Portal
+                </a>
+              </div>
+              
+              <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin: 0;">
+                ⚠️ This password will expire in 7 days. Please log in and set your own password as soon as possible.
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="color: #6b7280; font-size: 14px; margin: 0 0 10px;">With divine blessings,</p>
+              <p style="color: #1f2937; font-size: 16px; font-weight: 600; margin: 0;">Swami Rupeshwaranand Ashram</p>
+              <p style="color: #9ca3af; font-size: 12px; margin: 15px 0 0;">
+                © ${new Date().getFullYear()} Swami Rupeshwaranand Ashram. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `.trim();
+  }
 }

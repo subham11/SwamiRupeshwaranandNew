@@ -38,6 +38,7 @@ interface UserRecord {
   passwordHash?: string;
   hasPassword: boolean;
   isVerified: boolean;
+  role: 'super_admin' | 'admin' | 'content_editor' | 'user';
   createdAt: string;
   updatedAt: string;
   lastLoginAt?: string;
@@ -50,6 +51,7 @@ interface TokenPayload {
   email: string;
   name?: string;
   hasPassword?: boolean;
+  role: 'super_admin' | 'admin' | 'content_editor' | 'user';
   type: 'access' | 'refresh';
   iat: number;
   exp: number;
@@ -116,6 +118,7 @@ export class OtpAuthService {
     email: string,
     name?: string,
     hasPassword?: boolean,
+    role: 'super_admin' | 'admin' | 'content_editor' | 'user' = 'user',
     type: 'access' | 'refresh' = 'access',
   ): string {
     const expiry = type === 'access' ? this.ACCESS_TOKEN_EXPIRY : this.REFRESH_TOKEN_EXPIRY;
@@ -124,6 +127,7 @@ export class OtpAuthService {
       email,
       name,
       hasPassword,
+      role,
       type,
       iat: Date.now(),
       exp: Date.now() + expiry,
@@ -180,6 +184,7 @@ export class OtpAuthService {
       user.email,
       user.name,
       user.hasPassword,
+      user.role || 'user',
       'access',
     );
     const refreshToken = this.generateToken(
@@ -187,6 +192,7 @@ export class OtpAuthService {
       user.email,
       user.name,
       user.hasPassword,
+      user.role || 'user',
       'refresh',
     );
     return {
@@ -354,6 +360,7 @@ export class OtpAuthService {
       name?: string;
       hasPassword: boolean;
       isVerified: boolean;
+      role: 'super_admin' | 'admin' | 'content_editor' | 'user';
       isNewUser: boolean;
     };
   }> {
@@ -415,6 +422,7 @@ export class OtpAuthService {
         email: normalizedEmail,
         hasPassword: false,
         isVerified: true,
+        role: 'user',
         createdAt: now,
         updatedAt: now,
         lastLoginAt: now,
@@ -451,6 +459,7 @@ export class OtpAuthService {
         name: user.name,
         hasPassword: user.hasPassword || false,
         isVerified: user.isVerified,
+        role: user.role || 'user',
         isNewUser,
       },
     };
@@ -532,6 +541,7 @@ export class OtpAuthService {
       name?: string;
       hasPassword: boolean;
       isVerified: boolean;
+      role: 'super_admin' | 'admin' | 'content_editor' | 'user';
       isNewUser: boolean;
     };
   }> {
@@ -574,6 +584,7 @@ export class OtpAuthService {
         name: user.name,
         hasPassword: true,
         isVerified: user.isVerified,
+        role: user.role || 'user',
         isNewUser: false,
       },
     };
@@ -736,6 +747,7 @@ export class OtpAuthService {
     phone?: string;
     hasPassword: boolean;
     isVerified: boolean;
+    role: 'super_admin' | 'admin' | 'content_editor' | 'user';
     createdAt: string;
     lastLoginAt?: string;
   }> {
@@ -752,6 +764,7 @@ export class OtpAuthService {
       phone: user.phone,
       hasPassword: user.hasPassword || false,
       isVerified: user.isVerified,
+      role: user.role || 'user',
       createdAt: user.createdAt,
       lastLoginAt: user.lastLoginAt,
     };

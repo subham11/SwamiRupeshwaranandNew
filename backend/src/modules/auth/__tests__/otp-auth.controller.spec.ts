@@ -155,7 +155,7 @@ describe('OtpAuthController', () => {
 
   describe('setPassword', () => {
     it('should set password for authenticated user', async () => {
-      const user: CurrentUserData = { sub: 'user-123', email: 'test@example.com' };
+      const user: CurrentUserData = { sub: 'user-123', email: 'test@example.com', role: 'user' };
       const expectedResponse = {
         success: true,
         message: 'Password set successfully',
@@ -218,7 +218,7 @@ describe('OtpAuthController', () => {
 
   describe('changePassword', () => {
     it('should change password for authenticated user', async () => {
-      const user: CurrentUserData = { sub: 'user-123', email: 'test@example.com' };
+      const user: CurrentUserData = { sub: 'user-123', email: 'test@example.com', role: 'user' };
       const expectedResponse = {
         success: true,
         message: 'Password changed successfully',
@@ -258,7 +258,7 @@ describe('OtpAuthController', () => {
 
   describe('getProfile', () => {
     it('should get user profile', async () => {
-      const user: CurrentUserData = { sub: 'user-123', email: 'test@example.com' };
+      const user: CurrentUserData = { sub: 'user-123', email: 'test@example.com', role: 'user' };
       const expectedResponse = {
         id: 'user-123',
         email: 'test@example.com',
@@ -278,7 +278,7 @@ describe('OtpAuthController', () => {
 
   describe('updateProfile', () => {
     it('should update user profile', async () => {
-      const user: CurrentUserData = { sub: 'user-123', email: 'test@example.com' };
+      const user: CurrentUserData = { sub: 'user-123', email: 'test@example.com', role: 'user' };
       const updates = { name: 'Updated Name', phone: '+9876543210' };
       const expectedResponse = {
         success: true,
@@ -305,7 +305,7 @@ describe('OtpAuthController', () => {
     });
 
     it('should update only name', async () => {
-      const user: CurrentUserData = { sub: 'user-123', email: 'test@example.com' };
+      const user: CurrentUserData = { sub: 'user-123', email: 'test@example.com', role: 'user' };
       const updates = { name: 'New Name Only' };
       mockOtpAuthService.updateProfile.mockResolvedValue({
         success: true,

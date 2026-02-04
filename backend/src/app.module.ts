@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
+import { AdminModule } from './modules/admin/admin.module';
 import { ContentModule } from './modules/content/content.module';
 import { EventsModule } from './modules/events/events.module';
 import { TeachingsModule } from './modules/teachings/teachings.module';
@@ -25,6 +26,7 @@ import { EmailModule } from './common/email/email.module';
     HealthModule,
     AuthModule,
     UsersModule,
+    AdminModule,
     ContentModule,
     EventsModule,
     TeachingsModule,

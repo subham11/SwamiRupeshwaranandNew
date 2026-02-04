@@ -4,6 +4,7 @@ export interface CurrentUserData {
   sub: string;
   email: string;
   name?: string;
+  role: 'super_admin' | 'admin' | 'content_editor' | 'user';
 }
 
 export const CurrentUser = createParamDecorator(

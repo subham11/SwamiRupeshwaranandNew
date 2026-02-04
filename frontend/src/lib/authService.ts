@@ -19,6 +19,7 @@ interface LoginResponse {
     hasPassword: boolean;
     isVerified: boolean;
     isNewUser: boolean;
+    role: 'super_admin' | 'admin' | 'content_editor' | 'user';
   };
 }
 

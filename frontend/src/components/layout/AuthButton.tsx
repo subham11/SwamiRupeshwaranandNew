@@ -33,6 +33,15 @@ const DashboardIcon = () => (
   </svg>
 );
 
+// Admin icon
+const AdminIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2L2 7l10 5 10-5-10-5z" />
+    <path d="M2 17l10 5 10-5" />
+    <path d="M2 12l10 5 10-5" />
+  </svg>
+);
+
 interface AuthButtonProps {
   locale: AppLocale;
 }
@@ -70,9 +79,13 @@ export default function AuthButton({ locale }: AuthButtonProps) {
   const labels = {
     login: locale === 'en' ? 'Login' : 'लॉगिन',
     dashboard: locale === 'en' ? 'Dashboard' : 'डैशबोर्ड',
+    admin: locale === 'en' ? 'Admin Panel' : 'व्यवस्थापक',
     logout: locale === 'en' ? 'Logout' : 'लॉगआउट',
     myAccount: locale === 'en' ? 'My Account' : 'मेरा खाता',
   };
+
+  // Check if user has admin access
+  const isAdmin = user?.role === 'super_admin' || user?.role === 'admin';
 
   // Show placeholder during SSR to prevent hydration mismatch
   if (!mounted) {
@@ -152,6 +165,17 @@ export default function AuthButton({ locale }: AuthButtonProps) {
             <DashboardIcon />
             {labels.dashboard}
           </Link>
+          {isAdmin && (
+            <Link
+              href={`/${locale}/admin/users`}
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+              style={{ color: 'var(--color-text)' }}
+            >
+              <AdminIcon />
+              {labels.admin}
+            </Link>
+          )}
           <hr className="my-1" style={{ borderColor: 'var(--color-border)' }} />
           <button
             onClick={handleLogout}

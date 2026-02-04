@@ -1,19 +1,20 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto';
-import { JwtAuthGuard } from '@/common/guards';
-import { CurrentUser, CurrentUserData } from '@/common/decorators';
+import { CreateUserDto, UpdateUserDto, UserResponseDto, UserRole } from './dto';
+import { JwtAuthGuard, RolesGuard } from '@/common/guards';
+import { CurrentUser, CurrentUserData, Roles, AdminOnly, SuperAdminOnly } from '@/common/decorators';
 
 @ApiTags('Users')
 @Controller('users')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth('JWT-auth')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new user' })
+  @AdminOnly()
+  @ApiOperation({ summary: 'Create a new user (Admin only)' })
   @ApiResponse({
     status: 201,
     description: 'User created successfully',
@@ -24,7 +25,8 @@ export class UsersController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all users' })
+  @AdminOnly()
+  @ApiOperation({ summary: 'Get all users (Admin only)' })
   @ApiResponse({
     status: 200,
     description: 'List of users',
@@ -46,7 +48,8 @@ export class UsersController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get user by ID' })
+  @AdminOnly()
+  @ApiOperation({ summary: 'Get user by ID (Admin only)' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiResponse({
     status: 200,
@@ -59,7 +62,8 @@ export class UsersController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update user' })
+  @AdminOnly()
+  @ApiOperation({ summary: 'Update user (Admin only)' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiResponse({
     status: 200,
@@ -74,7 +78,8 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete user' })
+  @SuperAdminOnly()
+  @ApiOperation({ summary: 'Delete user (Super Admin only)' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
   async remove(@Param('id') id: string): Promise<void> {
