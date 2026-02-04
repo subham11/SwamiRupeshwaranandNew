@@ -6,12 +6,10 @@ frontend:
         - npm install
     build:
       commands:
-        # Set environment variables for Amplify build
-        - export AMPLIFY_BUILD=true
-        - export NEXT_PUBLIC_USE_API=true
         # Build the Next.js application
         - npm run build
   artifacts:
+    # For Next.js SSR on Amplify, let Amplify handle artifacts automatically
     baseDirectory: .next
     files:
       - '**/*'
@@ -20,14 +18,18 @@ frontend:
       - node_modules/**/*
       - .next/cache/**/*
 
-customRules:
-  - source: /
-    target: /en
-    status: '302'
+# Note: For SSR to work correctly on Amplify Gen 2, ensure:
+# 1. "output" in next.config.ts is NOT set to 'export'
+# 2. Framework detection in Amplify Console is set to "Next.js SSR"
+# 3. Redirects are configured in Amplify Console > App settings > Rewrites and redirects
 
-# Environment variables can be set in Amplify Console:
+# Add this redirect in Amplify Console:
+# Source: /
+# Target: /en  
+# Type: 302 (Redirect - Temporary)
+
+# Environment variables to set in Amplify Console:
+# - AMPLIFY_BUILD: true
 # - NEXT_PUBLIC_API_URL: Your API Gateway URL
 # - NEXT_PUBLIC_SITE_URL: Your production site URL
-# - NEXT_PUBLIC_SITE_NAME: Site display name
-# - NEXT_PUBLIC_ENABLE_DONATIONS: true/false
-# - NEXT_PUBLIC_ENABLE_AUTH: true/false
+# - NEXT_PUBLIC_USE_API: true
