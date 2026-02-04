@@ -1,6 +1,34 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SetPasswordForm from '../SetPasswordForm';
 
+// Mock next/navigation
+jest.mock('next/navigation', () => ({
+  useParams: () => ({ locale: 'en' }),
+}));
+
+// Mock i18n
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'auth.setPassword': 'Set Password',
+        'auth.setPasswordDesc': 'Create a password for faster login next time',
+        'auth.newPassword': 'Password',
+        'auth.confirmPassword': 'Confirm Password',
+        'auth.settingPassword': 'Setting password...',
+        'auth.skipForNow': 'Skip for now',
+        'auth.passwordsMatch': 'Passwords match',
+        'auth.passwordsDoNotMatch': 'Passwords do not match',
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+
+jest.mock('@/i18n/i18n.client', () => ({
+  initI18nClient: jest.fn(),
+}));
+
 // Mock useAuth hook
 const mockSetPassword = jest.fn();
 const mockClearError = jest.fn();
@@ -109,7 +137,8 @@ describe('SetPasswordForm', () => {
   it('shows heading', () => {
     render(<SetPasswordForm />);
     
-    expect(screen.getByText(/set your password/i)).toBeInTheDocument();
+    // Heading uses 'Set Password' text (same as button), check for h2
+    expect(screen.getByRole('heading', { name: /set password/i })).toBeInTheDocument();
   });
 
   it('has toggle password visibility button', () => {

@@ -1,6 +1,40 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import LoginForm from '../LoginForm';
 
+// Mock next/navigation
+jest.mock('next/navigation', () => ({
+  useParams: () => ({ locale: 'en' }),
+}));
+
+// Mock i18n
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'auth.welcomeBack': 'Welcome Back',
+        'auth.login': 'Login',
+        'auth.loginWithOtp': 'Login with OTP',
+        'auth.loginWithPassword': 'Login with Password',
+        'auth.enterEmailOtp': 'Enter your email to receive a one-time password',
+        'auth.enterEmailPassword': 'Enter your email and password to login',
+        'auth.emailAddress': 'Email Address',
+        'auth.password': 'Password',
+        'auth.sendOtp': 'Send OTP',
+        'auth.sendingOtp': 'Sending OTP...',
+        'auth.loggingIn': 'Logging in...',
+        'auth.loginWithOtpInstead': 'Login with OTP instead',
+        'auth.loginWithPasswordInstead': 'Login with password instead',
+        'auth.forgotPassword': 'Forgot your password?',
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+
+jest.mock('@/i18n/i18n.client', () => ({
+  initI18nClient: jest.fn(),
+}));
+
 // Mock useAuth hook
 const mockRequestOtp = jest.fn();
 const mockLoginWithPassword = jest.fn();

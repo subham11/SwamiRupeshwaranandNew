@@ -1,6 +1,33 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import OtpVerificationForm from '../OtpVerificationForm';
 
+// Mock next/navigation
+jest.mock('next/navigation', () => ({
+  useParams: () => ({ locale: 'en' }),
+}));
+
+// Mock i18n
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'auth.verifyOtp': 'Verify OTP',
+        'auth.enterOtpCode': 'Enter the 6-digit code sent to your email',
+        'auth.verify': 'Verify',
+        'auth.verifying': 'Verifying...',
+        'auth.resendOtp': 'Resend OTP',
+        'auth.back': 'Back',
+        'auth.didntReceiveCode': "Didn't receive the code?",
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+
+jest.mock('@/i18n/i18n.client', () => ({
+  initI18nClient: jest.fn(),
+}));
+
 // Mock useAuth hook
 const mockVerifyOtp = jest.fn();
 const mockRequestOtp = jest.fn();
@@ -41,7 +68,7 @@ describe('OtpVerificationForm', () => {
   it('shows verify button', () => {
     render(<OtpVerificationForm />);
     
-    expect(screen.getByRole('button', { name: /verify otp/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^verify$/i })).toBeInTheDocument();
   });
 
   it('accepts numeric input in OTP fields', () => {
@@ -56,7 +83,8 @@ describe('OtpVerificationForm', () => {
   it('shows resend option', () => {
     render(<OtpVerificationForm />);
     
-    expect(screen.getByText(/didn't receive the code/i)).toBeInTheDocument();
+    // The resend text is shown (with countdown initially)
+    expect(screen.getByText(/resend otp/i)).toBeInTheDocument();
   });
 
   it('auto-focuses next input when a digit is entered', () => {
