@@ -4,6 +4,8 @@ frontend:
     preBuild:
       commands:
         - npm install
+        # Clear any cached build artifacts
+        - rm -rf .next
     build:
       commands:
         # Set environment variables for production build
@@ -20,7 +22,6 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
-      - .next/cache/**/*
 
 # Note: For SSR to work correctly on Amplify Gen 2, ensure:
 # 1. "output" in next.config.ts is NOT set to 'export'
