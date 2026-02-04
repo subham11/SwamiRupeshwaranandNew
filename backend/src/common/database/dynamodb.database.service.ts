@@ -122,15 +122,37 @@ export class DynamoDBDatabaseService implements DatabaseService {
   }
 
   async update<T>(entityType: string, options: UpdateOptions): Promise<T> {
+    // Build update expression from simplified 'update' object if provided
+    let updateExpression = options.updateExpression;
+    let expressionAttributeNames = options.expressionAttributeNames || {};
+    let expressionAttributeValues = options.expressionAttributeValues || {};
+
+    if (options.update && !updateExpression) {
+      const setParts: string[] = [];
+      Object.entries(options.update).forEach(([key, value], index) => {
+        const attrName = `#attr${index}`;
+        const attrValue = `:val${index}`;
+        setParts.push(`${attrName} = ${attrValue}`);
+        expressionAttributeNames[attrName] = key;
+        expressionAttributeValues[attrValue] = value;
+      });
+      // Always add updatedAt
+      setParts.push('#updatedAt = :updatedAt');
+      expressionAttributeNames['#updatedAt'] = 'updatedAt';
+      expressionAttributeValues[':updatedAt'] = new Date().toISOString();
+      
+      updateExpression = `SET ${setParts.join(', ')}`;
+    } else if (updateExpression) {
+      // Add updatedAt to existing expression
+      expressionAttributeValues[':updatedAt'] = new Date().toISOString();
+    }
+
     const command = new UpdateCommand({
       TableName: this.tableName,
       Key: options.key,
-      UpdateExpression: options.updateExpression,
-      ExpressionAttributeNames: options.expressionAttributeNames,
-      ExpressionAttributeValues: {
-        ...options.expressionAttributeValues,
-        ':updatedAt': new Date().toISOString(),
-      },
+      UpdateExpression: updateExpression,
+      ExpressionAttributeNames: Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
+      ExpressionAttributeValues: Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined,
       ConditionExpression: options.conditionExpression,
       ReturnValues: 'ALL_NEW',
     });
