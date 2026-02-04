@@ -1,0 +1,304 @@
+{
+  "pages": [
+    {
+      "type": "page",
+      "slug": "swamiji",
+      "title": {
+        "en": "Swamiji",
+        "hi": "स्वामीजी"
+      },
+      "excerpt": {
+        "en": "Biography, teachings, and mission.",
+        "hi": "जीवन परिचय, शिक्षाएं और मिशन।"
+      },
+      "heroImage": "/images/hero-1.svg",
+      "updatedAt": "2026-02-04T00:00:00.000Z"
+    },
+    {
+      "type": "page",
+      "slug": "ashram",
+      "title": {
+        "en": "Ashram",
+        "hi": "आश्रम"
+      },
+      "excerpt": {
+        "en": "About the ashram, darshan timings, and guidance.",
+        "hi": "आश्रम, दर्शन समय और मार्गदर्शन।"
+      },
+      "heroImage": "/images/hero-2.svg",
+      "updatedAt": "2026-02-04T00:00:00.000Z"
+    }
+  ],
+  "events": [
+    {
+      "type": "event",
+      "id": "evt-01",
+      "slug": "satsang-weekly",
+      "title": {
+        "en": "Weekly Satsang",
+        "hi": "साप्ताहिक सत्संग"
+      },
+      "description": {
+        "en": "Join for bhajan, discourse, and community satsang.",
+        "hi": "भजन, प्रवचन और सामूहिक सत्संग।"
+      },
+      "location": {
+        "en": "Sri Pitambara Peeth",
+        "hi": "श्री पीताम्बरा पीठ"
+      },
+      "startAt": "2026-02-08T11:00:00.000Z",
+      "endAt": "2026-02-08T13:00:00.000Z",
+      "heroImage": "/images/event-1.svg",
+      "status": "upcoming"
+    },
+    {
+      "type": "event",
+      "id": "evt-02",
+      "slug": "maha-abhishek",
+      "title": {
+        "en": "Maha Abhishek",
+        "hi": "महा अभिषेक"
+      },
+      "description": {
+        "en": "Special poojan and abhishek with sankalp.",
+        "hi": "विशेष पूजन एवं अभिषेक संकल्प सहित।"
+      },
+      "location": {
+        "en": "Sri Pitambara Peeth",
+        "hi": "श्री पीताम्बरा पीठ"
+      },
+      "startAt": "2026-02-15T05:30:00.000Z",
+      "heroImage": "/images/event-2.svg",
+      "status": "upcoming"
+    }
+  ],
+  "services": [
+    {
+      "type": "service",
+      "slug": "sadhana",
+      "title": {
+        "en": "Sadhana Programs",
+        "hi": "साधना कार्यक्रम"
+      },
+      "shortDescription": {
+        "en": "Guided spiritual practice and meditation.",
+        "hi": "मार्गदर्शित आध्यात्मिक साधना और ध्यान।"
+      },
+      "order": 1,
+      "heroImage": "/images/service-1.svg"
+    },
+    {
+      "type": "service",
+      "slug": "siddha-yantra",
+      "title": {
+        "en": "Siddha Yantra",
+        "hi": "सिद्ध यंत्र"
+      },
+      "shortDescription": {
+        "en": "Sacred yantras for spiritual enhancement.",
+        "hi": "आध्यात्मिक विकास हेतु पवित्र यंत्र।"
+      },
+      "order": 2,
+      "heroImage": "/images/service-2.svg"
+    },
+    {
+      "type": "service",
+      "slug": "raksha-kavach",
+      "title": {
+        "en": "Raksha Kavach",
+        "hi": "रक्षा कवच"
+      },
+      "shortDescription": {
+        "en": "Protection mantra and spiritual armor.",
+        "hi": "रक्षा मंत्र और आध्यात्मिक कवच।"
+      },
+      "order": 3,
+      "heroImage": "/images/service-3.svg"
+    },
+    {
+      "type": "service",
+      "slug": "pitr-dosha",
+      "title": {
+        "en": "Pitr Dosha Nivaran",
+        "hi": "पितृ दोष निवारण"
+      },
+      "shortDescription": {
+        "en": "Ancestral blessing and dosha remedies.",
+        "hi": "पितृ आशीर्वाद और दोष निवारण।"
+      },
+      "order": 4,
+      "heroImage": "/images/service-1.svg"
+    },
+    {
+      "type": "service",
+      "slug": "tantra-badha",
+      "title": {
+        "en": "Tantra Badha Nivaran",
+        "hi": "तंत्र बाधा निवारण"
+      },
+      "shortDescription": {
+        "en": "Tantra cleansing and spiritual liberation.",
+        "hi": "तंत्र शुद्धिकरण और आध्यात्मिक मुक्ति।"
+      },
+      "order": 5,
+      "heroImage": "/images/service-2.svg"
+    },
+    {
+      "type": "service",
+      "slug": "narayan-bali",
+      "title": {
+        "en": "Narayan Bali",
+        "hi": "नारायण बलि"
+      },
+      "shortDescription": {
+        "en": "Sacred ritual for ancestral peace.",
+        "hi": "पितृ शांति हेतु पवित्र अनुष्ठान।"
+      },
+      "order": 6,
+      "heroImage": "/images/service-3.svg"
+    },
+    {
+      "type": "service",
+      "slug": "tripindi-shradh",
+      "title": {
+        "en": "Tripindi Shradh",
+        "hi": "त्रिपिंडी श्राद्ध"
+      },
+      "shortDescription": {
+        "en": "Three-generation ancestral ceremony.",
+        "hi": "तीन पीढ़ी का श्राद्ध अनुष्ठान।"
+      },
+      "order": 7,
+      "heroImage": "/images/service-1.svg"
+    },
+    {
+      "type": "service",
+      "slug": "bajrang-baan",
+      "title": {
+        "en": "Bajrang Baan Paath",
+        "hi": "बजरंग बाण पाठ"
+      },
+      "shortDescription": {
+        "en": "Strength and protection through mantras.",
+        "hi": "मंत्रों के माध्यम से बल और रक्षा।"
+      },
+      "order": 8,
+      "heroImage": "/images/service-2.svg"
+    },
+    {
+      "type": "service",
+      "slug": "purnima-havan",
+      "title": {
+        "en": "Purnima Havan",
+        "hi": "पूर्णिमा हवन"
+      },
+      "shortDescription": {
+        "en": "Full moon fire ritual for blessings.",
+        "hi": "पूर्ण चंद्र पर आशीर्वाद हेतु अग्नि पूजा।"
+      },
+      "order": 9,
+      "heroImage": "/images/service-3.svg"
+    },
+    {
+      "type": "service",
+      "slug": "amavasya-pooja",
+      "title": {
+        "en": "Amavasya Pitru Pooja",
+        "hi": "अमावस्या पितृ पूजा"
+      },
+      "shortDescription": {
+        "en": "New moon ancestral worship ceremony.",
+        "hi": "अमावस्या पर पितृ पूजा अनुष्ठान।"
+      },
+      "order": 10,
+      "heroImage": "/images/service-1.svg"
+    },
+    {
+      "type": "service",
+      "slug": "mantra-sadhana",
+      "title": {
+        "en": "Mantra Sadhana Shivir",
+        "hi": "मंत्र साधना शिविर"
+      },
+      "shortDescription": {
+        "en": "Intensive mantra initiation and practice.",
+        "hi": "गहन मंत्र दीक्षा और साधना।"
+      },
+      "order": 11,
+      "heroImage": "/images/service-2.svg"
+    },
+    {
+      "type": "service",
+      "slug": "margdarshan",
+      "title": {
+        "en": "Daiviya Margdarshan Shivir",
+        "hi": "दैव्य मार्गदर्शन शिविर"
+      },
+      "shortDescription": {
+        "en": "Divine guidance and spiritual direction.",
+        "hi": "दिव्य मार्गदर्शन और आध्यात्मिक दिशा।"
+      },
+      "order": 12,
+      "heroImage": "/images/service-3.svg"
+    }
+  ],
+  "gallery": [
+    {
+      "type": "media",
+      "id": "img-01",
+      "kind": "image",
+      "title": {
+        "en": "Ashram Moment",
+        "hi": "आश्रम झलक"
+      },
+      "url": "/images/gallery-1.svg",
+      "alt": {
+        "en": "Ashram moment photo",
+        "hi": "आश्रम झलक फोटो"
+      },
+      "aspect": "portrait"
+    },
+    {
+      "type": "media",
+      "id": "img-02",
+      "kind": "image",
+      "title": {
+        "en": "Poojan",
+        "hi": "पूजन"
+      },
+      "url": "/images/gallery-2.svg",
+      "alt": {
+        "en": "Poojan photo",
+        "hi": "पूजन फोटो"
+      },
+      "aspect": "landscape"
+    },
+    {
+      "type": "media",
+      "id": "img-03",
+      "kind": "image",
+      "title": {
+        "en": "Satsang",
+        "hi": "सत्संग"
+      },
+      "url": "/images/gallery-3.svg",
+      "alt": {
+        "en": "Satsang photo",
+        "hi": "सत्संग फोटो"
+      },
+      "aspect": "square"
+    }
+  ],
+  "media": [
+    {
+      "type": "media",
+      "id": "yt-01",
+      "kind": "youtube",
+      "title": {
+        "en": "Latest Pravachan",
+        "hi": "नवीन प्रवचन"
+      },
+      "url": "https://www.youtube.com/channel/UCguXru7RXLPGdLwqApPLqOg"
+    }
+  ]
+}

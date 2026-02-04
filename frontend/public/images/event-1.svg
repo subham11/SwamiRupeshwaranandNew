@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fafafa"/>
+      <stop offset="1" stop-color="#f1f5f9"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <rect x="64" y="64" width="1072" height="502" rx="32" fill="#fff" stroke="#e5e7eb"/>
+  <text x="120" y="220" font-family="Inter,system-ui,Arial" font-size="56" font-weight="700" fill="#0f172a">Weekly Satsang</text>
+  <text x="120" y="300" font-family="Inter,system-ui,Arial" font-size="28" fill="#334155">Event cover image</text>
+  <text x="120" y="520" font-family="Inter,system-ui,Arial" font-size="18" fill="#64748b">Next.js • Streaming SSR • i18n • CMS-ready</text>
+</svg>

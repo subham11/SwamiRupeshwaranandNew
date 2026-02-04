@@ -1,0 +1,59 @@
+{
+  "brand": "Swami Rupeshwaranand",
+  "nav": {
+    "home": "Home",
+    "swamiji": "Swamiji",
+    "ashram": "Ashram",
+    "services": "Poojan Services",
+    "events": "Events",
+    "teachings": "Teachings",
+    "gurukul": "One District One Gurukul",
+    "donation": "Donation",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Guidance, Sadhana, and Seva",
+    "subtitle": "A modern, responsive website with multilingual content and fast streaming pages.",
+    "ctaPrimary": "Explore Services",
+    "ctaSecondary": "Watch on YouTube",
+    "slide1": {
+      "title": "Divine Guidance For Modern Life",
+      "description": "Navigate your spiritual journey with timeless wisdom adapted for contemporary living."
+    },
+    "slide2": {
+      "title": "Daily Inspirations & Teachings",
+      "description": "Receive daily spiritual wisdom and guidance from Swami Rupeshwaranand."
+    },
+    "slide3": {
+      "title": "Path to Inner Peace",
+      "description": "Discover ancient techniques for finding tranquility in the modern world through meditation and mindful living."
+    },
+    "slide4": {
+      "title": "Ancient Wisdom for Today",
+      "description": "Bridge the gap between ancient spiritual knowledge and modern life challenges."
+    },
+    "slide5": {
+      "title": "Spiritual Awakening Awaits",
+      "description": "Begin your transformational journey towards enlightenment and self-realization."
+    }
+  },
+  "navGroup": {
+    "about": "About",
+    "offerings": "Offerings",
+    "initiatives": "Initiatives",
+    "connect": "Connect"
+  },
+  "navDesc": {
+    "swamiji": "Biography and teachings",
+    "ashram": "Ashram info and guidance",
+    "services": "Poojan & sankalp services",
+    "events": "Upcoming programs & satsang",
+    "teachings": "Sacred spiritual teachings",
+    "gurukul": "One District One Gurukul initiative",
+    "donation": "Support seva and dharma work",
+    "contact": "Reach us and visit"
+  },
+  "cta": {
+    "learnMore": "Learn more"
+  }
+}

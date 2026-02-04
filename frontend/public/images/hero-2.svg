@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="heroGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c2d12"/>
+      <stop offset="50%" stop-color="#9a3412"/>
+      <stop offset="100%" stop-color="#c2410c"/>
+    </linearGradient>
+    <pattern id="sacredPattern2" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+      <circle cx="30" cy="30" r="1.5" fill="#fcd34d" opacity="0.25"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#heroGrad2)"/>
+  <rect width="1200" height="630" fill="url(#sacredPattern2)"/>
+  <text x="600" y="260" font-family="Georgia,serif" font-size="96" font-weight="600" fill="#fcd34d" text-anchor="middle">🙏</text>
+  <text x="600" y="370" font-family="Georgia,serif" font-size="48" fill="#ffffff" opacity="0.95" text-anchor="middle">Satsang &amp; Spiritual Gatherings</text>
+  <text x="600" y="430" font-family="Inter,system-ui,Arial" font-size="24" fill="#fcd34d" opacity="0.8" text-anchor="middle">Replace with real photography</text>
+</svg>

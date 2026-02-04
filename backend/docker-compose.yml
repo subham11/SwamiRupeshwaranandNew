@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # MongoDB for local development (primary local database)
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb-local
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_DATABASE=swami_rupeshwaranand_api_local
+
+  # MongoDB Express UI (optional - for viewing data)
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_BASICAUTH_ENABLED=false
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+  # DynamoDB Local (optional - for testing DynamoDB locally)
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - dynamodb-data:/home/dynamodblocal/data
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data"
+    restart: unless-stopped
+    profiles:
+      - dynamodb
+
+  # DynamoDB Admin UI (optional - for viewing data)
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin:latest
+    container_name: dynamodb-admin
+    ports:
+      - "8001:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://dynamodb-local:8000
+      - AWS_REGION=ap-south-1
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+    depends_on:
+      - dynamodb-local
+    restart: unless-stopped
+    profiles:
+      - dynamodb
+
+volumes:
+  mongodb-data:
+  dynamodb-data:
