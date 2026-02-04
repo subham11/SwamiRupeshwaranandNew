@@ -1,9 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/useAuth';
 import Button from '@/components/ui/Button';
 import OtpVerificationForm from './OtpVerificationForm';
+import { initI18nClient } from '@/i18n/i18n.client';
+import type { AppLocale } from '@/i18n/config';
 
 interface ForgotPasswordFormProps {
   onSuccess?: () => void;
@@ -11,6 +15,11 @@ interface ForgotPasswordFormProps {
 }
 
 export default function ForgotPasswordForm({ onSuccess, onBack }: ForgotPasswordFormProps) {
+  const params = useParams();
+  const locale = (params?.locale as AppLocale) || 'en';
+  useMemo(() => initI18nClient(locale), [locale]);
+  const { t } = useTranslation('common');
+
   const { forgotPassword, resetPassword, isLoading, error, clearError, otpSent, otpEmail, clearOtpState } = useAuth();
   const [email, setEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -87,17 +96,17 @@ export default function ForgotPasswordForm({ onSuccess, onBack }: ForgotPassword
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
-              Create New Password
+              {t('auth.createNewPassword')}
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400 mt-2">
-              Enter the OTP and your new password
+              {t('auth.enterOtpAndNewPassword')}
             </p>
           </div>
 
           <form onSubmit={handleResetPassword} className="space-y-6">
             <div>
               <label htmlFor="otp" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                OTP Code
+                {t('auth.otpCode')}
               </label>
               <input
                 id="otp"
@@ -106,7 +115,7 @@ export default function ForgotPasswordForm({ onSuccess, onBack }: ForgotPassword
                 maxLength={6}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                placeholder="Enter 6-digit OTP"
+                placeholder={t('auth.enterOtpPlaceholder')}
                 className="w-full px-4 py-3 border border-zinc-300 dark:border-zinc-600 rounded-lg 
                          bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white text-center text-xl tracking-widest
                          focus:ring-2 focus:ring-amber-500 focus:border-transparent
@@ -116,7 +125,7 @@ export default function ForgotPasswordForm({ onSuccess, onBack }: ForgotPassword
 
             <div>
               <label htmlFor="newPassword" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                New Password
+                {t('auth.newPassword')}
               </label>
               <div className="relative">
                 <input
@@ -156,7 +165,7 @@ export default function ForgotPasswordForm({ onSuccess, onBack }: ForgotPassword
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                Confirm Password
+                {t('auth.confirmPassword')}
               </label>
               <input
                 id="confirmPassword"
@@ -170,7 +179,7 @@ export default function ForgotPasswordForm({ onSuccess, onBack }: ForgotPassword
                          transition-colors"
               />
               {confirmPassword && !doPasswordsMatch && (
-                <p className="mt-1 text-sm text-red-500">Passwords do not match</p>
+                <p className="mt-1 text-sm text-red-500">{t('auth.passwordsDoNotMatch')}</p>
               )}
             </div>
 
@@ -185,7 +194,7 @@ export default function ForgotPasswordForm({ onSuccess, onBack }: ForgotPassword
               disabled={isLoading || !isPasswordValid || !doPasswordsMatch || otp.length !== 6}
               className="w-full py-3"
             >
-              {isLoading ? 'Resetting...' : 'Reset Password'}
+              {isLoading ? t('auth.resetting') : t('auth.resetPassword')}
             </Button>
           </form>
 
@@ -195,7 +204,7 @@ export default function ForgotPasswordForm({ onSuccess, onBack }: ForgotPassword
               onClick={handleBack}
               className="text-sm text-zinc-600 dark:text-zinc-400 hover:underline"
             >
-              ← Back
+              ← {t('auth.back')}
             </button>
           </div>
         </div>
@@ -214,17 +223,17 @@ export default function ForgotPasswordForm({ onSuccess, onBack }: ForgotPassword
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
-            Forgot Password?
+            {t('auth.forgotPassword')}
           </h2>
           <p className="text-zinc-600 dark:text-zinc-400 mt-2">
-            Enter your email and we&apos;ll send you an OTP to reset your password
+            {t('auth.forgotPasswordDesc')}
           </p>
         </div>
 
         <form onSubmit={handleRequestOtp} className="space-y-6">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-              Email Address
+              {t('auth.emailAddress')}
             </label>
             <input
               id="email"
@@ -251,7 +260,7 @@ export default function ForgotPasswordForm({ onSuccess, onBack }: ForgotPassword
             disabled={isLoading || !email}
             className="w-full py-3"
           >
-            {isLoading ? 'Sending...' : 'Send Reset OTP'}
+            {isLoading ? t('auth.sending') : t('auth.sendResetOtp')}
           </Button>
         </form>
 
@@ -262,7 +271,7 @@ export default function ForgotPasswordForm({ onSuccess, onBack }: ForgotPassword
               onClick={onBack}
               className="text-sm text-zinc-600 dark:text-zinc-400 hover:underline"
             >
-              ← Back to login
+              ← {t('auth.backToLogin')}
             </button>
           </div>
         )}

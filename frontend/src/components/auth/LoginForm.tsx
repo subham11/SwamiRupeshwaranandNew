@@ -1,8 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/useAuth';
 import Button from '@/components/ui/Button';
+import { initI18nClient } from '@/i18n/i18n.client';
+import type { AppLocale } from '@/i18n/config';
 
 interface LoginFormProps {
   onOtpSent?: () => void;
@@ -11,6 +15,11 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ onOtpSent, onLoginSuccess, onForgotPassword }: LoginFormProps) {
+  const params = useParams();
+  const locale = (params?.locale as AppLocale) || 'en';
+  useMemo(() => initI18nClient(locale), [locale]);
+  const { t } = useTranslation('common');
+  
   const { requestOtp, loginWithPassword, isLoading, error, clearError, otpSent } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,12 +53,12 @@ export default function LoginForm({ onOtpSent, onLoginSuccess, onForgotPassword 
       <div className="bg-white dark:bg-zinc-800 rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
-            Welcome Back
+            {t('auth.welcomeBack')}
           </h2>
           <p className="text-zinc-600 dark:text-zinc-400 mt-2">
             {loginMode === 'otp' 
-              ? 'Enter your email to receive a one-time password'
-              : 'Enter your email and password to login'
+              ? t('auth.enterEmailOtp')
+              : t('auth.enterEmailPassword')
             }
           </p>
         </div>
@@ -57,14 +66,14 @@ export default function LoginForm({ onOtpSent, onLoginSuccess, onForgotPassword 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-              Email Address
+              {t('auth.emailAddress')}
             </label>
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
+              placeholder={t('auth.emailPlaceholder')}
               required
               className="w-full px-4 py-3 border border-zinc-300 dark:border-zinc-600 rounded-lg 
                        bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white
@@ -76,14 +85,14 @@ export default function LoginForm({ onOtpSent, onLoginSuccess, onForgotPassword 
           {loginMode === 'password' && (
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                Password
+                {t('auth.password')}
               </label>
               <input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder={t('auth.passwordPlaceholder')}
                 required
                 minLength={8}
                 className="w-full px-4 py-3 border border-zinc-300 dark:border-zinc-600 rounded-lg 
@@ -111,10 +120,10 @@ export default function LoginForm({ onOtpSent, onLoginSuccess, onForgotPassword 
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                {loginMode === 'otp' ? 'Sending OTP...' : 'Logging in...'}
+                {loginMode === 'otp' ? t('auth.sendingOtp') : t('auth.loggingIn')}
               </span>
             ) : (
-              loginMode === 'otp' ? 'Send OTP' : 'Login'
+              loginMode === 'otp' ? t('auth.sendOtp') : t('auth.login')
             )}
           </Button>
         </form>
@@ -126,8 +135,8 @@ export default function LoginForm({ onOtpSent, onLoginSuccess, onForgotPassword 
             className="w-full text-center text-sm text-amber-600 dark:text-amber-400 hover:underline"
           >
             {loginMode === 'otp' 
-              ? 'Login with password instead' 
-              : 'Login with OTP instead'
+              ? t('auth.loginWithPasswordInstead')
+              : t('auth.loginWithOtpInstead')
             }
           </button>
 
@@ -137,7 +146,7 @@ export default function LoginForm({ onOtpSent, onLoginSuccess, onForgotPassword 
               onClick={onForgotPassword}
               className="w-full text-center text-sm text-zinc-600 dark:text-zinc-400 hover:underline"
             >
-              Forgot your password?
+              {t('auth.forgotPassword')}
             </button>
           )}
         </div>

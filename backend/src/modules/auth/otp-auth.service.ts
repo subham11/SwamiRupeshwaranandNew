@@ -151,13 +151,13 @@ export class OtpAuthService {
   verifyToken(token: string): TokenPayload | null {
     try {
       const parts = token.split('.');
-      if (parts.length !== 2) return null;
+      if (parts.length !== 3) return null;
 
-      const [base64Payload, signature] = parts;
+      const [base64Header, base64Payload, signature] = parts;
       const secret = this.configService.get('JWT_SECRET', 'ashram-jwt-secret-key-2024');
       const expectedSignature = crypto
         .createHmac('sha256', secret)
-        .update(base64Payload)
+        .update(`${base64Header}.${base64Payload}`)
         .digest('base64url');
 
       if (signature !== expectedSignature) return null;

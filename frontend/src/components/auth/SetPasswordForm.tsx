@@ -1,8 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/useAuth';
 import Button from '@/components/ui/Button';
+import { initI18nClient } from '@/i18n/i18n.client';
+import type { AppLocale } from '@/i18n/config';
 
 interface SetPasswordFormProps {
   onSuccess?: () => void;
@@ -10,6 +14,11 @@ interface SetPasswordFormProps {
 }
 
 export default function SetPasswordForm({ onSuccess, onSkip }: SetPasswordFormProps) {
+  const params = useParams();
+  const locale = (params?.locale as AppLocale) || 'en';
+  useMemo(() => initI18nClient(locale), [locale]);
+  const { t } = useTranslation('common');
+  
   const { setPassword, isLoading, error, clearError } = useAuth();
   const [password, setPasswordValue] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -48,17 +57,17 @@ export default function SetPasswordForm({ onSuccess, onSkip }: SetPasswordFormPr
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
-            Set Your Password
+            {t('auth.setPassword')}
           </h2>
           <p className="text-zinc-600 dark:text-zinc-400 mt-2">
-            Create a secure password for faster login next time
+            {t('auth.setPasswordDesc')}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-              Password
+              {t('auth.newPassword')}
             </label>
             <div className="relative">
               <input
@@ -113,7 +122,7 @@ export default function SetPasswordForm({ onSuccess, onSkip }: SetPasswordFormPr
 
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-              Confirm Password
+              {t('auth.confirmPassword')}
             </label>
             <input
               id="confirmPassword"
@@ -127,10 +136,10 @@ export default function SetPasswordForm({ onSuccess, onSkip }: SetPasswordFormPr
                        transition-colors"
             />
             {confirmPassword && !doPasswordsMatch && (
-              <p className="mt-1 text-sm text-red-500">Passwords do not match</p>
+              <p className="mt-1 text-sm text-red-500">{t('auth.passwordsDoNotMatch')}</p>
             )}
             {doPasswordsMatch && (
-              <p className="mt-1 text-sm text-green-500">Passwords match</p>
+              <p className="mt-1 text-sm text-green-500">{t('auth.passwordsMatch')}</p>
             )}
           </div>
 
@@ -151,10 +160,10 @@ export default function SetPasswordForm({ onSuccess, onSkip }: SetPasswordFormPr
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Setting password...
+                {t('auth.settingPassword')}
               </span>
             ) : (
-              'Set Password'
+              t('auth.setPassword')
             )}
           </Button>
         </form>
@@ -166,7 +175,7 @@ export default function SetPasswordForm({ onSuccess, onSkip }: SetPasswordFormPr
               onClick={onSkip}
               className="text-sm text-zinc-600 dark:text-zinc-400 hover:underline"
             >
-              Skip for now
+              {t('auth.skipForNow')}
             </button>
           </div>
         )}

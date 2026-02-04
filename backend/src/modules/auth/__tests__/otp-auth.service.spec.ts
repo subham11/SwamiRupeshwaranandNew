@@ -338,8 +338,9 @@ describe('OtpAuthService', () => {
       mockDatabaseService.delete.mockResolvedValue(undefined);
       mockDatabaseService.put.mockResolvedValue({} as any);
 
-      // Create a valid token manually
+      // Create a valid token manually (3-part JWT)
       const crypto = require('crypto');
+      const header = { alg: 'HS256', typ: 'JWT' };
       const payload = {
         sub: 'user-123',
         email: 'test@example.com',
@@ -347,12 +348,13 @@ describe('OtpAuthService', () => {
         iat: Date.now(),
         exp: Date.now() + 3600000,
       };
+      const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url');
       const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64url');
       const signature = crypto
         .createHmac('sha256', 'test-jwt-secret')
-        .update(base64Payload)
+        .update(`${base64Header}.${base64Payload}`)
         .digest('base64url');
-      const token = `${base64Payload}.${signature}`;
+      const token = `${base64Header}.${base64Payload}.${signature}`;
 
       const result = service.verifyToken(token);
 
@@ -363,6 +365,7 @@ describe('OtpAuthService', () => {
 
     it('should return null for expired token', () => {
       const crypto = require('crypto');
+      const header = { alg: 'HS256', typ: 'JWT' };
       const payload = {
         sub: 'user-123',
         email: 'test@example.com',
@@ -370,12 +373,13 @@ describe('OtpAuthService', () => {
         iat: Date.now() - 7200000,
         exp: Date.now() - 3600000, // Expired
       };
+      const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url');
       const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64url');
       const signature = crypto
         .createHmac('sha256', 'test-jwt-secret')
-        .update(base64Payload)
+        .update(`${base64Header}.${base64Payload}`)
         .digest('base64url');
-      const token = `${base64Payload}.${signature}`;
+      const token = `${base64Header}.${base64Payload}.${signature}`;
 
       const result = service.verifyToken(token);
 
@@ -383,6 +387,7 @@ describe('OtpAuthService', () => {
     });
 
     it('should return null for invalid signature', () => {
+      const header = { alg: 'HS256', typ: 'JWT' };
       const payload = {
         sub: 'user-123',
         email: 'test@example.com',
@@ -390,8 +395,9 @@ describe('OtpAuthService', () => {
         iat: Date.now(),
         exp: Date.now() + 3600000,
       };
+      const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url');
       const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64url');
-      const token = `${base64Payload}.invalidsignature`;
+      const token = `${base64Header}.${base64Payload}.invalidsignature`;
 
       const result = service.verifyToken(token);
 
@@ -421,8 +427,9 @@ describe('OtpAuthService', () => {
 
       mockDatabaseService.get.mockResolvedValue(user);
 
-      // Create a valid refresh token
+      // Create a valid refresh token (3-part JWT)
       const crypto = require('crypto');
+      const header = { alg: 'HS256', typ: 'JWT' };
       const payload = {
         sub: 'user-123',
         email: 'test@example.com',
@@ -430,12 +437,13 @@ describe('OtpAuthService', () => {
         iat: Date.now(),
         exp: Date.now() + 604800000, // 7 days
       };
+      const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url');
       const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64url');
       const signature = crypto
         .createHmac('sha256', 'test-jwt-secret')
-        .update(base64Payload)
+        .update(`${base64Header}.${base64Payload}`)
         .digest('base64url');
-      const refreshToken = `${base64Payload}.${signature}`;
+      const refreshToken = `${base64Header}.${base64Payload}.${signature}`;
 
       const result = await service.refreshToken(refreshToken);
 
@@ -452,6 +460,7 @@ describe('OtpAuthService', () => {
       mockDatabaseService.get.mockResolvedValue(null);
 
       const crypto = require('crypto');
+      const header = { alg: 'HS256', typ: 'JWT' };
       const payload = {
         sub: 'user-123',
         email: 'deleted@example.com',
@@ -459,12 +468,13 @@ describe('OtpAuthService', () => {
         iat: Date.now(),
         exp: Date.now() + 604800000,
       };
+      const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url');
       const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64url');
       const signature = crypto
         .createHmac('sha256', 'test-jwt-secret')
-        .update(base64Payload)
+        .update(`${base64Header}.${base64Payload}`)
         .digest('base64url');
-      const refreshToken = `${base64Payload}.${signature}`;
+      const refreshToken = `${base64Header}.${base64Payload}.${signature}`;
 
       await expect(service.refreshToken(refreshToken)).rejects.toThrow(UnauthorizedException);
     });

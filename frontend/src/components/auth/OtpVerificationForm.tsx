@@ -1,8 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { useParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/useAuth';
 import Button from '@/components/ui/Button';
+import { initI18nClient } from '@/i18n/i18n.client';
+import type { AppLocale } from '@/i18n/config';
 
 interface OtpVerificationFormProps {
   onVerifySuccess?: (isNewUser: boolean) => void;
@@ -14,6 +18,11 @@ export default function OtpVerificationForm({
   onVerifySuccess, 
   onBack 
 }: OtpVerificationFormProps) {
+  const params = useParams();
+  const locale = (params?.locale as AppLocale) || 'en';
+  useMemo(() => initI18nClient(locale), [locale]);
+  const { t } = useTranslation('common');
+  
   const { verifyOtp, requestOtp, isLoading, error, clearError, otpEmail, otpPurpose } = useAuth();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [resendCooldown, setResendCooldown] = useState(60);
@@ -101,10 +110,10 @@ export default function OtpVerificationForm({
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
-            {otpPurpose === 'reset-password' ? 'Reset Password' : 'Verify Your Email'}
+            {otpPurpose === 'reset-password' ? t('auth.resetPassword') : t('auth.verifyOtp')}
           </h2>
           <p className="text-zinc-600 dark:text-zinc-400 mt-2">
-            We&apos;ve sent a 6-digit code to
+            {t('auth.enterOtpCode')}
           </p>
           <p className="text-amber-600 dark:text-amber-400 font-medium">
             {otpEmail}
@@ -149,26 +158,25 @@ export default function OtpVerificationForm({
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Verifying...
+                {t('auth.verifying')}
               </span>
             ) : (
-              'Verify OTP'
+              t('auth.verify')
             )}
           </Button>
         </form>
 
         <div className="mt-6 space-y-4 text-center">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Didn&apos;t receive the code?{' '}
             {resendCooldown > 0 ? (
-              <span className="text-amber-600">Resend in {resendCooldown}s</span>
+              <span className="text-amber-600">{t('auth.resendOtp')} ({resendCooldown}s)</span>
             ) : (
               <button
                 type="button"
                 onClick={handleResend}
                 className="text-amber-600 dark:text-amber-400 hover:underline font-medium"
               >
-                Resend OTP
+                {t('auth.resendOtp')}
               </button>
             )}
           </p>
@@ -179,7 +187,7 @@ export default function OtpVerificationForm({
               onClick={onBack}
               className="text-sm text-zinc-600 dark:text-zinc-400 hover:underline"
             >
-              ← Back to login
+              ← {t('auth.back')}
             </button>
           )}
         </div>
