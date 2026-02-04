@@ -94,6 +94,17 @@ const nextConfig: NextConfig = {
     
     return [];
   },
+  
+  // Redirects for locale handling
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/en',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
