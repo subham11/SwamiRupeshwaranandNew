@@ -270,6 +270,7 @@ a:hover {
   
   .btn-primary:hover {
     background: var(--color-accent);
+    color: var(--color-primary);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
