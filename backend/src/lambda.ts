@@ -35,10 +35,14 @@ async function bootstrap(): Promise<Handler> {
   );
 
   // Swagger Documentation (enabled in all environments for testing)
+  const stage = process.env.STAGE || 'dev';
+  const apiGatewayUrl = process.env.API_GATEWAY_URL || 'https://x3cgcqhhub.execute-api.ap-south-1.amazonaws.com';
+  
   const config = new DocumentBuilder()
     .setTitle('Swami Rupeshwaranand API')
     .setDescription('Backend API for Swami Rupeshwaranand website')
     .setVersion('1.0')
+    .addServer(`${apiGatewayUrl}/${stage}`, `AWS ${stage.toUpperCase()} Environment`)
     .addBearerAuth(
       {
         type: 'http',
@@ -61,11 +65,7 @@ async function bootstrap(): Promise<Handler> {
   return serverlessExpress({ app: expressApp });
 }
 
-export const handler: Handler = async (
-  event: any,
-  context: Context,
-  callback: Callback,
-) => {
+export const handler: Handler = async (event: any, context: Context, callback: Callback) => {
   // Warmup handler - Cost Optimization
   if (event.source === 'serverless-plugin-warmup') {
     console.log('Warmup event received');

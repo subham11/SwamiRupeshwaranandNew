@@ -47,7 +47,10 @@ export class DynamoDBDatabaseService implements DatabaseService {
       },
     });
 
-    const prefix = this.configService.get<string>('DYNAMODB_TABLE_PREFIX', 'swami-rupeshwaranand-api-dev');
+    const prefix = this.configService.get<string>(
+      'DYNAMODB_TABLE_PREFIX',
+      'swami-rupeshwaranand-api-dev',
+    );
     this.tableName = `${prefix}-main`;
   }
 
@@ -84,7 +87,10 @@ export class DynamoDBDatabaseService implements DatabaseService {
     await this.client.send(command);
   }
 
-  async query<T>(entityType: string, options: QueryOptions): Promise<{ items: T[]; lastKey?: Record<string, any> }> {
+  async query<T>(
+    entityType: string,
+    options: QueryOptions,
+  ): Promise<{ items: T[]; lastKey?: Record<string, any> }> {
     const command = new QueryCommand({
       TableName: this.tableName,
       IndexName: options.indexName,
@@ -157,7 +163,12 @@ export class DynamoDBDatabaseService implements DatabaseService {
     return results;
   }
 
-  async batchWrite(items: Array<{ PutRequest?: { Item: Record<string, any> }; DeleteRequest?: { Key: Record<string, any> } }>): Promise<void> {
+  async batchWrite(
+    items: Array<{
+      PutRequest?: { Item: Record<string, any> };
+      DeleteRequest?: { Key: Record<string, any> };
+    }>,
+  ): Promise<void> {
     if (items.length === 0) return;
 
     const chunks = this.chunkArray(items, 25);

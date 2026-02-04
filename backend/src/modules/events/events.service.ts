@@ -63,7 +63,11 @@ export class EventsService {
     return this.mapToResponse(event);
   }
 
-  async findAll(filters: { upcoming?: boolean; locale?: string; limit?: number }): Promise<EventListResponseDto> {
+  async findAll(filters: {
+    upcoming?: boolean;
+    locale?: string;
+    limit?: number;
+  }): Promise<EventListResponseDto> {
     const result = await this.databaseService.query<EventEntity>(this.entityType, {
       indexName: 'GSI1',
       keyConditionExpression: 'GSI1PK = :pk',
@@ -119,8 +123,16 @@ export class EventsService {
     const expressionAttributeValues: Record<string, any> = {};
 
     const fields = [
-      'title', 'description', 'startDate', 'endDate', 'location',
-      'venue', 'image', 'registrationUrl', 'maxParticipants', 'status'
+      'title',
+      'description',
+      'startDate',
+      'endDate',
+      'location',
+      'venue',
+      'image',
+      'registrationUrl',
+      'maxParticipants',
+      'status',
     ];
 
     for (const field of fields) {
@@ -147,10 +159,7 @@ export class EventsService {
   }
 
   async delete(id: string, locale = 'en'): Promise<void> {
-    await this.databaseService.delete(
-      `${this.entityType}#${id}`,
-      `${this.entityType}#${locale}`,
-    );
+    await this.databaseService.delete(`${this.entityType}#${id}`, `${this.entityType}#${locale}`);
   }
 
   private mapToResponse(event: EventEntity): EventResponseDto {

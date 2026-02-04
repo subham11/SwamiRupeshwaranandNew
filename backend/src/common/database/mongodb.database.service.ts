@@ -11,7 +11,10 @@ export class MongoDBDatabaseService implements DatabaseService {
 
   constructor(private readonly configService: ConfigService) {
     const uri = this.configService.get<string>('MONGODB_URI', 'mongodb://localhost:27017/');
-    const prefix = this.configService.get<string>('DYNAMODB_TABLE_PREFIX', 'swami-rupeshwaranand-api-local');
+    const prefix = this.configService.get<string>(
+      'DYNAMODB_TABLE_PREFIX',
+      'swami-rupeshwaranand-api-local',
+    );
     this.dbName = prefix.replace(/-/g, '_');
     this.client = new MongoClient(uri);
   }
@@ -43,7 +46,7 @@ export class MongoDBDatabaseService implements DatabaseService {
   async get<T>(pk: string, sk: string): Promise<T | null> {
     const entityType = this.extractEntityType(pk);
     const collection = this.getCollection(entityType);
-    
+
     const result = await collection.findOne({ PK: pk, SK: sk });
     return result as T | null;
   }
@@ -60,11 +63,7 @@ export class MongoDBDatabaseService implements DatabaseService {
       updatedAt: new Date().toISOString(),
     };
 
-    await collection.replaceOne(
-      { _id: compositeId as any },
-      doc,
-      { upsert: true }
-    );
+    await collection.replaceOne({ _id: compositeId as any }, doc, { upsert: true });
 
     return item;
   }
@@ -72,20 +71,23 @@ export class MongoDBDatabaseService implements DatabaseService {
   async delete(pk: string, sk: string): Promise<void> {
     const entityType = this.extractEntityType(pk);
     const collection = this.getCollection(entityType);
-    
+
     await collection.deleteOne({ PK: pk, SK: sk });
   }
 
-  async query<T>(entityType: string, options: QueryOptions): Promise<{ items: T[]; lastKey?: Record<string, any> }> {
+  async query<T>(
+    entityType: string,
+    options: QueryOptions,
+  ): Promise<{ items: T[]; lastKey?: Record<string, any> }> {
     const collection = this.getCollection(entityType);
-    
+
     // Build MongoDB query from options
     let query: Record<string, any> = {};
-    
+
     if (options.filter) {
       query = { ...options.filter };
     }
-    
+
     // Handle GSI1 queries (common pattern)
     if (options.expressionAttributeValues) {
       const values = options.expressionAttributeValues;
@@ -112,7 +114,7 @@ export class MongoDBDatabaseService implements DatabaseService {
     }
 
     const items = await cursor.toArray();
-    
+
     return {
       items: items as T[],
       lastKey: undefined, // MongoDB uses skip/limit instead of cursor-based pagination
@@ -121,9 +123,9 @@ export class MongoDBDatabaseService implements DatabaseService {
 
   async scan<T>(entityType: string, filter?: Record<string, any>): Promise<T[]> {
     const collection = this.getCollection(entityType);
-    
+
     let query: Record<string, any> = {};
-    
+
     if (filter) {
       // Convert DynamoDB-style filter to MongoDB query
       // Handle "begins_with(PK, :prefix)" pattern
@@ -138,7 +140,7 @@ export class MongoDBDatabaseService implements DatabaseService {
 
   async update<T>(entityType: string, options: UpdateOptions): Promise<T> {
     const collection = this.getCollection(entityType);
-    
+
     const filter = {
       PK: options.key.PK,
       SK: options.key.SK,
@@ -152,10 +154,11 @@ export class MongoDBDatabaseService implements DatabaseService {
     if (options.expressionAttributeValues && options.expressionAttributeNames) {
       for (const [placeholder, value] of Object.entries(options.expressionAttributeValues)) {
         if (placeholder === ':updatedAt') continue;
-        
+
         // Find the actual field name from expressionAttributeNames
         const namePlaceholder = placeholder.replace(':', '#');
-        const fieldName = options.expressionAttributeNames[namePlaceholder] || placeholder.replace(':', '');
+        const fieldName =
+          options.expressionAttributeNames[namePlaceholder] || placeholder.replace(':', '');
         updateDoc[fieldName] = value;
       }
     }
@@ -167,7 +170,7 @@ export class MongoDBDatabaseService implements DatabaseService {
     const result = await collection.findOneAndUpdate(
       filter,
       { $set: updateDoc },
-      { returnDocument: 'after' }
+      { returnDocument: 'after' },
     );
 
     return result as T;
@@ -187,10 +190,10 @@ export class MongoDBDatabaseService implements DatabaseService {
     }
 
     const results: T[] = [];
-    
+
     for (const [entityType, entityKeys] of grouped) {
       const collection = this.getCollection(entityType);
-      const orConditions = entityKeys.map(k => ({ PK: k.PK, SK: k.SK }));
+      const orConditions = entityKeys.map((k) => ({ PK: k.PK, SK: k.SK }));
       const items = await collection.find({ $or: orConditions }).toArray();
       results.push(...(items as T[]));
     }
@@ -198,7 +201,12 @@ export class MongoDBDatabaseService implements DatabaseService {
     return results;
   }
 
-  async batchWrite(items: Array<{ PutRequest?: { Item: Record<string, any> }; DeleteRequest?: { Key: Record<string, any> } }>): Promise<void> {
+  async batchWrite(
+    items: Array<{
+      PutRequest?: { Item: Record<string, any> };
+      DeleteRequest?: { Key: Record<string, any> };
+    }>,
+  ): Promise<void> {
     for (const item of items) {
       if (item.PutRequest) {
         await this.put(item.PutRequest.Item);

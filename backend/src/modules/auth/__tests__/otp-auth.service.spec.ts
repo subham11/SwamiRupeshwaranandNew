@@ -70,7 +70,10 @@ describe('OtpAuthService', () => {
       expect(result.success).toBe(true);
       expect(result.message).toContain('OTP sent successfully');
       expect(result.expiresIn).toBe(10);
-      expect(mockEmailService.sendOtpEmail).toHaveBeenCalledWith('test@example.com', expect.any(String));
+      expect(mockEmailService.sendOtpEmail).toHaveBeenCalledWith(
+        'test@example.com',
+        expect.any(String),
+      );
       expect(mockDatabaseService.put).toHaveBeenCalled();
     });
 
@@ -132,7 +135,7 @@ describe('OtpAuthService', () => {
       const otp = '123456';
       const crypto = require('crypto');
       const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
-      
+
       mockDatabaseService.get
         .mockResolvedValueOnce({ ...validOtpRecord, otp: hashedOtp }) // OTP record
         .mockResolvedValueOnce(null); // No existing user
@@ -151,7 +154,9 @@ describe('OtpAuthService', () => {
     it('should throw error if no OTP request found', async () => {
       mockDatabaseService.get.mockResolvedValue(null);
 
-      await expect(service.verifyOtp('test@example.com', '123456')).rejects.toThrow(BadRequestException);
+      await expect(service.verifyOtp('test@example.com', '123456')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw error if OTP expired', async () => {
@@ -163,7 +168,9 @@ describe('OtpAuthService', () => {
       mockDatabaseService.get.mockResolvedValue(expiredOtp);
       mockDatabaseService.delete.mockResolvedValue(undefined);
 
-      await expect(service.verifyOtp('test@example.com', '123456')).rejects.toThrow(BadRequestException);
+      await expect(service.verifyOtp('test@example.com', '123456')).rejects.toThrow(
+        BadRequestException,
+      );
       expect(mockDatabaseService.delete).toHaveBeenCalled();
     });
 
@@ -176,7 +183,9 @@ describe('OtpAuthService', () => {
       mockDatabaseService.get.mockResolvedValue(maxAttemptsOtp);
       mockDatabaseService.delete.mockResolvedValue(undefined);
 
-      await expect(service.verifyOtp('test@example.com', '123456')).rejects.toThrow(UnauthorizedException);
+      await expect(service.verifyOtp('test@example.com', '123456')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should increment attempts on wrong OTP', async () => {
@@ -188,7 +197,9 @@ describe('OtpAuthService', () => {
       mockDatabaseService.get.mockResolvedValue(wrongOtpRecord);
       mockDatabaseService.update.mockResolvedValue({} as any);
 
-      await expect(service.verifyOtp('test@example.com', '123456')).rejects.toThrow(UnauthorizedException);
+      await expect(service.verifyOtp('test@example.com', '123456')).rejects.toThrow(
+        UnauthorizedException,
+      );
       expect(mockDatabaseService.update).toHaveBeenCalled();
     });
   });
@@ -209,8 +220,10 @@ describe('OtpAuthService', () => {
       // Hash password the same way the service does
       const crypto = require('crypto');
       const salt = 'test-password-salt';
-      const passwordHash = crypto.pbkdf2Sync('TestPassword123!', salt, 100000, 64, 'sha512').toString('hex');
-      
+      const passwordHash = crypto
+        .pbkdf2Sync('TestPassword123!', salt, 100000, 64, 'sha512')
+        .toString('hex');
+
       mockDatabaseService.get.mockResolvedValue({ ...existingUser, passwordHash });
       mockDatabaseService.update.mockResolvedValue({} as any);
 
@@ -224,8 +237,9 @@ describe('OtpAuthService', () => {
     it('should throw error for non-existent user', async () => {
       mockDatabaseService.get.mockResolvedValue(null);
 
-      await expect(service.loginWithPassword('nonexistent@example.com', 'password'))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.loginWithPassword('nonexistent@example.com', 'password'),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw error for user without password set', async () => {
@@ -235,19 +249,23 @@ describe('OtpAuthService', () => {
         passwordHash: undefined,
       });
 
-      await expect(service.loginWithPassword('test@example.com', 'password'))
-        .rejects.toThrow(BadRequestException);
+      await expect(service.loginWithPassword('test@example.com', 'password')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw error for wrong password', async () => {
       const crypto = require('crypto');
       const salt = 'test-password-salt';
-      const passwordHash = crypto.pbkdf2Sync('CorrectPassword', salt, 100000, 64, 'sha512').toString('hex');
-      
+      const passwordHash = crypto
+        .pbkdf2Sync('CorrectPassword', salt, 100000, 64, 'sha512')
+        .toString('hex');
+
       mockDatabaseService.get.mockResolvedValue({ ...existingUser, passwordHash });
 
-      await expect(service.loginWithPassword('test@example.com', 'WrongPassword'))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(service.loginWithPassword('test@example.com', 'WrongPassword')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 
@@ -265,7 +283,12 @@ describe('OtpAuthService', () => {
       mockDatabaseService.get.mockResolvedValue(existingUser);
       mockDatabaseService.update.mockResolvedValue({} as any);
 
-      const result = await service.setPassword('user-123', 'test@example.com', 'NewPassword123!', 'NewPassword123!');
+      const result = await service.setPassword(
+        'user-123',
+        'test@example.com',
+        'NewPassword123!',
+        'NewPassword123!',
+      );
 
       expect(result.success).toBe(true);
       expect(result.message).toContain('Password set successfully');
@@ -273,22 +296,25 @@ describe('OtpAuthService', () => {
     });
 
     it('should throw error if passwords do not match', async () => {
-      await expect(service.setPassword('user-123', 'test@example.com', 'Password1', 'Password2'))
-        .rejects.toThrow(BadRequestException);
+      await expect(
+        service.setPassword('user-123', 'test@example.com', 'Password1', 'Password2'),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw error if user not found', async () => {
       mockDatabaseService.get.mockResolvedValue(null);
 
-      await expect(service.setPassword('user-123', 'test@example.com', 'Password1', 'Password1'))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.setPassword('user-123', 'test@example.com', 'Password1', 'Password1'),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw error if user ID does not match', async () => {
       mockDatabaseService.get.mockResolvedValue({ ...existingUser, id: 'different-user' });
 
-      await expect(service.setPassword('user-123', 'test@example.com', 'Password1', 'Password1'))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.setPassword('user-123', 'test@example.com', 'Password1', 'Password1'),
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 
@@ -306,7 +332,7 @@ describe('OtpAuthService', () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      
+
       mockDatabaseService.get.mockResolvedValue(user);
       mockDatabaseService.update.mockResolvedValue({} as any);
       mockDatabaseService.delete.mockResolvedValue(undefined);
@@ -419,8 +445,7 @@ describe('OtpAuthService', () => {
     });
 
     it('should throw error for invalid refresh token', async () => {
-      await expect(service.refreshToken('invalid-token'))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshToken('invalid-token')).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw error if user not found', async () => {
@@ -441,8 +466,7 @@ describe('OtpAuthService', () => {
         .digest('base64url');
       const refreshToken = `${base64Payload}.${signature}`;
 
-      await expect(service.refreshToken(refreshToken))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshToken(refreshToken)).rejects.toThrow(UnauthorizedException);
     });
   });
 

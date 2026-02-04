@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -18,7 +8,12 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { ContentService } from './content.service';
-import { CreateContentDto, UpdateContentDto, ContentResponseDto, ContentListResponseDto } from './dto';
+import {
+  CreateContentDto,
+  UpdateContentDto,
+  ContentResponseDto,
+  ContentListResponseDto,
+} from './dto';
 import { JwtAuthGuard } from '@/common/guards';
 import { Public } from '@/common/decorators';
 

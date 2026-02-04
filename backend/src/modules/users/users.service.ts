@@ -161,10 +161,7 @@ export class UsersService {
     await this.cognitoService.deleteUser(user.email);
 
     // Delete from Database
-    await this.databaseService.delete(
-      `${this.entityType}#${id}`,
-      `${this.entityType}#${id}`,
-    );
+    await this.databaseService.delete(`${this.entityType}#${id}`, `${this.entityType}#${id}`);
   }
 
   private mapToResponse(user: UserEntity): UserResponseDto {

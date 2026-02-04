@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
@@ -47,7 +42,7 @@ export class JwtAuthGuard implements CanActivate {
     try {
       // Basic JWT validation (decode and check expiration)
       const payload = this.decodeToken(token);
-      
+
       if (!payload || this.isTokenExpired(payload)) {
         throw new UnauthorizedException('Token expired');
       }

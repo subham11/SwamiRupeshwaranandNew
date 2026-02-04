@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -43,7 +33,12 @@ export class EventsController {
   @Get()
   @Public()
   @ApiOperation({ summary: 'Get all events' })
-  @ApiQuery({ name: 'upcoming', required: false, type: Boolean, description: 'Filter upcoming events only' })
+  @ApiQuery({
+    name: 'upcoming',
+    required: false,
+    type: Boolean,
+    description: 'Filter upcoming events only',
+  })
   @ApiQuery({ name: 'locale', required: false, description: 'Filter by locale' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({

@@ -29,11 +29,19 @@ export interface DatabaseService {
   get<T>(pk: string, sk: string): Promise<T | null>;
   put<T extends Record<string, any>>(item: T): Promise<T>;
   delete(pk: string, sk: string): Promise<void>;
-  query<T>(entityType: string, options: QueryOptions): Promise<{ items: T[]; lastKey?: Record<string, any> }>;
+  query<T>(
+    entityType: string,
+    options: QueryOptions,
+  ): Promise<{ items: T[]; lastKey?: Record<string, any> }>;
   scan<T>(entityType: string, filter?: Record<string, any>): Promise<T[]>;
   update<T>(entityType: string, options: UpdateOptions): Promise<T>;
   batchGet<T>(keys: Array<{ PK: string; SK: string }>): Promise<T[]>;
-  batchWrite(items: Array<{ PutRequest?: { Item: Record<string, any> }; DeleteRequest?: { Key: Record<string, any> } }>): Promise<void>;
+  batchWrite(
+    items: Array<{
+      PutRequest?: { Item: Record<string, any> };
+      DeleteRequest?: { Key: Record<string, any> };
+    }>,
+  ): Promise<void>;
 }
 
 export const DATABASE_SERVICE = 'DATABASE_SERVICE';

@@ -1,7 +1,12 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
-import { CreateContentDto, UpdateContentDto, ContentResponseDto, ContentListResponseDto } from './dto';
+import {
+  CreateContentDto,
+  UpdateContentDto,
+  ContentResponseDto,
+  ContentListResponseDto,
+} from './dto';
 
 interface ContentEntity {
   PK: string;
@@ -62,7 +67,11 @@ export class ContentService {
     return this.mapToResponse(content);
   }
 
-  async findAll(filters: { type?: string; locale?: string; limit?: number }): Promise<ContentListResponseDto> {
+  async findAll(filters: {
+    type?: string;
+    locale?: string;
+    limit?: number;
+  }): Promise<ContentListResponseDto> {
     let result;
 
     if (filters.type) {
@@ -162,10 +171,7 @@ export class ContentService {
   }
 
   async delete(id: string, locale = 'en'): Promise<void> {
-    await this.databaseService.delete(
-      `${this.entityType}#${id}`,
-      `${this.entityType}#${locale}`,
-    );
+    await this.databaseService.delete(`${this.entityType}#${id}`, `${this.entityType}#${locale}`);
   }
 
   private mapToResponse(content: ContentEntity): ContentResponseDto {

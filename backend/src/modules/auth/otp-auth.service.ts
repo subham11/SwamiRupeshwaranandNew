@@ -1,4 +1,10 @@
-import { Injectable, Inject, BadRequestException, UnauthorizedException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  BadRequestException,
+  UnauthorizedException,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmailService } from '../../common/email/email.service';
 import { DATABASE_SERVICE, DatabaseService } from '../../common/database/database.interface';
@@ -105,7 +111,13 @@ export class OtpAuthService {
   /**
    * Generate JWT token
    */
-  private generateToken(userId: string, email: string, name?: string, hasPassword?: boolean, type: 'access' | 'refresh' = 'access'): string {
+  private generateToken(
+    userId: string,
+    email: string,
+    name?: string,
+    hasPassword?: boolean,
+    type: 'access' | 'refresh' = 'access',
+  ): string {
     const expiry = type === 'access' ? this.ACCESS_TOKEN_EXPIRY : this.REFRESH_TOKEN_EXPIRY;
     const payload: TokenPayload = {
       sub: userId,
@@ -118,10 +130,7 @@ export class OtpAuthService {
     };
     const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64url');
     const secret = this.configService.get('JWT_SECRET', 'ashram-jwt-secret-key-2024');
-    const signature = crypto
-      .createHmac('sha256', secret)
-      .update(base64Payload)
-      .digest('base64url');
+    const signature = crypto.createHmac('sha256', secret).update(base64Payload).digest('base64url');
     return `${base64Payload}.${signature}`;
   }
 
@@ -142,8 +151,10 @@ export class OtpAuthService {
 
       if (signature !== expectedSignature) return null;
 
-      const payload = JSON.parse(Buffer.from(base64Payload, 'base64url').toString('utf-8')) as TokenPayload;
-      
+      const payload = JSON.parse(
+        Buffer.from(base64Payload, 'base64url').toString('utf-8'),
+      ) as TokenPayload;
+
       if (Date.now() > payload.exp) return null;
 
       return payload;
@@ -155,9 +166,25 @@ export class OtpAuthService {
   /**
    * Generate both access and refresh tokens
    */
-  private generateTokenPair(user: UserRecord): { accessToken: string; refreshToken: string; expiresIn: number } {
-    const accessToken = this.generateToken(user.id, user.email, user.name, user.hasPassword, 'access');
-    const refreshToken = this.generateToken(user.id, user.email, user.name, user.hasPassword, 'refresh');
+  private generateTokenPair(user: UserRecord): {
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+  } {
+    const accessToken = this.generateToken(
+      user.id,
+      user.email,
+      user.name,
+      user.hasPassword,
+      'access',
+    );
+    const refreshToken = this.generateToken(
+      user.id,
+      user.email,
+      user.name,
+      user.hasPassword,
+      'refresh',
+    );
     return {
       accessToken,
       refreshToken,
@@ -170,9 +197,10 @@ export class OtpAuthService {
    */
   private maskEmail(email: string): string {
     const [localPart, domain] = email.split('@');
-    const maskedLocal = localPart.length > 2
-      ? `${localPart.charAt(0)}${'*'.repeat(localPart.length - 2)}${localPart.charAt(localPart.length - 1)}`
-      : '*'.repeat(localPart.length);
+    const maskedLocal =
+      localPart.length > 2
+        ? `${localPart.charAt(0)}${'*'.repeat(localPart.length - 2)}${localPart.charAt(localPart.length - 1)}`
+        : '*'.repeat(localPart.length);
     return `${maskedLocal}@${domain}`;
   }
 
@@ -181,10 +209,7 @@ export class OtpAuthService {
    */
   async getUserByEmail(email: string): Promise<UserRecord | null> {
     const normalizedEmail = email.toLowerCase().trim();
-    return this.databaseService.get<UserRecord>(
-      `USER#${normalizedEmail}`,
-      'PROFILE',
-    );
+    return this.databaseService.get<UserRecord>(`USER#${normalizedEmail}`, 'PROFILE');
   }
 
   // ============================================
@@ -194,7 +219,9 @@ export class OtpAuthService {
   /**
    * Request OTP for email login
    */
-  async requestOtp(email: string): Promise<{ success: boolean; message: string; expiresIn: number }> {
+  async requestOtp(
+    email: string,
+  ): Promise<{ success: boolean; message: string; expiresIn: number }> {
     const normalizedEmail = email.toLowerCase().trim();
 
     // Check for cooldown (prevent OTP spam)
@@ -204,10 +231,10 @@ export class OtpAuthService {
     );
 
     if (existingOtp) {
-      const cooldownEnd = existingOtp.createdAt 
+      const cooldownEnd = existingOtp.createdAt
         ? new Date(existingOtp.createdAt).getTime() + this.OTP_COOLDOWN_SECONDS * 1000
         : 0;
-      
+
       if (Date.now() < cooldownEnd) {
         const waitSeconds = Math.ceil((cooldownEnd - Date.now()) / 1000);
         throw new BadRequestException(
@@ -216,10 +243,7 @@ export class OtpAuthService {
       }
 
       // Delete old OTP
-      await this.databaseService.delete(
-        `OTP#${normalizedEmail}`,
-        'PENDING',
-      );
+      await this.databaseService.delete(`OTP#${normalizedEmail}`, 'PENDING');
     }
 
     // Generate new OTP
@@ -256,14 +280,18 @@ export class OtpAuthService {
   /**
    * Request OTP for password reset
    */
-  async requestPasswordResetOtp(email: string): Promise<{ success: boolean; message: string; expiresIn: number }> {
+  async requestPasswordResetOtp(
+    email: string,
+  ): Promise<{ success: boolean; message: string; expiresIn: number }> {
     const normalizedEmail = email.toLowerCase().trim();
 
     // Check if user exists
     const user = await this.getUserByEmail(normalizedEmail);
     if (!user) {
       // Don't reveal if user exists - return success anyway
-      this.logger.warn(`Password reset requested for non-existent user: ${this.maskEmail(normalizedEmail)}`);
+      this.logger.warn(
+        `Password reset requested for non-existent user: ${this.maskEmail(normalizedEmail)}`,
+      );
       return {
         success: true,
         message: `If an account exists for ${this.maskEmail(normalizedEmail)}, an OTP has been sent.`,
@@ -277,10 +305,7 @@ export class OtpAuthService {
     const expiresAt = Date.now() + this.OTP_EXPIRY_MINUTES * 60 * 1000;
 
     // Delete any existing reset OTP
-    await this.databaseService.delete(
-      `OTP#${normalizedEmail}`,
-      'RESET',
-    );
+    await this.databaseService.delete(`OTP#${normalizedEmail}`, 'RESET');
 
     const otpRecord: OtpRecord = {
       PK: `OTP#${normalizedEmail}`,
@@ -310,13 +335,23 @@ export class OtpAuthService {
   /**
    * Verify OTP and authenticate user
    */
-  async verifyOtp(email: string, otp: string): Promise<{
+  async verifyOtp(
+    email: string,
+    otp: string,
+  ): Promise<{
     success: boolean;
     message: string;
     accessToken?: string;
     refreshToken?: string;
     expiresIn?: number;
-    user?: { id: string; email: string; name?: string; hasPassword: boolean; isVerified: boolean; isNewUser: boolean };
+    user?: {
+      id: string;
+      email: string;
+      name?: string;
+      hasPassword: boolean;
+      isVerified: boolean;
+      isNewUser: boolean;
+    };
   }> {
     const normalizedEmail = email.toLowerCase().trim();
 
@@ -332,19 +367,13 @@ export class OtpAuthService {
 
     // Check if OTP expired
     if (Date.now() > otpRecord.expiresAt) {
-      await this.databaseService.delete(
-        `OTP#${normalizedEmail}`,
-        'PENDING',
-      );
+      await this.databaseService.delete(`OTP#${normalizedEmail}`, 'PENDING');
       throw new BadRequestException('OTP has expired. Please request a new one.');
     }
 
     // Check attempts
     if (otpRecord.attempts >= this.MAX_OTP_ATTEMPTS) {
-      await this.databaseService.delete(
-        `OTP#${normalizedEmail}`,
-        'PENDING',
-      );
+      await this.databaseService.delete(`OTP#${normalizedEmail}`, 'PENDING');
       throw new UnauthorizedException('Too many failed attempts. Please request a new OTP.');
     }
 
@@ -356,24 +385,16 @@ export class OtpAuthService {
         key: { PK: `OTP#${normalizedEmail}`, SK: 'PENDING' },
         update: { attempts: otpRecord.attempts + 1 },
       });
-      
+
       const remainingAttempts = this.MAX_OTP_ATTEMPTS - otpRecord.attempts - 1;
-      throw new UnauthorizedException(
-        `Invalid OTP. ${remainingAttempts} attempt(s) remaining.`,
-      );
+      throw new UnauthorizedException(`Invalid OTP. ${remainingAttempts} attempt(s) remaining.`);
     }
 
     // OTP verified - delete it
-    await this.databaseService.delete(
-      `OTP#${normalizedEmail}`,
-      'PENDING',
-    );
+    await this.databaseService.delete(`OTP#${normalizedEmail}`, 'PENDING');
 
     // Find or create user
-    let user = await this.databaseService.get<UserRecord>(
-      `USER#${normalizedEmail}`,
-      'PROFILE',
-    );
+    let user = await this.databaseService.get<UserRecord>(`USER#${normalizedEmail}`, 'PROFILE');
 
     let isNewUser = false;
 
@@ -412,7 +433,9 @@ export class OtpAuthService {
     // Generate tokens
     const tokens = this.generateTokenPair(user);
 
-    this.logger.log(`User ${isNewUser ? 'created and' : ''} logged in: ${this.maskEmail(normalizedEmail)}`);
+    this.logger.log(
+      `User ${isNewUser ? 'created and' : ''} logged in: ${this.maskEmail(normalizedEmail)}`,
+    );
 
     return {
       success: true,
@@ -432,7 +455,9 @@ export class OtpAuthService {
   /**
    * Resend OTP (with cooldown check)
    */
-  async resendOtp(email: string): Promise<{ success: boolean; message: string; expiresIn: number }> {
+  async resendOtp(
+    email: string,
+  ): Promise<{ success: boolean; message: string; expiresIn: number }> {
     return this.requestOtp(email);
   }
 
@@ -443,7 +468,12 @@ export class OtpAuthService {
   /**
    * Set password for user (after OTP verification)
    */
-  async setPassword(userId: string, email: string, password: string, confirmPassword: string): Promise<{
+  async setPassword(
+    userId: string,
+    email: string,
+    password: string,
+    confirmPassword: string,
+  ): Promise<{
     success: boolean;
     message: string;
   }> {
@@ -455,10 +485,7 @@ export class OtpAuthService {
     }
 
     // Get user
-    const user = await this.databaseService.get<UserRecord>(
-      `USER#${normalizedEmail}`,
-      'PROFILE',
-    );
+    const user = await this.databaseService.get<UserRecord>(`USER#${normalizedEmail}`, 'PROFILE');
 
     if (!user || user.id !== userId) {
       throw new UnauthorizedException('Invalid user');
@@ -468,10 +495,10 @@ export class OtpAuthService {
     const passwordHash = this.hashPassword(password);
     await this.databaseService.update('USER', {
       key: { PK: `USER#${normalizedEmail}`, SK: 'PROFILE' },
-      update: { 
-        passwordHash, 
-        hasPassword: true, 
-        updatedAt: new Date().toISOString() 
+      update: {
+        passwordHash,
+        hasPassword: true,
+        updatedAt: new Date().toISOString(),
       },
     });
 
@@ -486,21 +513,28 @@ export class OtpAuthService {
   /**
    * Login with email and password
    */
-  async loginWithPassword(email: string, password: string): Promise<{
+  async loginWithPassword(
+    email: string,
+    password: string,
+  ): Promise<{
     success: boolean;
     message: string;
     accessToken: string;
     refreshToken: string;
     expiresIn: number;
-    user: { id: string; email: string; name?: string; hasPassword: boolean; isVerified: boolean; isNewUser: boolean };
+    user: {
+      id: string;
+      email: string;
+      name?: string;
+      hasPassword: boolean;
+      isVerified: boolean;
+      isNewUser: boolean;
+    };
   }> {
     const normalizedEmail = email.toLowerCase().trim();
 
     // Get user
-    const user = await this.databaseService.get<UserRecord>(
-      `USER#${normalizedEmail}`,
-      'PROFILE',
-    );
+    const user = await this.databaseService.get<UserRecord>(`USER#${normalizedEmail}`, 'PROFILE');
 
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
@@ -544,17 +578,18 @@ export class OtpAuthService {
   /**
    * Reset password using OTP
    */
-  async resetPassword(email: string, otp: string, newPassword: string): Promise<{
+  async resetPassword(
+    email: string,
+    otp: string,
+    newPassword: string,
+  ): Promise<{
     success: boolean;
     message: string;
   }> {
     const normalizedEmail = email.toLowerCase().trim();
 
     // Get reset OTP record
-    const otpRecord = await this.databaseService.get<OtpRecord>(
-      `OTP#${normalizedEmail}`,
-      'RESET',
-    );
+    const otpRecord = await this.databaseService.get<OtpRecord>(`OTP#${normalizedEmail}`, 'RESET');
 
     if (!otpRecord) {
       throw new BadRequestException('No password reset request found. Please request a new OTP.');
@@ -562,19 +597,13 @@ export class OtpAuthService {
 
     // Check if OTP expired
     if (Date.now() > otpRecord.expiresAt) {
-      await this.databaseService.delete(
-        `OTP#${normalizedEmail}`,
-        'RESET',
-      );
+      await this.databaseService.delete(`OTP#${normalizedEmail}`, 'RESET');
       throw new BadRequestException('OTP has expired. Please request a new one.');
     }
 
     // Check attempts
     if (otpRecord.attempts >= this.MAX_OTP_ATTEMPTS) {
-      await this.databaseService.delete(
-        `OTP#${normalizedEmail}`,
-        'RESET',
-      );
+      await this.databaseService.delete(`OTP#${normalizedEmail}`, 'RESET');
       throw new UnauthorizedException('Too many failed attempts. Please request a new OTP.');
     }
 
@@ -585,27 +614,22 @@ export class OtpAuthService {
         key: { PK: `OTP#${normalizedEmail}`, SK: 'RESET' },
         update: { attempts: otpRecord.attempts + 1 },
       });
-      
+
       const remainingAttempts = this.MAX_OTP_ATTEMPTS - otpRecord.attempts - 1;
-      throw new UnauthorizedException(
-        `Invalid OTP. ${remainingAttempts} attempt(s) remaining.`,
-      );
+      throw new UnauthorizedException(`Invalid OTP. ${remainingAttempts} attempt(s) remaining.`);
     }
 
     // Delete OTP
-    await this.databaseService.delete(
-      `OTP#${normalizedEmail}`,
-      'RESET',
-    );
+    await this.databaseService.delete(`OTP#${normalizedEmail}`, 'RESET');
 
     // Update password
     const passwordHash = this.hashPassword(newPassword);
     await this.databaseService.update('USER', {
       key: { PK: `USER#${normalizedEmail}`, SK: 'PROFILE' },
-      update: { 
-        passwordHash, 
-        hasPassword: true, 
-        updatedAt: new Date().toISOString() 
+      update: {
+        passwordHash,
+        hasPassword: true,
+        updatedAt: new Date().toISOString(),
       },
     });
 
@@ -620,17 +644,19 @@ export class OtpAuthService {
   /**
    * Change password (for authenticated users)
    */
-  async changePassword(userId: string, email: string, currentPassword: string, newPassword: string): Promise<{
+  async changePassword(
+    userId: string,
+    email: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<{
     success: boolean;
     message: string;
   }> {
     const normalizedEmail = email.toLowerCase().trim();
 
     // Get user
-    const user = await this.databaseService.get<UserRecord>(
-      `USER#${normalizedEmail}`,
-      'PROFILE',
-    );
+    const user = await this.databaseService.get<UserRecord>(`USER#${normalizedEmail}`, 'PROFILE');
 
     if (!user || user.id !== userId) {
       throw new UnauthorizedException('Invalid user');
@@ -649,9 +675,9 @@ export class OtpAuthService {
     const passwordHash = this.hashPassword(newPassword);
     await this.databaseService.update('USER', {
       key: { PK: `USER#${normalizedEmail}`, SK: 'PROFILE' },
-      update: { 
-        passwordHash, 
-        updatedAt: new Date().toISOString() 
+      update: {
+        passwordHash,
+        updatedAt: new Date().toISOString(),
       },
     });
 
@@ -673,7 +699,7 @@ export class OtpAuthService {
     expiresIn: number;
   }> {
     const payload = this.verifyToken(refreshToken);
-    
+
     if (!payload || payload.type !== 'refresh') {
       throw new UnauthorizedException('Invalid refresh token');
     }
@@ -696,7 +722,10 @@ export class OtpAuthService {
   /**
    * Get current user profile
    */
-  async getProfile(userId: string, email: string): Promise<{
+  async getProfile(
+    userId: string,
+    email: string,
+  ): Promise<{
     id: string;
     email: string;
     name?: string;
@@ -707,7 +736,7 @@ export class OtpAuthService {
     lastLoginAt?: string;
   }> {
     const user = await this.getUserByEmail(email);
-    
+
     if (!user || user.id !== userId) {
       throw new UnauthorizedException('User not found');
     }
@@ -727,7 +756,11 @@ export class OtpAuthService {
   /**
    * Update user profile
    */
-  async updateProfile(userId: string, email: string, updates: { name?: string; phone?: string }): Promise<{
+  async updateProfile(
+    userId: string,
+    email: string,
+    updates: { name?: string; phone?: string },
+  ): Promise<{
     success: boolean;
     message: string;
   }> {
@@ -740,9 +773,9 @@ export class OtpAuthService {
 
     await this.databaseService.update('USER', {
       key: { PK: `USER#${normalizedEmail}`, SK: 'PROFILE' },
-      update: { 
+      update: {
         ...updates,
-        updatedAt: new Date().toISOString() 
+        updatedAt: new Date().toISOString(),
       },
     });
 

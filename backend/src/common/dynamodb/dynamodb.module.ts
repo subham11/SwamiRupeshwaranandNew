@@ -28,7 +28,7 @@ import { DynamoDBService } from './dynamodb.service';
         }
 
         const client = new DynamoDBClient(clientConfig);
-        
+
         // Create DocumentClient with marshalling options
         return DynamoDBDocumentClient.from(client, {
           marshallOptions: {

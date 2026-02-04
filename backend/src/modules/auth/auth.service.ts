@@ -7,10 +7,7 @@ export class AuthService {
   constructor(private readonly cognitoService: CognitoService) {}
 
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
-    const result = await this.cognitoService.authenticate(
-      loginDto.email,
-      loginDto.password,
-    );
+    const result = await this.cognitoService.authenticate(loginDto.email, loginDto.password);
 
     return {
       success: true,

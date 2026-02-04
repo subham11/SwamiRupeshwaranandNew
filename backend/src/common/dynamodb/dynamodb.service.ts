@@ -40,7 +40,10 @@ export class DynamoDBService {
     private readonly client: DynamoDBDocumentClient,
     private readonly configService: ConfigService,
   ) {
-    const prefix = this.configService.get<string>('DYNAMODB_TABLE_PREFIX', 'swami-rupeshwaranand-api-dev');
+    const prefix = this.configService.get<string>(
+      'DYNAMODB_TABLE_PREFIX',
+      'swami-rupeshwaranand-api-dev',
+    );
     this.tableName = `${prefix}-main`;
   }
 
@@ -97,7 +100,10 @@ export class DynamoDBService {
     };
   }
 
-  async scan<T>(filterExpression?: string, expressionAttributeValues?: Record<string, any>): Promise<T[]> {
+  async scan<T>(
+    filterExpression?: string,
+    expressionAttributeValues?: Record<string, any>,
+  ): Promise<T[]> {
     const command = new ScanCommand({
       TableName: this.tableName,
       FilterExpression: filterExpression,
@@ -151,7 +157,12 @@ export class DynamoDBService {
     return results;
   }
 
-  async batchWrite(items: Array<{ PutRequest?: { Item: Record<string, any> }; DeleteRequest?: { Key: Record<string, any> } }>): Promise<void> {
+  async batchWrite(
+    items: Array<{
+      PutRequest?: { Item: Record<string, any> };
+      DeleteRequest?: { Key: Record<string, any> };
+    }>,
+  ): Promise<void> {
     if (items.length === 0) return;
 
     // DynamoDB batch write limit is 25 items

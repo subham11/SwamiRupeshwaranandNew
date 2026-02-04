@@ -27,7 +27,10 @@ export class EmailService {
   private readonly fromName: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.fromEmail = this.configService.get<string>('SMTP_FROM_EMAIL', 'noreply@swamirupeshwaranand.in');
+    this.fromEmail = this.configService.get<string>(
+      'SMTP_FROM_EMAIL',
+      'noreply@swamirupeshwaranand.in',
+    );
     this.fromName = this.configService.get<string>('SMTP_FROM_NAME', 'Swami Rupeshwaranand ji');
 
     this.transporter = nodemailer.createTransport({
@@ -144,9 +147,9 @@ Swami Rupeshwaranand Ashram
   async sendWelcomeEmail(to: string, name?: string): Promise<boolean> {
     const userName = name || to.split('@')[0];
     const subject = 'Welcome to Swami Rupeshwaranand Ashram';
-    
+
     const html = this.getWelcomeEmailTemplate(userName);
-    
+
     const text = `
 Dear ${userName},
 

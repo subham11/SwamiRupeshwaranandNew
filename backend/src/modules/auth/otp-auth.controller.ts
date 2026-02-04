@@ -1,4 +1,13 @@
-import { Controller, Post, Get, Body, HttpCode, HttpStatus, UseGuards, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+  Patch,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { OtpAuthService } from './otp-auth.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -138,16 +147,8 @@ export class OtpAuthController {
     status: 400,
     description: 'Passwords do not match or invalid password format',
   })
-  async setPassword(
-    @CurrentUser() user: CurrentUserData,
-    @Body() dto: SetPasswordDto,
-  ) {
-    return this.otpAuthService.setPassword(
-      user.sub,
-      user.email,
-      dto.password,
-      dto.confirmPassword,
-    );
+  async setPassword(@CurrentUser() user: CurrentUserData, @Body() dto: SetPasswordDto) {
+    return this.otpAuthService.setPassword(user.sub, user.email, dto.password, dto.confirmPassword);
   }
 
   @Public()
@@ -204,10 +205,7 @@ export class OtpAuthController {
     status: 401,
     description: 'Current password is incorrect',
   })
-  async changePassword(
-    @CurrentUser() user: CurrentUserData,
-    @Body() dto: ChangePasswordDto,
-  ) {
+  async changePassword(@CurrentUser() user: CurrentUserData, @Body() dto: ChangePasswordDto) {
     return this.otpAuthService.changePassword(
       user.sub,
       user.email,

@@ -1,7 +1,12 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
-import { CreateTeachingDto, UpdateTeachingDto, TeachingResponseDto, TeachingListResponseDto } from './dto';
+import {
+  CreateTeachingDto,
+  UpdateTeachingDto,
+  TeachingResponseDto,
+  TeachingListResponseDto,
+} from './dto';
 
 interface TeachingEntity {
   PK: string;
@@ -68,7 +73,11 @@ export class TeachingsService {
     return this.mapToResponse(teaching);
   }
 
-  async findAll(filters: { category?: string; locale?: string; limit?: number }): Promise<TeachingListResponseDto> {
+  async findAll(filters: {
+    category?: string;
+    locale?: string;
+    limit?: number;
+  }): Promise<TeachingListResponseDto> {
     let result;
 
     if (filters.category) {
@@ -140,8 +149,17 @@ export class TeachingsService {
     const expressionAttributeValues: Record<string, any> = {};
 
     const fields = [
-      'title', 'content', 'excerpt', 'category', 'tags',
-      'featuredImage', 'audioUrl', 'videoUrl', 'duration', 'status', 'slug'
+      'title',
+      'content',
+      'excerpt',
+      'category',
+      'tags',
+      'featuredImage',
+      'audioUrl',
+      'videoUrl',
+      'duration',
+      'status',
+      'slug',
     ];
 
     for (const field of fields) {
@@ -174,10 +192,7 @@ export class TeachingsService {
   }
 
   async delete(id: string, locale = 'en'): Promise<void> {
-    await this.databaseService.delete(
-      `${this.entityType}#${id}`,
-      `${this.entityType}#${locale}`,
-    );
+    await this.databaseService.delete(`${this.entityType}#${id}`, `${this.entityType}#${locale}`);
   }
 
   private mapToResponse(teaching: TeachingEntity): TeachingResponseDto {

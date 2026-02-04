@@ -32,6 +32,7 @@ provider:
   
   environment:
     NODE_ENV: ${self:provider.stage}
+    STAGE: ${self:provider.stage}
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1'
     USE_DYNAMODB: 'true'
     DYNAMODB_TABLE_PREFIX: ${self:service}-${self:provider.stage}
