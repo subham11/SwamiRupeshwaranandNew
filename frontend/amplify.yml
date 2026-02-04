@@ -20,6 +20,11 @@ frontend:
       - node_modules/**/*
       - .next/cache/**/*
 
+customRules:
+  - source: /
+    target: /en
+    status: '302'
+
 # Environment variables can be set in Amplify Console:
 # - NEXT_PUBLIC_API_URL: Your API Gateway URL
 # - NEXT_PUBLIC_SITE_URL: Your production site URL
