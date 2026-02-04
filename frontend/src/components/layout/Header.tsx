@@ -3,6 +3,7 @@ import type { AppLocale } from "@/i18n/config";
 import { Container } from "@/components/ui/Container";
 import MobileMenu from "@/components/layout/MobileMenu";
 import MegaMenu from "@/components/layout/MegaMenu";
+import AuthButton from "@/components/layout/AuthButton";
 import { resolveNavGroups } from "@/config/nav";
 import { getDict } from "@/i18n/dict";
 
@@ -146,6 +147,9 @@ export default async function Header({ locale }: { locale: AppLocale }) {
 
         {/* CTA Button (Desktop) + Mobile Menu */}
         <div className="flex items-center gap-4">
+          {/* Auth Button - Login or User Menu */}
+          <AuthButton locale={locale} />
+
           {/* Donate/CTA Button - Inspired by Isha */}
           <Link
             href={`/${locale}/donation`}
