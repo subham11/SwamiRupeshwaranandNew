@@ -82,7 +82,8 @@ export class JwtAuthGuard implements CanActivate {
     if (!payload.exp) {
       return false;
     }
-    const now = Math.floor(Date.now() / 1000);
+    // Token exp is in milliseconds, compare with current time in ms
+    const now = Date.now();
     return payload.exp < now;
   }
 }
