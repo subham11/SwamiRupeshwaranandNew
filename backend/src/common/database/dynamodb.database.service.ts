@@ -129,22 +129,27 @@ export class DynamoDBDatabaseService implements DatabaseService {
 
     if (options.update && !updateExpression) {
       const setParts: string[] = [];
+      let hasUpdatedAt = false;
+      
       Object.entries(options.update).forEach(([key, value], index) => {
+        if (key === 'updatedAt') {
+          hasUpdatedAt = true;
+        }
         const attrName = `#attr${index}`;
         const attrValue = `:val${index}`;
         setParts.push(`${attrName} = ${attrValue}`);
         expressionAttributeNames[attrName] = key;
         expressionAttributeValues[attrValue] = value;
       });
-      // Always add updatedAt
-      setParts.push('#updatedAt = :updatedAt');
-      expressionAttributeNames['#updatedAt'] = 'updatedAt';
-      expressionAttributeValues[':updatedAt'] = new Date().toISOString();
+      
+      // Add updatedAt only if not already in the update object
+      if (!hasUpdatedAt) {
+        setParts.push('#updatedAt = :updatedAt');
+        expressionAttributeNames['#updatedAt'] = 'updatedAt';
+        expressionAttributeValues[':updatedAt'] = new Date().toISOString();
+      }
       
       updateExpression = `SET ${setParts.join(', ')}`;
-    } else if (updateExpression) {
-      // Add updatedAt to existing expression
-      expressionAttributeValues[':updatedAt'] = new Date().toISOString();
     }
 
     const command = new UpdateCommand({
