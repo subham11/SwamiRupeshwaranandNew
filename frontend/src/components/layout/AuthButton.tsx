@@ -38,10 +38,16 @@ interface AuthButtonProps {
 }
 
 export default function AuthButton({ locale }: AuthButtonProps) {
+  const [mounted, setMounted] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  // Handle hydration - only render after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -67,6 +73,22 @@ export default function AuthButton({ locale }: AuthButtonProps) {
     logout: locale === 'en' ? 'Logout' : 'लॉगआउट',
     myAccount: locale === 'en' ? 'My Account' : 'मेरा खाता',
   };
+
+  // Show placeholder during SSR to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div
+        className="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border"
+        style={{
+          borderColor: 'var(--color-border)',
+          color: 'var(--color-text)',
+        }}
+      >
+        <UserIcon />
+        <span>{labels.login}</span>
+      </div>
+    );
+  }
 
   // Not authenticated - show login button
   if (!isAuthenticated) {
