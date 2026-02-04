@@ -132,6 +132,14 @@ a:hover {
   color: var(--color-accent);
 }
 
+/* Button links should not inherit link hover styles */
+a.btn-primary,
+a.btn-primary:hover,
+a.btn-outline,
+a.btn-outline:hover {
+  text-decoration: none;
+}
+
 /* Decorative Elements */
 @layer components {
   /* Sacred Divider - inspired by omswami.org */
@@ -270,7 +278,7 @@ a:hover {
   
   .btn-primary:hover {
     background: var(--color-accent);
-    color: #ffffff;
+    color: #ffffff !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
