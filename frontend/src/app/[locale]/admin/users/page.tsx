@@ -54,7 +54,9 @@ export default function AdminUsersPage() {
   const isSuperAdmin = user?.role === 'super_admin';
   const isAdmin = user?.role === 'admin' || isSuperAdmin;
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://x3cgcqhhub.execute-api.ap-south-1.amazonaws.com/dev/api/v1';
+  // Ensure API_BASE always has /api/v1 suffix
+  const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://x3cgcqhhub.execute-api.ap-south-1.amazonaws.com/dev';
+  const API_BASE = rawApiUrl.endsWith('/api/v1') ? rawApiUrl : `${rawApiUrl.replace(/\/$/, '')}/api/v1`;
 
   const fetchUsers = useCallback(async () => {
     if (!accessToken) return;
