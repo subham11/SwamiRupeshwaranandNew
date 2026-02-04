@@ -6,11 +6,7 @@ import { DatabaseModule } from '@/common/database';
 import { EmailModule } from '@/common/email';
 
 @Module({
-  imports: [
-    ConfigModule,
-    DatabaseModule,
-    EmailModule,
-  ],
+  imports: [ConfigModule, DatabaseModule, EmailModule],
   controllers: [AdminController],
   providers: [AdminService],
   exports: [AdminService],

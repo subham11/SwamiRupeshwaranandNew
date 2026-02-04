@@ -16,7 +16,7 @@ export const Roles = (...roles: UserRole[]) => SetMetadata(ROLES_KEY, roles);
  * Requires user to have all specified permissions
  * @example @RequirePermissions('users:read', 'users:update')
  */
-export const RequirePermissions = (...permissions: Permission[]) => 
+export const RequirePermissions = (...permissions: Permission[]) =>
   SetMetadata(PERMISSIONS_KEY, permissions);
 
 /**
@@ -38,4 +38,5 @@ export const AdminOnly = () => Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN);
 /**
  * Shorthand for CONTENT_EDITOR or higher endpoints
  */
-export const EditorOnly = () => Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.CONTENT_EDITOR);
+export const EditorOnly = () =>
+  Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.CONTENT_EDITOR);

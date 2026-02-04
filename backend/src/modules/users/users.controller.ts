@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto, UserResponseDto, UserRole } from './dto';
+import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto';
 import { JwtAuthGuard, RolesGuard } from '@/common/guards';
-import { CurrentUser, CurrentUserData, Roles, AdminOnly, SuperAdminOnly } from '@/common/decorators';
+import { CurrentUser, CurrentUserData, AdminOnly, SuperAdminOnly } from '@/common/decorators';
 
 @ApiTags('Users')
 @Controller('users')

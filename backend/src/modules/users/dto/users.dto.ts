@@ -5,10 +5,10 @@ import { IsEmail, IsString, IsOptional, IsEnum } from 'class-validator';
 // User Roles Hierarchy (highest to lowest)
 // ============================================
 export enum UserRole {
-  SUPER_ADMIN = 'super_admin',   // Full system access, can manage all admins
-  ADMIN = 'admin',               // Can manage content editors and users
+  SUPER_ADMIN = 'super_admin', // Full system access, can manage all admins
+  ADMIN = 'admin', // Can manage content editors and users
   CONTENT_EDITOR = 'content_editor', // Can manage content (teachings, events)
-  USER = 'user',                 // Regular authenticated user
+  USER = 'user', // Regular authenticated user
 }
 
 // Role hierarchy for permission checks
@@ -27,20 +27,20 @@ export const PERMISSIONS = {
   'users:update': [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   'users:delete': [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   'users:manage-roles': [UserRole.SUPER_ADMIN],
-  
+
   // Admin Management
   'admins:read': [UserRole.SUPER_ADMIN],
   'admins:create': [UserRole.SUPER_ADMIN],
   'admins:update': [UserRole.SUPER_ADMIN],
   'admins:delete': [UserRole.SUPER_ADMIN],
-  
+
   // Content Management
   'content:read': [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.CONTENT_EDITOR, UserRole.USER],
   'content:create': [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.CONTENT_EDITOR],
   'content:update': [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.CONTENT_EDITOR],
   'content:delete': [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.CONTENT_EDITOR],
   'content:publish': [UserRole.SUPER_ADMIN, UserRole.ADMIN],
-  
+
   // System Settings
   'settings:read': [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   'settings:update': [UserRole.SUPER_ADMIN],

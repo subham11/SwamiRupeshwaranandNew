@@ -132,13 +132,16 @@ export class OtpAuthService {
       iat: Date.now(),
       exp: Date.now() + expiry,
     };
-    
+
     // Create JWT with proper 3-part structure: header.payload.signature
     const header = { alg: 'HS256', typ: 'JWT' };
     const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url');
     const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64url');
     const secret = this.configService.get('JWT_SECRET', 'ashram-jwt-secret-key-2024');
-    const signature = crypto.createHmac('sha256', secret).update(`${base64Header}.${base64Payload}`).digest('base64url');
+    const signature = crypto
+      .createHmac('sha256', secret)
+      .update(`${base64Header}.${base64Payload}`)
+      .digest('base64url');
     return `${base64Header}.${base64Payload}.${signature}`;
   }
 

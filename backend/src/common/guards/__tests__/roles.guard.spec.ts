@@ -1,12 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { RolesGuard, ROLES_KEY, PERMISSIONS_KEY, MINIMUM_ROLE_KEY } from '../roles.guard';
+import { RolesGuard } from '../roles.guard';
 import { UserRole } from '@/modules/users/dto';
 
 describe('RolesGuard', () => {
   let guard: RolesGuard;
-  let reflector: jest.Mocked<Reflector>;
 
   const mockReflector = {
     getAllAndOverride: jest.fn(),
@@ -34,7 +33,6 @@ describe('RolesGuard', () => {
     }).compile();
 
     guard = module.get<RolesGuard>(RolesGuard);
-    reflector = module.get(Reflector);
   });
 
   afterEach(() => {

@@ -1,4 +1,11 @@
-import { Injectable, Inject, BadRequestException, ForbiddenException, NotFoundException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
@@ -111,7 +118,10 @@ export class AdminService {
     await this.databaseService.put(user);
 
     // Get frontend URL for the login link
-    const frontendUrl = this.configService.get('FRONTEND_URL', 'https://main.d25c4jn4vz213v.amplifyapp.com');
+    const frontendUrl = this.configService.get(
+      'FRONTEND_URL',
+      'https://main.d25c4jn4vz213v.amplifyapp.com',
+    );
     const loginUrl = `${frontendUrl}/en/auth/login`;
 
     // Send invitation email
@@ -123,7 +133,9 @@ export class AdminService {
       loginUrl,
     );
 
-    this.logger.log(`Admin invitation sent to ${normalizedEmail} with role ${dto.role} by ${invitedByEmail}`);
+    this.logger.log(
+      `Admin invitation sent to ${normalizedEmail} with role ${dto.role} by ${invitedByEmail}`,
+    );
 
     return {
       success: true,

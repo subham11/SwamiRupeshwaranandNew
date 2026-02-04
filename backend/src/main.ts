@@ -37,18 +37,24 @@ async function bootstrap() {
   if (swaggerEnabled) {
     const stage = configService.get<string>('STAGE', 'dev');
     const apiGatewayUrl = configService.get<string>('API_GATEWAY_URL', '');
-    
+
     const configBuilder = new DocumentBuilder()
       .setTitle(configService.get<string>('SWAGGER_TITLE', 'Swami Rupeshwaranand API'))
       .setDescription(configService.get<string>('SWAGGER_DESCRIPTION', 'Backend API'))
       .setVersion(configService.get<string>('SWAGGER_VERSION', '1.0'));
-    
+
     // Add server URLs
     if (apiGatewayUrl) {
-      configBuilder.addServer(`${apiGatewayUrl}/${stage}`, `AWS ${stage.toUpperCase()} Environment`);
+      configBuilder.addServer(
+        `${apiGatewayUrl}/${stage}`,
+        `AWS ${stage.toUpperCase()} Environment`,
+      );
     }
-    configBuilder.addServer(`http://localhost:${configService.get<number>('API_PORT', 2026)}`, 'Local Development');
-    
+    configBuilder.addServer(
+      `http://localhost:${configService.get<number>('API_PORT', 2026)}`,
+      'Local Development',
+    );
+
     const config = configBuilder
       .addBearerAuth(
         {

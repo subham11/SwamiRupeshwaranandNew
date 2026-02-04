@@ -124,13 +124,13 @@ export class DynamoDBDatabaseService implements DatabaseService {
   async update<T>(entityType: string, options: UpdateOptions): Promise<T> {
     // Build update expression from simplified 'update' object if provided
     let updateExpression = options.updateExpression;
-    let expressionAttributeNames = options.expressionAttributeNames || {};
-    let expressionAttributeValues = options.expressionAttributeValues || {};
+    const expressionAttributeNames = options.expressionAttributeNames || {};
+    const expressionAttributeValues = options.expressionAttributeValues || {};
 
     if (options.update && !updateExpression) {
       const setParts: string[] = [];
       let hasUpdatedAt = false;
-      
+
       Object.entries(options.update).forEach(([key, value], index) => {
         if (key === 'updatedAt') {
           hasUpdatedAt = true;
@@ -141,14 +141,14 @@ export class DynamoDBDatabaseService implements DatabaseService {
         expressionAttributeNames[attrName] = key;
         expressionAttributeValues[attrValue] = value;
       });
-      
+
       // Add updatedAt only if not already in the update object
       if (!hasUpdatedAt) {
         setParts.push('#updatedAt = :updatedAt');
         expressionAttributeNames['#updatedAt'] = 'updatedAt';
         expressionAttributeValues[':updatedAt'] = new Date().toISOString();
       }
-      
+
       updateExpression = `SET ${setParts.join(', ')}`;
     }
 
@@ -156,8 +156,10 @@ export class DynamoDBDatabaseService implements DatabaseService {
       TableName: this.tableName,
       Key: options.key,
       UpdateExpression: updateExpression,
-      ExpressionAttributeNames: Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
-      ExpressionAttributeValues: Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined,
+      ExpressionAttributeNames:
+        Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
+      ExpressionAttributeValues:
+        Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined,
       ConditionExpression: options.conditionExpression,
       ReturnValues: 'ALL_NEW',
     });

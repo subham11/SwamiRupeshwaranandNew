@@ -54,7 +54,7 @@ export class RolesGuard implements CanActivate {
       const hasRole = requiredRoles.includes(userRole);
       if (!hasRole) {
         throw new ForbiddenException(
-          `Access denied: Requires one of these roles: ${requiredRoles.join(', ')}`
+          `Access denied: Requires one of these roles: ${requiredRoles.join(', ')}`,
         );
       }
     }
@@ -62,20 +62,18 @@ export class RolesGuard implements CanActivate {
     // Check minimum role (user role must be >= required role in hierarchy)
     if (minimumRole) {
       if (!hasMinimumRole(userRole, minimumRole)) {
-        throw new ForbiddenException(
-          `Access denied: Requires at least ${minimumRole} role`
-        );
+        throw new ForbiddenException(`Access denied: Requires at least ${minimumRole} role`);
       }
     }
 
     // Check required permissions (user must have all specified permissions)
     if (requiredPermissions && requiredPermissions.length > 0) {
-      const hasAllPermissions = requiredPermissions.every(permission => 
-        hasPermission(userRole, permission)
+      const hasAllPermissions = requiredPermissions.every((permission) =>
+        hasPermission(userRole, permission),
       );
       if (!hasAllPermissions) {
         throw new ForbiddenException(
-          `Access denied: Missing required permissions: ${requiredPermissions.join(', ')}`
+          `Access denied: Missing required permissions: ${requiredPermissions.join(', ')}`,
         );
       }
     }

@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsString, IsOptional, IsEnum, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsString, IsEnum, MinLength } from 'class-validator';
 import { UserRole } from '@/modules/users/dto';
 
 // ============================================
@@ -16,18 +16,18 @@ export class InviteUserDto {
   @MinLength(2)
   name: string;
 
-  @ApiProperty({ 
-    enum: [UserRole.ADMIN, UserRole.CONTENT_EDITOR], 
-    description: 'Role to assign to the invited user' 
+  @ApiProperty({
+    enum: [UserRole.ADMIN, UserRole.CONTENT_EDITOR],
+    description: 'Role to assign to the invited user',
   })
   @IsEnum(UserRole)
   role: UserRole.ADMIN | UserRole.CONTENT_EDITOR;
 }
 
 export class UpdateUserRoleDto {
-  @ApiProperty({ 
-    enum: UserRole, 
-    description: 'New role to assign to the user' 
+  @ApiProperty({
+    enum: UserRole,
+    description: 'New role to assign to the user',
   })
   @IsEnum(UserRole)
   role: UserRole;

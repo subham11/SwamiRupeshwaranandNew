@@ -2,15 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { AdminService } from '../admin.service';
-import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
+import { DATABASE_SERVICE } from '@/common/database';
 import { EmailService } from '@/common/email';
 import { UserRole } from '@/modules/users/dto';
 
 describe('AdminService', () => {
   let service: AdminService;
-  let databaseService: jest.Mocked<DatabaseService>;
-  let emailService: jest.Mocked<EmailService>;
-  let configService: jest.Mocked<ConfigService>;
 
   const mockDatabaseService = {
     get: jest.fn(),
@@ -48,9 +45,6 @@ describe('AdminService', () => {
     }).compile();
 
     service = module.get<AdminService>(AdminService);
-    databaseService = module.get(DATABASE_SERVICE);
-    emailService = module.get(EmailService);
-    configService = module.get(ConfigService);
   });
 
   afterEach(() => {
@@ -104,9 +98,9 @@ describe('AdminService', () => {
         role: UserRole.ADMIN as UserRole.ADMIN | UserRole.CONTENT_EDITOR,
       };
 
-      await expect(
-        service.inviteUser(adminInvite, 'admin@example.com', 'admin'),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.inviteUser(adminInvite, 'admin@example.com', 'admin')).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('should throw BadRequestException when user already exists', async () => {
@@ -115,9 +109,9 @@ describe('AdminService', () => {
         email: 'newuser@example.com',
       });
 
-      await expect(
-        service.inviteUser(inviteDto, 'admin@example.com', 'admin'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.inviteUser(inviteDto, 'admin@example.com', 'admin')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should normalize email to lowercase', async () => {
@@ -134,10 +128,7 @@ describe('AdminService', () => {
       const result = await service.inviteUser(uppercaseEmailInvite, 'admin@example.com', 'admin');
 
       expect(result.user.email).toBe('uppercase@example.com');
-      expect(mockDatabaseService.get).toHaveBeenCalledWith(
-        'USER#uppercase@example.com',
-        'PROFILE',
-      );
+      expect(mockDatabaseService.get).toHaveBeenCalledWith('USER#uppercase@example.com', 'PROFILE');
     });
 
     it('should send invitation email with correct parameters', async () => {
@@ -305,10 +296,7 @@ describe('AdminService', () => {
 
       await service.deleteUser('user-123', 'super_admin');
 
-      expect(mockDatabaseService.delete).toHaveBeenCalledWith(
-        'USER#user@example.com',
-        'PROFILE',
-      );
+      expect(mockDatabaseService.delete).toHaveBeenCalledWith('USER#user@example.com', 'PROFILE');
     });
 
     it('should throw ForbiddenException when non-super_admin tries to delete', async () => {
@@ -319,17 +307,17 @@ describe('AdminService', () => {
       const superAdminUser = { ...mockUser, role: 'super_admin' };
       mockDatabaseService.query.mockResolvedValue({ items: [superAdminUser] });
 
-      await expect(
-        service.deleteUser('user-123', 'super_admin'),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.deleteUser('user-123', 'super_admin')).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('should throw NotFoundException when user not found', async () => {
       mockDatabaseService.query.mockResolvedValue({ items: [] });
 
-      await expect(
-        service.deleteUser('nonexistent-id', 'super_admin'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.deleteUser('nonexistent-id', 'super_admin')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

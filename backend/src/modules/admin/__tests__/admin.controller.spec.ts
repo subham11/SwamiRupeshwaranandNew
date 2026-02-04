@@ -7,7 +7,6 @@ import { JwtAuthGuard, RolesGuard } from '@/common/guards';
 
 describe('AdminController', () => {
   let controller: AdminController;
-  let adminService: jest.Mocked<AdminService>;
 
   const mockAdminService = {
     inviteUser: jest.fn(),
@@ -38,7 +37,6 @@ describe('AdminController', () => {
       .compile();
 
     controller = module.get<AdminController>(AdminController);
-    adminService = module.get(AdminService);
   });
 
   afterEach(() => {

@@ -341,9 +341,9 @@ Swami Rupeshwaranand Ashram
     temporaryPassword: string,
     loginUrl: string,
   ): Promise<boolean> {
-    const roleLabel = role === 'admin' ? 'Administrator' : 
-                      role === 'content_editor' ? 'Content Editor' : role;
-    
+    const roleLabel =
+      role === 'admin' ? 'Administrator' : role === 'content_editor' ? 'Content Editor' : role;
+
     const html = this.generateInviteEmailTemplate(name, roleLabel, temporaryPassword, loginUrl);
 
     return this.sendEmail({
