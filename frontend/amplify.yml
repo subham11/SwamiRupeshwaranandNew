@@ -6,6 +6,10 @@ frontend:
         - npm install
     build:
       commands:
+        # Set environment variables for production build
+        - export NEXT_PUBLIC_API_URL=https://x3cgcqhhub.execute-api.ap-south-1.amazonaws.com/dev
+        - export NEXT_PUBLIC_USE_API=true
+        - export AMPLIFY_BUILD=true
         # Build the Next.js application
         - npm run build
   artifacts:
@@ -27,9 +31,3 @@ frontend:
 # Source: /
 # Target: /en  
 # Type: 302 (Redirect - Temporary)
-
-# Environment variables to set in Amplify Console:
-# - AMPLIFY_BUILD: true
-# - NEXT_PUBLIC_API_URL: Your API Gateway URL
-# - NEXT_PUBLIC_SITE_URL: Your production site URL
-# - NEXT_PUBLIC_USE_API: true
