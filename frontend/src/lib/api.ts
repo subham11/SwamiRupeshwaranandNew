@@ -668,8 +668,8 @@ export interface ApiSubscriptionPlan {
 }
 
 export async function fetchSubscriptionPlans(): Promise<ApiSubscriptionPlan[]> {
-  const response = await apiRequest("/subscriptions/plans");
-  return response?.items || response || [];
+  const response = await apiRequest("/subscriptions/plans") as { items?: ApiSubscriptionPlan[] } | ApiSubscriptionPlan[];
+  return (response as { items?: ApiSubscriptionPlan[] })?.items || (response as ApiSubscriptionPlan[]) || [];
 }
 
 export async function fetchMySubscription(accessToken: string): Promise<unknown> {
