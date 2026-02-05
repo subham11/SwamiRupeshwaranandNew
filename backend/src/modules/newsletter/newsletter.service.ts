@@ -390,7 +390,6 @@ export class NewsletterService {
           subject: campaign.subject[locale] || campaign.subject.en,
           html: this.wrapEmailContent(
             campaign.content[locale] || campaign.content.en,
-            subscriber.email,
           ),
         });
         sent++;
