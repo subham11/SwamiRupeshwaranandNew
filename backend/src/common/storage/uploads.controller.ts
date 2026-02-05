@@ -44,11 +44,7 @@ export class UploadsController {
   @Post('presigned-url')
   @EditorOnly()
   async getPresignedUploadUrl(@Body() dto: GetPresignedUploadDto): Promise<PresignedUrlResult> {
-    return this.storageService.getPresignedUploadUrl(
-      dto.folder,
-      dto.fileName,
-      dto.contentType,
-    );
+    return this.storageService.getPresignedUploadUrl(dto.folder, dto.fileName, dto.contentType);
   }
 
   /**

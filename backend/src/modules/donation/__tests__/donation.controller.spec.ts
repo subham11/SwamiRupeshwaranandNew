@@ -72,14 +72,19 @@ describe('DonationController', () => {
   it('creates a Razorpay order', async () => {
     mockDonationService.createRazorpayOrder.mockResolvedValue({ orderId: 'order-1' });
 
-    const result = await controller.createRazorpayOrder({ amount: 100 } as any, { user: { sub: 'user-1' } });
+    const result = await controller.createRazorpayOrder({ amount: 100 } as any, {
+      user: { sub: 'user-1' },
+    });
 
     expect(result.orderId).toBe('order-1');
     expect(mockDonationService.createRazorpayOrder).toHaveBeenCalledWith({ amount: 100 }, 'user-1');
   });
 
   it('verifies payment', async () => {
-    mockDonationService.verifyPayment.mockResolvedValue({ id: 'don-1', status: DonationStatus.COMPLETED });
+    mockDonationService.verifyPayment.mockResolvedValue({
+      id: 'don-1',
+      status: DonationStatus.COMPLETED,
+    });
 
     const result = await controller.verifyPayment({ donationId: 'don-1' } as any);
 

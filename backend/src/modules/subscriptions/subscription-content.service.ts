@@ -1,11 +1,17 @@
-import { Injectable, Inject, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
 import { StorageService, StorageFolder } from '@/common/storage';
 import {
   ContentType,
   SubscriptionContentResponseDto,
-  SubscriptionContentListResponseDto,
+  // SubscriptionContentListResponseDto, // removed unused import
   CreateSubscriptionContentWithFileDto,
   BulkContentUploadDto,
   BulkContentUploadResponseDto,
@@ -65,7 +71,9 @@ export class SubscriptionContentService {
   /**
    * Generate presigned URL for uploading a file
    */
-  async getPresignedUploadUrl(dto: RequestPresignedUploadUrlDto): Promise<PresignedUploadUrlResponseDto> {
+  async getPresignedUploadUrl(
+    dto: RequestPresignedUploadUrlDto,
+  ): Promise<PresignedUploadUrlResponseDto> {
     const folder = this.getCategoryFolder(dto.category);
     const expiresIn = dto.expiresIn || 3600;
 
@@ -88,11 +96,13 @@ export class SubscriptionContentService {
   /**
    * Generate presigned URL for downloading a file (admin)
    */
-  async getPresignedDownloadUrl(dto: RequestPresignedDownloadUrlDto): Promise<PresignedDownloadUrlResponseDto> {
-    const key = dto.key.startsWith('http') 
-      ? this.storageService.extractKeyFromUrl(dto.key) || dto.key 
+  async getPresignedDownloadUrl(
+    dto: RequestPresignedDownloadUrlDto,
+  ): Promise<PresignedDownloadUrlResponseDto> {
+    const key = dto.key.startsWith('http')
+      ? this.storageService.extractKeyFromUrl(dto.key) || dto.key
       : dto.key;
-    
+
     const expiresIn = dto.expiresIn || 3600;
     const downloadUrl = await this.storageService.getPresignedDownloadUrl(key, expiresIn);
 
@@ -109,7 +119,9 @@ export class SubscriptionContentService {
   /**
    * Create content with uploaded file
    */
-  async createContentWithFile(dto: CreateSubscriptionContentWithFileDto): Promise<SubscriptionContentResponseDto> {
+  async createContentWithFile(
+    dto: CreateSubscriptionContentWithFileDto,
+  ): Promise<SubscriptionContentResponseDto> {
     // Verify plan exists
     await this.subscriptionsService.findPlanById(dto.planId);
 
@@ -122,8 +134,8 @@ export class SubscriptionContentService {
     const id = uuidv4();
     const locale = dto.locale || 'en';
     const fileUrl = this.storageService.getPublicUrl(dto.fileKey);
-    const thumbnailUrl = dto.thumbnailKey 
-      ? this.storageService.getPublicUrl(dto.thumbnailKey) 
+    const thumbnailUrl = dto.thumbnailKey
+      ? this.storageService.getPublicUrl(dto.thumbnailKey)
       : undefined;
 
     const content: SubscriptionContentEntity = {
@@ -173,7 +185,9 @@ export class SubscriptionContentService {
         });
         createdIds.push(content.id);
       } catch (error) {
-        errors.push(`Failed to create "${item.title}": ${error instanceof Error ? error.message : 'Unknown error'}`);
+        errors.push(
+          `Failed to create "${item.title}": ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
       }
     }
 
@@ -207,18 +221,21 @@ export class SubscriptionContentService {
     const newFileUrl = this.storageService.getPublicUrl(newFileKey);
 
     // Update in database
-    const updated = await this.databaseService.update<SubscriptionContentEntity>(this.contentEntityType, {
-      key: {
-        PK: `${this.contentEntityType}#${contentId}`,
-        SK: `${this.contentEntityType}#${locale}`,
+    const updated = await this.databaseService.update<SubscriptionContentEntity>(
+      this.contentEntityType,
+      {
+        key: {
+          PK: `${this.contentEntityType}#${contentId}`,
+          SK: `${this.contentEntityType}#${locale}`,
+        },
+        updateExpression: 'SET fileUrl = :fileUrl, fileKey = :fileKey, updatedAt = :updatedAt',
+        expressionAttributeValues: {
+          ':fileUrl': newFileUrl,
+          ':fileKey': newFileKey,
+          ':updatedAt': new Date().toISOString(),
+        },
       },
-      updateExpression: 'SET fileUrl = :fileUrl, fileKey = :fileKey, updatedAt = :updatedAt',
-      expressionAttributeValues: {
-        ':fileUrl': newFileUrl,
-        ':fileKey': newFileKey,
-        ':updatedAt': new Date().toISOString(),
-      },
-    });
+    );
 
     // Delete old file if it exists
     if (existing.fileUrl) {
@@ -250,18 +267,22 @@ export class SubscriptionContentService {
 
     const thumbnailUrl = this.storageService.getPublicUrl(newThumbnailKey);
 
-    const updated = await this.databaseService.update<SubscriptionContentEntity>(this.contentEntityType, {
-      key: {
-        PK: `${this.contentEntityType}#${contentId}`,
-        SK: `${this.contentEntityType}#${locale}`,
+    const updated = await this.databaseService.update<SubscriptionContentEntity>(
+      this.contentEntityType,
+      {
+        key: {
+          PK: `${this.contentEntityType}#${contentId}`,
+          SK: `${this.contentEntityType}#${locale}`,
+        },
+        updateExpression:
+          'SET thumbnailUrl = :thumbnailUrl, thumbnailKey = :thumbnailKey, updatedAt = :updatedAt',
+        expressionAttributeValues: {
+          ':thumbnailUrl': thumbnailUrl,
+          ':thumbnailKey': newThumbnailKey,
+          ':updatedAt': new Date().toISOString(),
+        },
       },
-      updateExpression: 'SET thumbnailUrl = :thumbnailUrl, thumbnailKey = :thumbnailKey, updatedAt = :updatedAt',
-      expressionAttributeValues: {
-        ':thumbnailUrl': thumbnailUrl,
-        ':thumbnailKey': newThumbnailKey,
-        ':updatedAt': new Date().toISOString(),
-      },
-    });
+    );
 
     return this.mapContentToResponse(updated);
   }
@@ -277,12 +298,12 @@ export class SubscriptionContentService {
 
     // Delete files from S3
     const keysToDelete: string[] = [];
-    
+
     if (content.fileUrl) {
       const fileKey = this.storageService.extractKeyFromUrl(content.fileUrl);
       if (fileKey) keysToDelete.push(fileKey);
     }
-    
+
     if (content.thumbnailUrl) {
       const thumbnailKey = this.storageService.extractKeyFromUrl(content.thumbnailUrl);
       if (thumbnailKey) keysToDelete.push(thumbnailKey);
@@ -306,7 +327,11 @@ export class SubscriptionContentService {
   /**
    * Check if user can access content and return access details
    */
-  async checkContentAccess(userId: string, contentId: string, locale = 'en'): Promise<ContentAccessResponseDto> {
+  async checkContentAccess(
+    userId: string,
+    contentId: string,
+    locale = 'en',
+  ): Promise<ContentAccessResponseDto> {
     const content = await this.findContentById(contentId, locale);
     if (!content) {
       throw new NotFoundException(`Content with ID ${contentId} not found`);
@@ -314,7 +339,7 @@ export class SubscriptionContentService {
 
     // Check user's subscription
     const hasAccess = await this.subscriptionsService.canUserAccessContent(userId, content.planId);
-    
+
     if (!hasAccess) {
       const plan = await this.subscriptionsService.findPlanById(content.planId);
       return {
@@ -347,7 +372,7 @@ export class SubscriptionContentService {
   ): Promise<SecureDownloadResponseDto> {
     const locale = dto.locale || 'en';
     const content = await this.findContentById(dto.contentId, locale);
-    
+
     if (!content) {
       throw new NotFoundException(`Content with ID ${dto.contentId} not found`);
     }
@@ -355,14 +380,14 @@ export class SubscriptionContentService {
     // Verify user has access
     const hasAccess = await this.subscriptionsService.canUserAccessContent(userId, content.planId);
     if (!hasAccess) {
-      throw new ForbiddenException('You do not have access to this content. Please subscribe to the required plan.');
+      throw new ForbiddenException(
+        'You do not have access to this content. Please subscribe to the required plan.',
+      );
     }
 
     // Get the appropriate key
-    const urlToUse = dto.thumbnail && content.thumbnailUrl 
-      ? content.thumbnailUrl 
-      : content.fileUrl;
-    
+    const urlToUse = dto.thumbnail && content.thumbnailUrl ? content.thumbnailUrl : content.fileUrl;
+
     if (!urlToUse) {
       throw new NotFoundException('File not found for this content');
     }
@@ -438,7 +463,10 @@ export class SubscriptionContentService {
   // Private Helper Methods
   // ============================================
 
-  private async findContentById(id: string, locale: string): Promise<SubscriptionContentResponseDto | null> {
+  private async findContentById(
+    id: string,
+    locale: string,
+  ): Promise<SubscriptionContentResponseDto | null> {
     try {
       const content = await this.databaseService.get<SubscriptionContentEntity>(
         `${this.contentEntityType}#${id}`,
@@ -471,7 +499,7 @@ export class SubscriptionContentService {
   private async isFileReferencedInContent(key: string): Promise<boolean> {
     // This is a simplified check - in production you might want a more comprehensive scan
     const url = this.storageService.getPublicUrl(key);
-    
+
     // Query all content and check if the URL is referenced
     // For efficiency, this could be improved with a reverse index
     const result = await this.databaseService.scan<SubscriptionContentEntity>(

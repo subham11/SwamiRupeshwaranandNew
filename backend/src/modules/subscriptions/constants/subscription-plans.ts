@@ -1,8 +1,8 @@
 /**
  * Subscription Plans Constants
- * 
+ *
  * This file contains the predefined subscription tiers for the application.
- * 
+ *
  * Payment Rules:
  * - Plans ≤ ₹2100: UPI Autopay enabled via Razorpay
  * - Plans > ₹2100 (₹5100, ₹21000): Manual payment only
@@ -37,7 +37,7 @@ export interface SubscriptionPlanDefinition {
 
 /**
  * Predefined Subscription Plans
- * 
+ *
  * 1. Free (₹0) - 10 Stotras including Bajrang Baan
  * 2. Basic (₹300) - 20 Stotras + Bajrang Baan practices [Autopay]
  * 3. Standard (₹1100) - 20 Stotras + practices + 1-time guidance [Autopay]
@@ -54,8 +54,10 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDefinition[] = [
     planType: SubscriptionPlanType.FREE,
     name: 'Free Plan',
     nameHi: 'निःशुल्क योजना',
-    description: 'Start your spiritual journey with 10 sacred Stotras including the powerful Bajrang Baan.',
-    descriptionHi: 'शक्तिशाली बजरंग बाण सहित 10 पवित्र स्तोत्रों के साथ अपनी आध्यात्मिक यात्रा शुरू करें।',
+    description:
+      'Start your spiritual journey with 10 sacred Stotras including the powerful Bajrang Baan.',
+    descriptionHi:
+      'शक्तिशाली बजरंग बाण सहित 10 पवित्र स्तोत्रों के साथ अपनी आध्यात्मिक यात्रा शुरू करें।',
     price: 0,
     billingCycle: BillingCycle.ONE_TIME,
     paymentMethod: PaymentMethod.FREE,
@@ -87,15 +89,15 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDefinition[] = [
     planType: SubscriptionPlanType.BASIC,
     name: 'Basic Plan',
     nameHi: 'बेसिक योजना',
-    description: 'Expand your practice with 20 Stotras and dedicated Bajrang Baan practice sessions.',
-    descriptionHi: '20 स्तोत्रों और समर्पित बजरंग बाण अभ्यास सत्रों के साथ अपने अभ्यास का विस्तार करें।',
+    description:
+      'Expand your practice with 20 Stotras and dedicated Bajrang Baan practice sessions.',
+    descriptionHi:
+      '20 स्तोत्रों और समर्पित बजरंग बाण अभ्यास सत्रों के साथ अपने अभ्यास का विस्तार करें।',
     price: 300,
     billingCycle: BillingCycle.MONTHLY,
     paymentMethod: PaymentMethod.UPI_AUTOPAY,
     autopayEnabled: true,
-    contents: [
-      { type: ContentType.STOTRA, count: 20, description: '20 Stotras collection' },
-    ],
+    contents: [{ type: ContentType.STOTRA, count: 20, description: '20 Stotras collection' }],
     guidance: null,
     features: [
       '20 Sacred Stotras',
@@ -122,15 +124,15 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDefinition[] = [
     planType: SubscriptionPlanType.STANDARD,
     name: 'Standard Plan',
     nameHi: 'स्टैंडर्ड योजना',
-    description: 'Get 20 Stotras with Bajrang Baan practices and one-time online guidance from the Ashram.',
-    descriptionHi: '20 स्तोत्र, बजरंग बाण अभ्यास और आश्रम से एक बार ऑनलाइन मार्गदर्शन प्राप्त करें।',
+    description:
+      'Get 20 Stotras with Bajrang Baan practices and one-time online guidance from the Ashram.',
+    descriptionHi:
+      '20 स्तोत्र, बजरंग बाण अभ्यास और आश्रम से एक बार ऑनलाइन मार्गदर्शन प्राप्त करें।',
     price: 1100,
     billingCycle: BillingCycle.MONTHLY,
     paymentMethod: PaymentMethod.UPI_AUTOPAY,
     autopayEnabled: true,
-    contents: [
-      { type: ContentType.STOTRA, count: 20, description: '20 Stotras collection' },
-    ],
+    contents: [{ type: ContentType.STOTRA, count: 20, description: '20 Stotras collection' }],
     guidance: {
       sessionsPerMonth: 0, // One-time guidance
       fromSwamiJi: false,
@@ -162,8 +164,10 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDefinition[] = [
     planType: SubscriptionPlanType.PREMIUM,
     name: 'Premium Plan',
     nameHi: 'प्रीमियम योजना',
-    description: 'Access 20 Stotras, 2 special protective Kavach, and online guidance from the Ashram 5 times a month.',
-    descriptionHi: '20 स्तोत्र, 2 विशेष सुरक्षा कवच, और आश्रम से महीने में 5 बार ऑनलाइन मार्गदर्शन प्राप्त करें।',
+    description:
+      'Access 20 Stotras, 2 special protective Kavach, and online guidance from the Ashram 5 times a month.',
+    descriptionHi:
+      '20 स्तोत्र, 2 विशेष सुरक्षा कवच, और आश्रम से महीने में 5 बार ऑनलाइन मार्गदर्शन प्राप्त करें।',
     price: 2100,
     billingCycle: BillingCycle.MONTHLY,
     paymentMethod: PaymentMethod.UPI_AUTOPAY,
@@ -203,8 +207,10 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDefinition[] = [
     planType: SubscriptionPlanType.ELITE,
     name: 'Elite Plan',
     nameHi: 'एलीट योजना',
-    description: 'Unlock 20 Stotras, 5 special protective Kavach, and guidance on Stotra Kavach accomplishment from the Ashram.',
-    descriptionHi: '20 स्तोत्र, 5 विशेष सुरक्षा कवच, और आश्रम से स्तोत्र कवच सिद्धि पर मार्गदर्शन प्राप्त करें।',
+    description:
+      'Unlock 20 Stotras, 5 special protective Kavach, and guidance on Stotra Kavach accomplishment from the Ashram.',
+    descriptionHi:
+      '20 स्तोत्र, 5 विशेष सुरक्षा कवच, और आश्रम से स्तोत्र कवच सिद्धि पर मार्गदर्शन प्राप्त करें।',
     price: 5100,
     billingCycle: BillingCycle.ONE_TIME,
     paymentMethod: PaymentMethod.MANUAL,
@@ -244,21 +250,28 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDefinition[] = [
     planType: SubscriptionPlanType.DIVINE,
     name: 'Divine Plan',
     nameHi: 'दिव्य योजना',
-    description: 'The ultimate spiritual package: 30 Stotras, 5 special protective Kavach, Ashram guidance, and personal online guidance from Revered Swami Rupeshwaranand Ji.',
-    descriptionHi: 'परम आध्यात्मिक पैकेज: 30 स्तोत्र, 5 विशेष सुरक्षा कवच, आश्रम मार्गदर्शन, और पूज्य स्वामी रूपेश्वरानंद जी से व्यक्तिगत ऑनलाइन मार्गदर्शन।',
+    description:
+      'The ultimate spiritual package: 30 Stotras, 5 special protective Kavach, Ashram guidance, and personal online guidance from Revered Swami Rupeshwaranand Ji.',
+    descriptionHi:
+      'परम आध्यात्मिक पैकेज: 30 स्तोत्र, 5 विशेष सुरक्षा कवच, आश्रम मार्गदर्शन, और पूज्य स्वामी रूपेश्वरानंद जी से व्यक्तिगत ऑनलाइन मार्गदर्शन।',
     price: 21000,
     billingCycle: BillingCycle.ONE_TIME,
     paymentMethod: PaymentMethod.MANUAL,
     autopayEnabled: false, // ❌ No autopay - Manual payment only
     contents: [
-      { type: ContentType.STOTRA, count: 30, description: '30 Stotras collection - Complete library' },
+      {
+        type: ContentType.STOTRA,
+        count: 30,
+        description: '30 Stotras collection - Complete library',
+      },
       { type: ContentType.KAVACH, count: 5, description: '5 Special protective Kavach' },
     ],
     guidance: {
       sessionsPerMonth: 0,
       fromSwamiJi: true, // ⭐ Direct guidance from Swami Ji
       guidanceType: 'online',
-      notes: 'One-time personal online guidance on Stotra Kavach accomplishment from Revered Swami Rupeshwaranand Ji, plus Ashram guidance',
+      notes:
+        'One-time personal online guidance on Stotra Kavach accomplishment from Revered Swami Rupeshwaranand Ji, plus Ashram guidance',
     },
     features: [
       '30 Sacred Stotras (Complete Collection)',
@@ -285,15 +298,17 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDefinition[] = [
 /**
  * Get plan by type
  */
-export function getPlanByType(planType: SubscriptionPlanType): SubscriptionPlanDefinition | undefined {
-  return SUBSCRIPTION_PLANS.find(plan => plan.planType === planType);
+export function getPlanByType(
+  planType: SubscriptionPlanType,
+): SubscriptionPlanDefinition | undefined {
+  return SUBSCRIPTION_PLANS.find((plan) => plan.planType === planType);
 }
 
 /**
  * Get plan by ID
  */
 export function getPlanById(id: string): SubscriptionPlanDefinition | undefined {
-  return SUBSCRIPTION_PLANS.find(plan => plan.id === id);
+  return SUBSCRIPTION_PLANS.find((plan) => plan.id === id);
 }
 
 /**
@@ -316,14 +331,14 @@ export function isManualPaymentRequired(planType: SubscriptionPlanType): boolean
  * Get all plans that support autopay
  */
 export function getAutopayPlans(): SubscriptionPlanDefinition[] {
-  return SUBSCRIPTION_PLANS.filter(plan => plan.autopayEnabled);
+  return SUBSCRIPTION_PLANS.filter((plan) => plan.autopayEnabled);
 }
 
 /**
  * Get all plans that require manual payment
  */
 export function getManualPaymentPlans(): SubscriptionPlanDefinition[] {
-  return SUBSCRIPTION_PLANS.filter(plan => plan.paymentMethod === PaymentMethod.MANUAL);
+  return SUBSCRIPTION_PLANS.filter((plan) => plan.paymentMethod === PaymentMethod.MANUAL);
 }
 
 /**

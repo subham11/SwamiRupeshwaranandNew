@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
 import {
@@ -171,7 +171,9 @@ export class SubscriptionsService {
     return this.mapPlanToResponse(plan);
   }
 
-  async findPlanByType(planType: SubscriptionPlanType): Promise<SubscriptionPlanResponseDto | null> {
+  async findPlanByType(
+    planType: SubscriptionPlanType,
+  ): Promise<SubscriptionPlanResponseDto | null> {
     const result = await this.databaseService.query<SubscriptionPlanEntity>(this.planEntityType, {
       indexName: 'GSI1',
       keyConditionExpression: 'GSI1PK = :pk',
@@ -189,7 +191,10 @@ export class SubscriptionsService {
     return this.mapPlanToResponse(result.items[0]);
   }
 
-  async updatePlan(id: string, dto: UpdateSubscriptionPlanDto): Promise<SubscriptionPlanResponseDto> {
+  async updatePlan(
+    id: string,
+    dto: UpdateSubscriptionPlanDto,
+  ): Promise<SubscriptionPlanResponseDto> {
     const existing = await this.findPlanById(id);
     if (!existing) {
       throw new NotFoundException(`Subscription plan with ID ${id} not found`);
@@ -200,8 +205,17 @@ export class SubscriptionsService {
     const expressionAttributeValues: Record<string, any> = {};
 
     const fieldsToUpdate = [
-      'name', 'description', 'price', 'billingCycle', 'paymentMethod',
-      'autopayEnabled', 'contents', 'guidance', 'features', 'isActive', 'displayOrder',
+      'name',
+      'description',
+      'price',
+      'billingCycle',
+      'paymentMethod',
+      'autopayEnabled',
+      'contents',
+      'guidance',
+      'features',
+      'isActive',
+      'displayOrder',
     ];
 
     for (const field of fieldsToUpdate) {
@@ -291,14 +305,17 @@ export class SubscriptionsService {
   }
 
   async findUserSubscriptions(userId: string): Promise<UserSubscriptionListResponseDto> {
-    const result = await this.databaseService.query<UserSubscriptionEntity>(this.userSubEntityType, {
-      indexName: 'GSI1',
-      keyConditionExpression: 'GSI1PK = :pk',
-      expressionAttributeValues: {
-        ':pk': `USER#${userId}`,
+    const result = await this.databaseService.query<UserSubscriptionEntity>(
+      this.userSubEntityType,
+      {
+        indexName: 'GSI1',
+        keyConditionExpression: 'GSI1PK = :pk',
+        expressionAttributeValues: {
+          ':pk': `USER#${userId}`,
+        },
+        scanIndexForward: false, // Latest first
       },
-      scanIndexForward: false, // Latest first
-    });
+    );
 
     return {
       items: result.items.map(this.mapUserSubscriptionToResponse),
@@ -307,20 +324,23 @@ export class SubscriptionsService {
   }
 
   async findActiveUserSubscription(userId: string): Promise<UserSubscriptionResponseDto | null> {
-    const result = await this.databaseService.query<UserSubscriptionEntity>(this.userSubEntityType, {
-      indexName: 'GSI1',
-      keyConditionExpression: 'GSI1PK = :pk',
-      filterExpression: '#status = :status',
-      expressionAttributeNames: {
-        '#status': 'status',
+    const result = await this.databaseService.query<UserSubscriptionEntity>(
+      this.userSubEntityType,
+      {
+        indexName: 'GSI1',
+        keyConditionExpression: 'GSI1PK = :pk',
+        filterExpression: '#status = :status',
+        expressionAttributeNames: {
+          '#status': 'status',
+        },
+        expressionAttributeValues: {
+          ':pk': `USER#${userId}`,
+          ':status': SubscriptionStatus.ACTIVE,
+        },
+        scanIndexForward: false,
+        limit: 1,
       },
-      expressionAttributeValues: {
-        ':pk': `USER#${userId}`,
-        ':status': SubscriptionStatus.ACTIVE,
-      },
-      scanIndexForward: false,
-      limit: 1,
-    });
+    );
 
     if (result.items.length === 0) {
       return null;
@@ -361,19 +381,25 @@ export class SubscriptionsService {
 
     if (filters.planType) {
       const planTypeFilter = 'planType = :planType';
-      filterExpression = filterExpression ? `${filterExpression} AND ${planTypeFilter}` : planTypeFilter;
+      filterExpression = filterExpression
+        ? `${filterExpression} AND ${planTypeFilter}`
+        : planTypeFilter;
       expressionAttributeValues[':planType'] = filters.planType;
     }
 
-    const result = await this.databaseService.query<UserSubscriptionEntity>(this.userSubEntityType, {
-      indexName: 'GSI2',
-      keyConditionExpression: 'GSI2PK = :pk',
-      filterExpression,
-      expressionAttributeNames: Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
-      expressionAttributeValues,
-      scanIndexForward: false,
-      limit: filters.limit || 100,
-    });
+    const result = await this.databaseService.query<UserSubscriptionEntity>(
+      this.userSubEntityType,
+      {
+        indexName: 'GSI2',
+        keyConditionExpression: 'GSI2PK = :pk',
+        filterExpression,
+        expressionAttributeNames:
+          Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
+        expressionAttributeValues,
+        scanIndexForward: false,
+        limit: filters.limit || 100,
+      },
+    );
 
     return {
       items: result.items.map(this.mapUserSubscriptionToResponse),
@@ -418,15 +444,19 @@ export class SubscriptionsService {
     updateExpressions.push('updatedAt = :updatedAt');
     expressionAttributeValues[':updatedAt'] = new Date().toISOString();
 
-    const updated = await this.databaseService.update<UserSubscriptionEntity>(this.userSubEntityType, {
-      key: {
-        PK: `${this.userSubEntityType}#${id}`,
-        SK: `${this.userSubEntityType}#${id}`,
+    const updated = await this.databaseService.update<UserSubscriptionEntity>(
+      this.userSubEntityType,
+      {
+        key: {
+          PK: `${this.userSubEntityType}#${id}`,
+          SK: `${this.userSubEntityType}#${id}`,
+        },
+        updateExpression: `SET ${updateExpressions.join(', ')}`,
+        expressionAttributeNames:
+          Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
+        expressionAttributeValues,
       },
-      updateExpression: `SET ${updateExpressions.join(', ')}`,
-      expressionAttributeNames: Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
-      expressionAttributeValues,
-    });
+    );
 
     return this.mapUserSubscriptionToResponse(updated);
   }
@@ -496,17 +526,22 @@ export class SubscriptionsService {
 
     if (locale) {
       const localeFilter = 'locale = :locale';
-      filterExpression = filterExpression ? `${filterExpression} AND ${localeFilter}` : localeFilter;
+      filterExpression = filterExpression
+        ? `${filterExpression} AND ${localeFilter}`
+        : localeFilter;
       expressionAttributeValues[':locale'] = locale;
     }
 
-    const result = await this.databaseService.query<SubscriptionContentEntity>(this.contentEntityType, {
-      indexName: 'GSI1',
-      keyConditionExpression: 'GSI1PK = :pk',
-      filterExpression,
-      expressionAttributeValues,
-      scanIndexForward: true,
-    });
+    const result = await this.databaseService.query<SubscriptionContentEntity>(
+      this.contentEntityType,
+      {
+        indexName: 'GSI1',
+        keyConditionExpression: 'GSI1PK = :pk',
+        filterExpression,
+        expressionAttributeValues,
+        scanIndexForward: true,
+      },
+    );
 
     return {
       items: result.items.map(this.mapContentToResponse),
@@ -541,7 +576,14 @@ export class SubscriptionsService {
     const expressionAttributeNames: Record<string, string> = {};
     const expressionAttributeValues: Record<string, any> = {};
 
-    const fieldsToUpdate = ['title', 'description', 'fileUrl', 'thumbnailUrl', 'duration', 'displayOrder'];
+    const fieldsToUpdate = [
+      'title',
+      'description',
+      'fileUrl',
+      'thumbnailUrl',
+      'duration',
+      'displayOrder',
+    ];
 
     for (const field of fieldsToUpdate) {
       if ((dto as any)[field] !== undefined) {
@@ -554,15 +596,18 @@ export class SubscriptionsService {
     updateExpressions.push('updatedAt = :updatedAt');
     expressionAttributeValues[':updatedAt'] = new Date().toISOString();
 
-    const updated = await this.databaseService.update<SubscriptionContentEntity>(this.contentEntityType, {
-      key: {
-        PK: `${this.contentEntityType}#${id}`,
-        SK: `${this.contentEntityType}#${locale}`,
+    const updated = await this.databaseService.update<SubscriptionContentEntity>(
+      this.contentEntityType,
+      {
+        key: {
+          PK: `${this.contentEntityType}#${id}`,
+          SK: `${this.contentEntityType}#${locale}`,
+        },
+        updateExpression: `SET ${updateExpressions.join(', ')}`,
+        expressionAttributeNames,
+        expressionAttributeValues,
       },
-      updateExpression: `SET ${updateExpressions.join(', ')}`,
-      expressionAttributeNames,
-      expressionAttributeValues,
-    });
+    );
 
     return this.mapContentToResponse(updated);
   }
@@ -611,7 +656,7 @@ export class SubscriptionsService {
 
   private calculateEndDate(startDate: Date, billingCycle: BillingCycle): Date {
     const endDate = new Date(startDate);
-    
+
     switch (billingCycle) {
       case BillingCycle.WEEKLY:
         endDate.setDate(endDate.getDate() + 7);

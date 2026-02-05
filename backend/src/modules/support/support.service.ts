@@ -80,7 +80,11 @@ export class SupportService {
   // Ticket Methods
   // ============================================
 
-  async createTicket(dto: CreateTicketDto, userId?: string, userEmail?: string): Promise<TicketResponseDto> {
+  async createTicket(
+    dto: CreateTicketDto,
+    userId?: string,
+    userEmail?: string,
+  ): Promise<TicketResponseDto> {
     if (!userId && !dto.email) {
       throw new BadRequestException('Email is required for guest tickets');
     }
@@ -209,7 +213,9 @@ export class SupportService {
 
     const updateExpression: string[] = ['#updatedAt = :updatedAt'];
     const expressionAttributeNames: Record<string, string> = { '#updatedAt': 'updatedAt' };
-    const expressionAttributeValues: Record<string, unknown> = { ':updatedAt': new Date().toISOString() };
+    const expressionAttributeValues: Record<string, unknown> = {
+      ':updatedAt': new Date().toISOString(),
+    };
 
     if (dto.status !== undefined) {
       updateExpression.push('#status = :status');
@@ -269,17 +275,11 @@ export class SupportService {
     // Delete all replies first
     const replies = await this.findRepliesByTicket(id);
     for (const reply of replies) {
-      await this.db.delete(
-        `${this.ticketEntityType}#${id}`,
-        `${this.replyEntityType}#${reply.id}`,
-      );
+      await this.db.delete(`${this.ticketEntityType}#${id}`, `${this.replyEntityType}#${reply.id}`);
     }
 
     // Delete ticket
-    await this.db.delete(
-      `${this.ticketEntityType}#${id}`,
-      `${this.ticketEntityType}#${id}`,
-    );
+    await this.db.delete(`${this.ticketEntityType}#${id}`, `${this.ticketEntityType}#${id}`);
   }
 
   // ============================================
@@ -318,18 +318,20 @@ export class SupportService {
     await this.db.put(entity);
 
     // Update ticket
-    const newStatus = isAdmin && ticket.status === TicketStatus.OPEN
-      ? TicketStatus.IN_PROGRESS
-      : !isAdmin && ticket.status === TicketStatus.WAITING_FOR_USER
+    const newStatus =
+      isAdmin && ticket.status === TicketStatus.OPEN
         ? TicketStatus.IN_PROGRESS
-        : ticket.status;
+        : !isAdmin && ticket.status === TicketStatus.WAITING_FOR_USER
+          ? TicketStatus.IN_PROGRESS
+          : ticket.status;
 
     await this.db.update<TicketEntity>(this.ticketEntityType, {
       key: {
         PK: `${this.ticketEntityType}#${ticketId}`,
         SK: `${this.ticketEntityType}#${ticketId}`,
       },
-      updateExpression: 'SET repliesCount = repliesCount + :inc, lastReplyAt = :lastReplyAt, lastReplyBy = :lastReplyBy, #status = :status, #updatedAt = :updatedAt',
+      updateExpression:
+        'SET repliesCount = repliesCount + :inc, lastReplyAt = :lastReplyAt, lastReplyBy = :lastReplyBy, #status = :status, #updatedAt = :updatedAt',
       expressionAttributeNames: {
         '#status': 'status',
         '#updatedAt': 'updatedAt',
@@ -399,9 +401,10 @@ export class SupportService {
       const resolved = new Date(ticket.resolvedAt!).getTime();
       totalResolutionTime += resolved - created;
     }
-    const averageResolutionTime = resolvedTickets.length > 0
-      ? totalResolutionTime / resolvedTickets.length / (1000 * 60 * 60) // Convert to hours
-      : 0;
+    const averageResolutionTime =
+      resolvedTickets.length > 0
+        ? totalResolutionTime / resolvedTickets.length / (1000 * 60 * 60) // Convert to hours
+        : 0;
 
     // Count by category
     const ticketsByCategory = {} as Record<TicketCategory, number>;
@@ -460,7 +463,11 @@ export class SupportService {
     }
   }
 
-  private async sendReplyNotification(ticket: TicketResponseDto, message: string, repliedByName: string): Promise<void> {
+  private async sendReplyNotification(
+    ticket: TicketResponseDto,
+    message: string,
+    repliedByName: string,
+  ): Promise<void> {
     try {
       await this.emailService.sendEmail({
         to: ticket.userEmail,

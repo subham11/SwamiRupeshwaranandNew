@@ -20,7 +20,7 @@ import {
   FieldType,
   LocalizedStringDto,
   ComponentFieldValue,
-  ComponentFieldDefinition,
+  // ComponentFieldDefinition, // removed unused import
 } from './dto';
 
 // ============================================
@@ -75,12 +75,31 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     description: 'Top announcement banner with scrolling text',
     icon: '📢',
     fields: [
-      { key: 'text', label: 'Text', type: FieldType.TEXTAREA, required: true, localized: true, placeholder: 'Enter announcement text...' },
-      { key: 'ariaLabel', label: 'Aria Label', type: FieldType.TEXT, required: false, localized: false, defaultValue: 'Announcements' },
+      {
+        key: 'text',
+        label: 'Text',
+        type: FieldType.TEXTAREA,
+        required: true,
+        localized: true,
+        placeholder: 'Enter announcement text...',
+      },
+      {
+        key: 'ariaLabel',
+        label: 'Aria Label',
+        type: FieldType.TEXT,
+        required: false,
+        localized: false,
+        defaultValue: 'Announcements',
+      },
       { key: 'bgColor', label: 'Background Color', type: FieldType.COLOR, defaultValue: '#f97316' },
       { key: 'textColor', label: 'Text Color', type: FieldType.COLOR, defaultValue: '#ffffff' },
       { key: 'link', label: 'Link URL', type: FieldType.URL, required: false },
-      { key: 'isScrolling', label: 'Enable Scrolling', type: FieldType.BOOLEAN, defaultValue: true },
+      {
+        key: 'isScrolling',
+        label: 'Enable Scrolling',
+        type: FieldType.BOOLEAN,
+        defaultValue: true,
+      },
     ],
   },
   {
@@ -90,12 +109,28 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     icon: '🖼️',
     fields: [
       { key: 'heading', label: 'Heading', type: FieldType.TEXT, required: true, localized: true },
-      { key: 'subheading', label: 'Subheading', type: FieldType.TEXTAREA, required: false, localized: true },
+      {
+        key: 'subheading',
+        label: 'Subheading',
+        type: FieldType.TEXTAREA,
+        required: false,
+        localized: true,
+      },
       { key: 'backgroundImage', label: 'Background Image', type: FieldType.IMAGE, required: true },
       { key: 'ctaText', label: 'CTA Button Text', type: FieldType.TEXT, localized: true },
       { key: 'ctaLink', label: 'CTA Button Link', type: FieldType.URL },
-      { key: 'overlayOpacity', label: 'Overlay Opacity', type: FieldType.NUMBER, defaultValue: 0.5 },
-      { key: 'enableParallax', label: 'Enable Parallax', type: FieldType.BOOLEAN, defaultValue: true },
+      {
+        key: 'overlayOpacity',
+        label: 'Overlay Opacity',
+        type: FieldType.NUMBER,
+        defaultValue: 0.5,
+      },
+      {
+        key: 'enableParallax',
+        label: 'Enable Parallax',
+        type: FieldType.BOOLEAN,
+        defaultValue: true,
+      },
     ],
   },
   {
@@ -104,10 +139,27 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     description: 'Display sacred teachings section',
     icon: '📖',
     fields: [
-      { key: 'title', label: 'Section Title', type: FieldType.TEXT, required: true, localized: true },
+      {
+        key: 'title',
+        label: 'Section Title',
+        type: FieldType.TEXT,
+        required: true,
+        localized: true,
+      },
       { key: 'subtitle', label: 'Subtitle', type: FieldType.TEXT, localized: true },
-      { key: 'teachings', label: 'Teachings (JSON)', type: FieldType.JSON, helpText: 'Array of teaching objects' },
-      { key: 'layout', label: 'Layout', type: FieldType.SELECT, options: ['grid', 'carousel', 'list'], defaultValue: 'grid' },
+      {
+        key: 'teachings',
+        label: 'Teachings (JSON)',
+        type: FieldType.JSON,
+        helpText: 'Array of teaching objects',
+      },
+      {
+        key: 'layout',
+        label: 'Layout',
+        type: FieldType.SELECT,
+        options: ['grid', 'carousel', 'list'],
+        defaultValue: 'grid',
+      },
       { key: 'maxItems', label: 'Max Items', type: FieldType.NUMBER, defaultValue: 6 },
     ],
   },
@@ -117,10 +169,21 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     description: 'Shows upcoming events list',
     icon: '📅',
     fields: [
-      { key: 'title', label: 'Section Title', type: FieldType.TEXT, required: true, localized: true },
+      {
+        key: 'title',
+        label: 'Section Title',
+        type: FieldType.TEXT,
+        required: true,
+        localized: true,
+      },
       { key: 'subtitle', label: 'Subtitle', type: FieldType.TEXT, localized: true },
       { key: 'maxEvents', label: 'Max Events to Show', type: FieldType.NUMBER, defaultValue: 4 },
-      { key: 'showPastEvents', label: 'Show Past Events', type: FieldType.BOOLEAN, defaultValue: false },
+      {
+        key: 'showPastEvents',
+        label: 'Show Past Events',
+        type: FieldType.BOOLEAN,
+        defaultValue: false,
+      },
       { key: 'viewAllLink', label: 'View All Link', type: FieldType.URL },
     ],
   },
@@ -130,10 +193,26 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     description: 'Inspirational quotes section',
     icon: '💬',
     fields: [
-      { key: 'title', label: 'Section Title', type: FieldType.TEXT, required: true, localized: true },
-      { key: 'quotes', label: 'Quotes (JSON)', type: FieldType.JSON, helpText: 'Array of quote objects with text and author' },
+      {
+        key: 'title',
+        label: 'Section Title',
+        type: FieldType.TEXT,
+        required: true,
+        localized: true,
+      },
+      {
+        key: 'quotes',
+        label: 'Quotes (JSON)',
+        type: FieldType.JSON,
+        helpText: 'Array of quote objects with text and author',
+      },
       { key: 'autoRotate', label: 'Auto Rotate', type: FieldType.BOOLEAN, defaultValue: true },
-      { key: 'rotateInterval', label: 'Rotate Interval (seconds)', type: FieldType.NUMBER, defaultValue: 5 },
+      {
+        key: 'rotateInterval',
+        label: 'Rotate Interval (seconds)',
+        type: FieldType.NUMBER,
+        defaultValue: 5,
+      },
       { key: 'backgroundImage', label: 'Background Image', type: FieldType.IMAGE },
     ],
   },
@@ -143,11 +222,28 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     description: 'Grid of services/offerings',
     icon: '🙏',
     fields: [
-      { key: 'title', label: 'Section Title', type: FieldType.TEXT, required: true, localized: true },
+      {
+        key: 'title',
+        label: 'Section Title',
+        type: FieldType.TEXT,
+        required: true,
+        localized: true,
+      },
       { key: 'subtitle', label: 'Subtitle', type: FieldType.TEXT, localized: true },
-      { key: 'columns', label: 'Columns', type: FieldType.SELECT, options: ['2', '3', '4'], defaultValue: '3' },
+      {
+        key: 'columns',
+        label: 'Columns',
+        type: FieldType.SELECT,
+        options: ['2', '3', '4'],
+        defaultValue: '3',
+      },
       { key: 'maxItems', label: 'Max Items', type: FieldType.NUMBER, defaultValue: 12 },
-      { key: 'showDescription', label: 'Show Description', type: FieldType.BOOLEAN, defaultValue: true },
+      {
+        key: 'showDescription',
+        label: 'Show Description',
+        type: FieldType.BOOLEAN,
+        defaultValue: true,
+      },
     ],
   },
   {
@@ -156,10 +252,32 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     description: 'Image/video gallery section',
     icon: '🖼️',
     fields: [
-      { key: 'title', label: 'Section Title', type: FieldType.TEXT, required: true, localized: true },
-      { key: 'layout', label: 'Layout', type: FieldType.SELECT, options: ['masonry', 'grid', 'carousel'], defaultValue: 'masonry' },
-      { key: 'images', label: 'Images (JSON)', type: FieldType.JSON, helpText: 'Array of image objects' },
-      { key: 'enableLightbox', label: 'Enable Lightbox', type: FieldType.BOOLEAN, defaultValue: true },
+      {
+        key: 'title',
+        label: 'Section Title',
+        type: FieldType.TEXT,
+        required: true,
+        localized: true,
+      },
+      {
+        key: 'layout',
+        label: 'Layout',
+        type: FieldType.SELECT,
+        options: ['masonry', 'grid', 'carousel'],
+        defaultValue: 'masonry',
+      },
+      {
+        key: 'images',
+        label: 'Images (JSON)',
+        type: FieldType.JSON,
+        helpText: 'Array of image objects',
+      },
+      {
+        key: 'enableLightbox',
+        label: 'Enable Lightbox',
+        type: FieldType.BOOLEAN,
+        defaultValue: true,
+      },
     ],
   },
   {
@@ -169,8 +287,20 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     icon: '📝',
     fields: [
       { key: 'title', label: 'Title', type: FieldType.TEXT, localized: true },
-      { key: 'content', label: 'Content', type: FieldType.RICHTEXT, required: true, localized: true },
-      { key: 'alignment', label: 'Alignment', type: FieldType.SELECT, options: ['left', 'center', 'right'], defaultValue: 'left' },
+      {
+        key: 'content',
+        label: 'Content',
+        type: FieldType.RICHTEXT,
+        required: true,
+        localized: true,
+      },
+      {
+        key: 'alignment',
+        label: 'Alignment',
+        type: FieldType.SELECT,
+        options: ['left', 'center', 'right'],
+        defaultValue: 'left',
+      },
     ],
   },
   {
@@ -183,7 +313,13 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
       { key: 'alt', label: 'Alt Text', type: FieldType.TEXT, required: true, localized: true },
       { key: 'caption', label: 'Caption', type: FieldType.TEXT, localized: true },
       { key: 'link', label: 'Link URL', type: FieldType.URL },
-      { key: 'width', label: 'Width', type: FieldType.SELECT, options: ['full', '3/4', '1/2', '1/3'], defaultValue: 'full' },
+      {
+        key: 'width',
+        label: 'Width',
+        type: FieldType.SELECT,
+        options: ['full', '3/4', '1/2', '1/3'],
+        defaultValue: 'full',
+      },
     ],
   },
   {
@@ -205,7 +341,13 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     description: 'Contact form section',
     icon: '✉️',
     fields: [
-      { key: 'title', label: 'Section Title', type: FieldType.TEXT, required: true, localized: true },
+      {
+        key: 'title',
+        label: 'Section Title',
+        type: FieldType.TEXT,
+        required: true,
+        localized: true,
+      },
       { key: 'subtitle', label: 'Subtitle', type: FieldType.TEXT, localized: true },
       { key: 'successMessage', label: 'Success Message', type: FieldType.TEXT, localized: true },
       { key: 'recipientEmail', label: 'Recipient Email', type: FieldType.TEXT },
@@ -217,10 +359,26 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     description: 'Donation/contribution section',
     icon: '🙏',
     fields: [
-      { key: 'title', label: 'Section Title', type: FieldType.TEXT, required: true, localized: true },
+      {
+        key: 'title',
+        label: 'Section Title',
+        type: FieldType.TEXT,
+        required: true,
+        localized: true,
+      },
       { key: 'description', label: 'Description', type: FieldType.TEXTAREA, localized: true },
-      { key: 'amounts', label: 'Preset Amounts (comma-separated)', type: FieldType.TEXT, defaultValue: '101,501,1100,2100,5100' },
-      { key: 'customAmountEnabled', label: 'Allow Custom Amount', type: FieldType.BOOLEAN, defaultValue: true },
+      {
+        key: 'amounts',
+        label: 'Preset Amounts (comma-separated)',
+        type: FieldType.TEXT,
+        defaultValue: '101,501,1100,2100,5100',
+      },
+      {
+        key: 'customAmountEnabled',
+        label: 'Allow Custom Amount',
+        type: FieldType.BOOLEAN,
+        defaultValue: true,
+      },
     ],
   },
   {
@@ -229,9 +387,21 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     description: 'Newsletter subscription form',
     icon: '📧',
     fields: [
-      { key: 'title', label: 'Section Title', type: FieldType.TEXT, required: true, localized: true },
+      {
+        key: 'title',
+        label: 'Section Title',
+        type: FieldType.TEXT,
+        required: true,
+        localized: true,
+      },
       { key: 'description', label: 'Description', type: FieldType.TEXT, localized: true },
-      { key: 'buttonText', label: 'Button Text', type: FieldType.TEXT, localized: true, defaultValue: 'Subscribe' },
+      {
+        key: 'buttonText',
+        label: 'Button Text',
+        type: FieldType.TEXT,
+        localized: true,
+        defaultValue: 'Subscribe',
+      },
       { key: 'successMessage', label: 'Success Message', type: FieldType.TEXT, localized: true },
     ],
   },
@@ -241,9 +411,25 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     description: 'Frequently asked questions accordion',
     icon: '❓',
     fields: [
-      { key: 'title', label: 'Section Title', type: FieldType.TEXT, required: true, localized: true },
-      { key: 'faqs', label: 'FAQs (JSON)', type: FieldType.JSON, helpText: 'Array of FAQ objects with question and answer' },
-      { key: 'allowMultipleOpen', label: 'Allow Multiple Open', type: FieldType.BOOLEAN, defaultValue: false },
+      {
+        key: 'title',
+        label: 'Section Title',
+        type: FieldType.TEXT,
+        required: true,
+        localized: true,
+      },
+      {
+        key: 'faqs',
+        label: 'FAQs (JSON)',
+        type: FieldType.JSON,
+        helpText: 'Array of FAQ objects with question and answer',
+      },
+      {
+        key: 'allowMultipleOpen',
+        label: 'Allow Multiple Open',
+        type: FieldType.BOOLEAN,
+        defaultValue: false,
+      },
     ],
   },
   {
@@ -252,9 +438,26 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     description: 'User testimonials/reviews section',
     icon: '⭐',
     fields: [
-      { key: 'title', label: 'Section Title', type: FieldType.TEXT, required: true, localized: true },
-      { key: 'testimonials', label: 'Testimonials (JSON)', type: FieldType.JSON, helpText: 'Array of testimonial objects' },
-      { key: 'layout', label: 'Layout', type: FieldType.SELECT, options: ['carousel', 'grid'], defaultValue: 'carousel' },
+      {
+        key: 'title',
+        label: 'Section Title',
+        type: FieldType.TEXT,
+        required: true,
+        localized: true,
+      },
+      {
+        key: 'testimonials',
+        label: 'Testimonials (JSON)',
+        type: FieldType.JSON,
+        helpText: 'Array of testimonial objects',
+      },
+      {
+        key: 'layout',
+        label: 'Layout',
+        type: FieldType.SELECT,
+        options: ['carousel', 'grid'],
+        defaultValue: 'carousel',
+      },
       { key: 'autoRotate', label: 'Auto Rotate', type: FieldType.BOOLEAN, defaultValue: true },
     ],
   },
@@ -412,8 +615,15 @@ export class PageComponentsService {
     const expressionAttributeValues: Record<string, any> = {};
 
     const fieldsToUpdate = [
-      'slug', 'title', 'description', 'path', 'heroImage', 
-      'status', 'displayOrder', 'metaTitle', 'metaDescription'
+      'slug',
+      'title',
+      'description',
+      'path',
+      'heroImage',
+      'status',
+      'displayOrder',
+      'metaTitle',
+      'metaDescription',
     ];
 
     for (const field of fieldsToUpdate) {
@@ -524,7 +734,10 @@ export class PageComponentsService {
     return this.mapComponentToResponse(component);
   }
 
-  async updateComponent(id: string, dto: UpdatePageComponentDto): Promise<PageComponentResponseDto> {
+  async updateComponent(
+    id: string,
+    dto: UpdatePageComponentDto,
+  ): Promise<PageComponentResponseDto> {
     const existing = await this.findComponentById(id);
     if (!existing) {
       throw new NotFoundException(`Component with ID ${id} not found`);
@@ -535,8 +748,14 @@ export class PageComponentsService {
     const expressionAttributeValues: Record<string, any> = {};
 
     const fieldsToUpdate = [
-      'componentType', 'name', 'description', 'fields', 
-      'displayOrder', 'isVisible', 'customClasses', 'customStyles'
+      'componentType',
+      'name',
+      'description',
+      'fields',
+      'displayOrder',
+      'isVisible',
+      'customClasses',
+      'customStyles',
     ];
 
     for (const field of fieldsToUpdate) {
@@ -550,15 +769,18 @@ export class PageComponentsService {
     updateExpressions.push('updatedAt = :updatedAt');
     expressionAttributeValues[':updatedAt'] = new Date().toISOString();
 
-    const updated = await this.databaseService.update<PageComponentEntity>(this.componentEntityType, {
-      key: {
-        PK: `${this.componentEntityType}#${id}`,
-        SK: `${this.componentEntityType}#${id}`,
+    const updated = await this.databaseService.update<PageComponentEntity>(
+      this.componentEntityType,
+      {
+        key: {
+          PK: `${this.componentEntityType}#${id}`,
+          SK: `${this.componentEntityType}#${id}`,
+        },
+        updateExpression: `SET ${updateExpressions.join(', ')}`,
+        expressionAttributeNames,
+        expressionAttributeValues,
       },
-      updateExpression: `SET ${updateExpressions.join(', ')}`,
-      expressionAttributeNames,
-      expressionAttributeValues,
-    });
+    );
 
     return this.mapComponentToResponse(updated);
   }

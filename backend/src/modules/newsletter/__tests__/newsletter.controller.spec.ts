@@ -80,7 +80,10 @@ describe('NewsletterController', () => {
 
   it('creates a campaign', async () => {
     const dto = { subject: { en: 'Hi' }, content: { en: '<p>Body</p>' } };
-    mockNewsletterService.createCampaign.mockResolvedValue({ id: 'c1', status: CampaignStatus.DRAFT });
+    mockNewsletterService.createCampaign.mockResolvedValue({
+      id: 'c1',
+      status: CampaignStatus.DRAFT,
+    });
 
     const result = await controller.createCampaign(dto as any, { user: { sub: 'admin-1' } });
 

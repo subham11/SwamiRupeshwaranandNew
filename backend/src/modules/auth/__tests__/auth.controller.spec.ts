@@ -20,9 +20,7 @@ describe('AuthController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [
-        { provide: AuthService, useValue: mockAuthService },
-      ],
+      providers: [{ provide: AuthService, useValue: mockAuthService }],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
@@ -60,9 +58,7 @@ describe('AuthController', () => {
     });
 
     it('should throw UnauthorizedException for invalid credentials', async () => {
-      mockAuthService.login.mockRejectedValue(
-        new UnauthorizedException('Invalid credentials')
-      );
+      mockAuthService.login.mockRejectedValue(new UnauthorizedException('Invalid credentials'));
 
       await expect(controller.login(loginDto)).rejects.toThrow(UnauthorizedException);
       await expect(controller.login(loginDto)).rejects.toThrow('Invalid credentials');
@@ -73,9 +69,7 @@ describe('AuthController', () => {
         email: 'nonexistent@example.com',
         password: 'SomePassword123!',
       };
-      mockAuthService.login.mockRejectedValue(
-        new UnauthorizedException('Invalid credentials')
-      );
+      mockAuthService.login.mockRejectedValue(new UnauthorizedException('Invalid credentials'));
 
       await expect(controller.login(nonExistentUserDto)).rejects.toThrow(UnauthorizedException);
     });
@@ -86,7 +80,7 @@ describe('AuthController', () => {
           message: 'New password required',
           challengeName: 'NEW_PASSWORD_REQUIRED',
           session: 'session-token-123',
-        })
+        }),
       );
 
       await expect(controller.login(loginDto)).rejects.toThrow(BadRequestException);
@@ -119,7 +113,7 @@ describe('AuthController', () => {
         password: '',
       };
       mockAuthService.login.mockRejectedValue(
-        new BadRequestException('Password must be at least 8 characters')
+        new BadRequestException('Password must be at least 8 characters'),
       );
 
       await expect(controller.login(emptyPasswordDto)).rejects.toThrow(BadRequestException);
@@ -131,7 +125,7 @@ describe('AuthController', () => {
         password: 'short',
       };
       mockAuthService.login.mockRejectedValue(
-        new BadRequestException('Password must be at least 8 characters')
+        new BadRequestException('Password must be at least 8 characters'),
       );
 
       await expect(controller.login(shortPasswordDto)).rejects.toThrow(BadRequestException);
@@ -167,7 +161,7 @@ describe('AuthController', () => {
         refreshToken: 'invalid-refresh-token',
       };
       mockAuthService.refreshToken.mockRejectedValue(
-        new UnauthorizedException('Invalid refresh token')
+        new UnauthorizedException('Invalid refresh token'),
       );
 
       await expect(controller.refresh(invalidRefreshDto)).rejects.toThrow(UnauthorizedException);
@@ -178,7 +172,7 @@ describe('AuthController', () => {
         refreshToken: 'expired-refresh-token',
       };
       mockAuthService.refreshToken.mockRejectedValue(
-        new UnauthorizedException('Refresh token expired')
+        new UnauthorizedException('Refresh token expired'),
       );
 
       await expect(controller.refresh(expiredRefreshDto)).rejects.toThrow(UnauthorizedException);
@@ -217,10 +211,12 @@ describe('AuthController', () => {
         session: 'invalid-session',
       };
       mockAuthService.setNewPassword.mockRejectedValue(
-        new UnauthorizedException('Invalid session')
+        new UnauthorizedException('Invalid session'),
       );
 
-      await expect(controller.setNewPassword(invalidSessionDto)).rejects.toThrow(UnauthorizedException);
+      await expect(controller.setNewPassword(invalidSessionDto)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw BadRequestException for weak password', async () => {
@@ -230,7 +226,7 @@ describe('AuthController', () => {
         session: 'valid-session',
       };
       mockAuthService.setNewPassword.mockRejectedValue(
-        new BadRequestException('Password does not meet requirements')
+        new BadRequestException('Password does not meet requirements'),
       );
 
       await expect(controller.setNewPassword(weakPasswordDto)).rejects.toThrow(BadRequestException);

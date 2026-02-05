@@ -16,11 +16,11 @@ import { Type } from 'class-transformer';
 // ============================================
 export enum SubscriptionPlanType {
   FREE = 'free',
-  BASIC = 'basic',           // ₹300
-  STANDARD = 'standard',     // ₹1100
-  PREMIUM = 'premium',       // ₹2100
-  ELITE = 'elite',           // ₹5100
-  DIVINE = 'divine',         // ₹21000
+  BASIC = 'basic', // ₹300
+  STANDARD = 'standard', // ₹1100
+  PREMIUM = 'premium', // ₹2100
+  ELITE = 'elite', // ₹5100
+  DIVINE = 'divine', // ₹21000
 }
 
 export enum BillingCycle {

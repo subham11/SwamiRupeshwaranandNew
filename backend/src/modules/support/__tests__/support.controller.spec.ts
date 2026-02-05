@@ -87,7 +87,9 @@ describe('SupportController', () => {
     const result = await controller.updateTicket('t1', { status: TicketStatus.RESOLVED } as any);
 
     expect(result.status).toBe(TicketStatus.RESOLVED);
-    expect(mockSupportService.updateTicket).toHaveBeenCalledWith('t1', { status: TicketStatus.RESOLVED });
+    expect(mockSupportService.updateTicket).toHaveBeenCalledWith('t1', {
+      status: TicketStatus.RESOLVED,
+    });
   });
 
   it('returns stats', async () => {

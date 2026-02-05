@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -49,9 +39,10 @@ export class SubscriptionContentUploadController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @EditorOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get presigned URL for file upload (Content Editor+)',
-    description: 'Returns a presigned URL for direct file upload to S3. Use this before creating content.'
+    description:
+      'Returns a presigned URL for direct file upload to S3. Use this before creating content.',
   })
   @ApiResponse({
     status: 201,
@@ -68,9 +59,9 @@ export class SubscriptionContentUploadController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get presigned URL for file download (Admin only)',
-    description: 'Returns a presigned URL for downloading any file from S3.'
+    description: 'Returns a presigned URL for downloading any file from S3.',
   })
   @ApiResponse({
     status: 201,
@@ -87,9 +78,9 @@ export class SubscriptionContentUploadController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @EditorOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Create subscription content with uploaded file (Content Editor+)',
-    description: 'Creates content record after file has been uploaded using presigned URL.'
+    description: 'Creates content record after file has been uploaded using presigned URL.',
   })
   @ApiResponse({
     status: 201,
@@ -106,9 +97,9 @@ export class SubscriptionContentUploadController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Bulk create subscription content (Admin only)',
-    description: 'Create multiple content items at once for a subscription plan.'
+    description: 'Create multiple content items at once for a subscription plan.',
   })
   @ApiResponse({
     status: 201,
@@ -125,9 +116,9 @@ export class SubscriptionContentUploadController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @EditorOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Update content file (Content Editor+)',
-    description: 'Replace the file for an existing content item.'
+    description: 'Replace the file for an existing content item.',
   })
   @ApiParam({ name: 'contentId', description: 'Content ID' })
   @ApiQuery({ name: 'locale', required: false })
@@ -148,9 +139,9 @@ export class SubscriptionContentUploadController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @EditorOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Update content thumbnail (Content Editor+)',
-    description: 'Replace the thumbnail for an existing content item.'
+    description: 'Replace the thumbnail for an existing content item.',
   })
   @ApiParam({ name: 'contentId', description: 'Content ID' })
   @ApiQuery({ name: 'locale', required: false })
@@ -171,9 +162,9 @@ export class SubscriptionContentUploadController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Delete content and associated files (Admin only)',
-    description: 'Deletes the content record and its S3 files.'
+    description: 'Deletes the content record and its S3 files.',
   })
   @ApiParam({ name: 'contentId', description: 'Content ID' })
   @ApiQuery({ name: 'locale', required: false })
@@ -193,9 +184,9 @@ export class SubscriptionContentUploadController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'List files by category (Admin only)',
-    description: 'List all files in a specific category folder in S3.'
+    description: 'List all files in a specific category folder in S3.',
   })
   @ApiParam({ name: 'category', enum: FileCategory })
   @ApiResponse({
@@ -213,12 +204,17 @@ export class SubscriptionContentUploadController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Find orphaned files (Admin only)',
-    description: 'Find files not linked to any content. Use dryRun=false to delete them.'
+    description: 'Find files not linked to any content. Use dryRun=false to delete them.',
   })
   @ApiQuery({ name: 'category', enum: FileCategory })
-  @ApiQuery({ name: 'dryRun', required: false, type: Boolean, description: 'If true, only list files without deleting' })
+  @ApiQuery({
+    name: 'dryRun',
+    required: false,
+    type: Boolean,
+    description: 'If true, only list files without deleting',
+  })
   @ApiResponse({
     status: 200,
     description: 'List of orphaned file keys',
@@ -238,9 +234,9 @@ export class SubscriptionContentUploadController {
   @Get('access/:contentId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Check content access',
-    description: 'Check if the current user has access to specific content.'
+    description: 'Check if the current user has access to specific content.',
   })
   @ApiParam({ name: 'contentId', description: 'Content ID' })
   @ApiQuery({ name: 'locale', required: false })
@@ -260,9 +256,10 @@ export class SubscriptionContentUploadController {
   @Post('secure-download')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get secure download URL',
-    description: 'Get a time-limited download URL for subscribed content. Only available if user has active subscription.'
+    description:
+      'Get a time-limited download URL for subscribed content. Only available if user has active subscription.',
   })
   @ApiResponse({
     status: 200,
@@ -283,9 +280,10 @@ export class SubscriptionContentUploadController {
 
   @Get('public/free-content')
   @Public()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get free tier content list',
-    description: 'Get content available in the free subscription tier (no authentication required).'
+    description:
+      'Get content available in the free subscription tier (no authentication required).',
   })
   async getFreeTierContent(): Promise<any> {
     // This would be implemented to return free tier content

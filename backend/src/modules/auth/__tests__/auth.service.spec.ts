@@ -19,10 +19,7 @@ describe('AuthService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AuthService,
-        { provide: CognitoService, useValue: mockCognitoService },
-      ],
+      providers: [AuthService, { provide: CognitoService, useValue: mockCognitoService }],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
@@ -64,28 +61,34 @@ describe('AuthService', () => {
 
     it('should throw UnauthorizedException for invalid email', async () => {
       mockCognitoService.authenticate.mockRejectedValue(
-        new UnauthorizedException('Invalid credentials')
+        new UnauthorizedException('Invalid credentials'),
       );
 
-      await expect(service.login({
-        email: 'nonexistent@example.com',
-        password: 'SomePassword123!',
-      })).rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.login({
+          email: 'nonexistent@example.com',
+          password: 'SomePassword123!',
+        }),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException for wrong password', async () => {
       mockCognitoService.authenticate.mockRejectedValue(
-        new UnauthorizedException('Invalid credentials')
+        new UnauthorizedException('Invalid credentials'),
       );
 
-      await expect(service.login({
-        email: 'test@example.com',
-        password: 'WrongPassword123!',
-      })).rejects.toThrow(UnauthorizedException);
-      await expect(service.login({
-        email: 'test@example.com',
-        password: 'WrongPassword123!',
-      })).rejects.toThrow('Invalid credentials');
+      await expect(
+        service.login({
+          email: 'test@example.com',
+          password: 'WrongPassword123!',
+        }),
+      ).rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.login({
+          email: 'test@example.com',
+          password: 'WrongPassword123!',
+        }),
+      ).rejects.toThrow('Invalid credentials');
     });
 
     it('should throw BadRequestException when new password is required', async () => {
@@ -94,7 +97,7 @@ describe('AuthService', () => {
           message: 'New password required',
           challengeName: 'NEW_PASSWORD_REQUIRED',
           session: 'session-token',
-        })
+        }),
       );
 
       await expect(service.login(loginDto)).rejects.toThrow(BadRequestException);
@@ -135,9 +138,7 @@ describe('AuthService', () => {
     });
 
     it('should handle network errors gracefully', async () => {
-      mockCognitoService.authenticate.mockRejectedValue(
-        new Error('Network error')
-      );
+      mockCognitoService.authenticate.mockRejectedValue(new Error('Network error'));
 
       await expect(service.login(loginDto)).rejects.toThrow('Network error');
     });
@@ -169,32 +170,36 @@ describe('AuthService', () => {
 
     it('should throw UnauthorizedException for invalid refresh token', async () => {
       mockCognitoService.refreshToken.mockRejectedValue(
-        new UnauthorizedException('Invalid refresh token')
+        new UnauthorizedException('Invalid refresh token'),
       );
 
-      await expect(service.refreshToken({
-        refreshToken: 'invalid-token',
-      })).rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.refreshToken({
+          refreshToken: 'invalid-token',
+        }),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException for expired refresh token', async () => {
-      mockCognitoService.refreshToken.mockRejectedValue(
-        new UnauthorizedException('Token expired')
-      );
+      mockCognitoService.refreshToken.mockRejectedValue(new UnauthorizedException('Token expired'));
 
-      await expect(service.refreshToken({
-        refreshToken: 'expired-token',
-      })).rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.refreshToken({
+          refreshToken: 'expired-token',
+        }),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should handle empty refresh token', async () => {
       mockCognitoService.refreshToken.mockRejectedValue(
-        new BadRequestException('Refresh token is required')
+        new BadRequestException('Refresh token is required'),
       );
 
-      await expect(service.refreshToken({
-        refreshToken: '',
-      })).rejects.toThrow(BadRequestException);
+      await expect(
+        service.refreshToken({
+          refreshToken: '',
+        }),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -229,35 +234,41 @@ describe('AuthService', () => {
 
     it('should throw UnauthorizedException for invalid session', async () => {
       mockCognitoService.respondToNewPasswordChallenge.mockRejectedValue(
-        new UnauthorizedException('Invalid session')
+        new UnauthorizedException('Invalid session'),
       );
 
-      await expect(service.setNewPassword({
-        ...newPasswordDto,
-        session: 'invalid-session',
-      })).rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.setNewPassword({
+          ...newPasswordDto,
+          session: 'invalid-session',
+        }),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException for expired session', async () => {
       mockCognitoService.respondToNewPasswordChallenge.mockRejectedValue(
-        new UnauthorizedException('Session expired')
+        new UnauthorizedException('Session expired'),
       );
 
-      await expect(service.setNewPassword({
-        ...newPasswordDto,
-        session: 'expired-session',
-      })).rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.setNewPassword({
+          ...newPasswordDto,
+          session: 'expired-session',
+        }),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw BadRequestException for password not meeting policy', async () => {
       mockCognitoService.respondToNewPasswordChallenge.mockRejectedValue(
-        new BadRequestException('Password does not meet complexity requirements')
+        new BadRequestException('Password does not meet complexity requirements'),
       );
 
-      await expect(service.setNewPassword({
-        ...newPasswordDto,
-        newPassword: 'weak',
-      })).rejects.toThrow(BadRequestException);
+      await expect(
+        service.setNewPassword({
+          ...newPasswordDto,
+          newPassword: 'weak',
+        }),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should handle password with all required complexity', async () => {

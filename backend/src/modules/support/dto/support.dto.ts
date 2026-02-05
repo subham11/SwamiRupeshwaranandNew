@@ -1,5 +1,5 @@
-import { IsString, IsEmail, IsOptional, IsBoolean, IsArray, IsEnum, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsString, IsEmail, IsOptional, IsBoolean, IsArray, IsEnum } from 'class-validator';
+// import { Type } from 'class-transformer'; // removed unused import
 
 // ============================================
 // Enums

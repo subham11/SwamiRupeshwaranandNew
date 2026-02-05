@@ -177,7 +177,9 @@ export class NewsletterService {
 
     const updateExpression: string[] = ['#updatedAt = :updatedAt'];
     const expressionAttributeNames: Record<string, string> = { '#updatedAt': 'updatedAt' };
-    const expressionAttributeValues: Record<string, unknown> = { ':updatedAt': new Date().toISOString() };
+    const expressionAttributeValues: Record<string, unknown> = {
+      ':updatedAt': new Date().toISOString(),
+    };
 
     if (dto.name !== undefined) {
       updateExpression.push('#name = :name');
@@ -291,7 +293,9 @@ export class NewsletterService {
 
     const updateExpression: string[] = ['#updatedAt = :updatedAt'];
     const expressionAttributeNames: Record<string, string> = { '#updatedAt': 'updatedAt' };
-    const expressionAttributeValues: Record<string, unknown> = { ':updatedAt': new Date().toISOString() };
+    const expressionAttributeValues: Record<string, unknown> = {
+      ':updatedAt': new Date().toISOString(),
+    };
 
     if (dto.subject !== undefined) {
       updateExpression.push('subject = :subject');
@@ -347,10 +351,7 @@ export class NewsletterService {
       throw new BadRequestException('Cannot delete a campaign that is being sent');
     }
 
-    await this.db.delete(
-      `${this.campaignEntityType}#${id}`,
-      `${this.campaignEntityType}#${id}`,
-    );
+    await this.db.delete(`${this.campaignEntityType}#${id}`, `${this.campaignEntityType}#${id}`);
   }
 
   async sendCampaign(id: string, dto: SendCampaignDto): Promise<CampaignResponseDto> {
@@ -406,7 +407,8 @@ export class NewsletterService {
         PK: `${this.campaignEntityType}#${id}`,
         SK: `${this.campaignEntityType}#${id}`,
       },
-      updateExpression: 'SET #status = :status, sentAt = :sentAt, stats = :stats, #updatedAt = :updatedAt',
+      updateExpression:
+        'SET #status = :status, sentAt = :sentAt, stats = :stats, #updatedAt = :updatedAt',
       expressionAttributeNames: {
         '#status': 'status',
         '#updatedAt': 'updatedAt',
@@ -438,9 +440,7 @@ export class NewsletterService {
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
     const activeSubscribers = subscribers.filter((s) => s.status === SubscriberStatus.ACTIVE);
-    const recentSubscribers = subscribers.filter(
-      (s) => new Date(s.subscribedAt) >= thirtyDaysAgo,
-    );
+    const recentSubscribers = subscribers.filter((s) => new Date(s.subscribedAt) >= thirtyDaysAgo);
 
     return {
       totalSubscribers: subscribers.length,
@@ -483,7 +483,7 @@ export class NewsletterService {
     }
   }
 
-  private wrapEmailContent(content: string, subscriberEmail: string): string {
+  private wrapEmailContent(content: string): string {
     return `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         ${content}

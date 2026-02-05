@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -36,7 +26,13 @@ import {
   ContentType,
 } from './dto';
 import { JwtAuthGuard, RolesGuard } from '@/common/guards';
-import { Public, AdminOnly, SuperAdminOnly, CurrentUser, CurrentUserData } from '@/common/decorators';
+import {
+  Public,
+  AdminOnly,
+  SuperAdminOnly,
+  CurrentUser,
+  CurrentUserData,
+} from '@/common/decorators';
 
 @ApiTags('Subscriptions')
 @Controller('subscriptions')
@@ -80,7 +76,9 @@ export class SubscriptionsController {
   async findAllPlans(
     @Query('activeOnly') activeOnly?: boolean,
   ): Promise<SubscriptionPlanListResponseDto> {
-    return this.subscriptionsService.findAllPlans(activeOnly === true || activeOnly === 'true' as any);
+    return this.subscriptionsService.findAllPlans(
+      activeOnly === true || activeOnly === ('true' as any),
+    );
   }
 
   @Get('plans/:id')
@@ -389,10 +387,7 @@ export class SubscriptionsController {
   @ApiParam({ name: 'id', description: 'Content ID' })
   @ApiQuery({ name: 'locale', required: false })
   @ApiResponse({ status: 200, description: 'Content deleted' })
-  async deleteContent(
-    @Param('id') id: string,
-    @Query('locale') locale?: string,
-  ): Promise<void> {
+  async deleteContent(@Param('id') id: string, @Query('locale') locale?: string): Promise<void> {
     return this.subscriptionsService.deleteContent(id, locale);
   }
 }

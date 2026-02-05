@@ -170,7 +170,9 @@ describe('DonationService', () => {
         status: DonationStatus.COMPLETED,
       } as any);
 
-      const receiptSpy = jest.spyOn(service as any, 'sendDonationReceipt').mockResolvedValue(undefined);
+      const receiptSpy = jest
+        .spyOn(service as any, 'sendDonationReceipt')
+        .mockResolvedValue(undefined);
 
       const result = await service.verifyPayment({
         donationId: 'don-1',

@@ -79,10 +79,10 @@ const MIME_TYPE_EXTENSIONS: Record<string, string> = {
 };
 
 const MAX_FILE_SIZES: Record<string, number> = {
-  image: 10 * 1024 * 1024,    // 10MB for images
-  pdf: 50 * 1024 * 1024,      // 50MB for PDFs
-  video: 500 * 1024 * 1024,   // 500MB for videos
-  audio: 100 * 1024 * 1024,   // 100MB for audio
+  image: 10 * 1024 * 1024, // 10MB for images
+  pdf: 50 * 1024 * 1024, // 50MB for PDFs
+  video: 500 * 1024 * 1024, // 500MB for videos
+  audio: 100 * 1024 * 1024, // 100MB for audio
 };
 
 @Injectable()
@@ -95,7 +95,8 @@ export class StorageService {
 
   constructor(private readonly configService: ConfigService) {
     this.isLocal = this.configService.get<string>('IS_LOCAL') === 'true';
-    this.bucketName = this.configService.get<string>('AWS_S3_BUCKET') || 'swami-rupeshwaranand-content';
+    this.bucketName =
+      this.configService.get<string>('AWS_S3_BUCKET') || 'swami-rupeshwaranand-content';
     this.cdnDomain = this.configService.get<string>('CDN_DOMAIN');
 
     if (this.isLocal) {
@@ -126,7 +127,7 @@ export class StorageService {
     expiresIn = 3600,
   ): Promise<PresignedUrlResult> {
     this.validateMimeType(contentType);
-    
+
     const extension = MIME_TYPE_EXTENSIONS[contentType] || this.getExtensionFromFileName(fileName);
     const key = this.generateKey(folder, extension);
 
@@ -197,11 +198,7 @@ export class StorageService {
   /**
    * Upload with a specific key (for replacing files)
    */
-  async uploadFileWithKey(
-    key: string,
-    buffer: Buffer,
-    contentType: string,
-  ): Promise<UploadResult> {
+  async uploadFileWithKey(key: string, buffer: Buffer, contentType: string): Promise<UploadResult> {
     this.validateMimeType(contentType);
     this.validateFileSize(buffer.length, contentType);
 
@@ -270,7 +267,7 @@ export class StorageService {
         Key: key,
       });
       const response = await this.s3Client.send(command);
-      
+
       return {
         key,
         size: response.ContentLength || 0,
@@ -293,7 +290,7 @@ export class StorageService {
     });
 
     const response = await this.s3Client.send(command);
-    
+
     return (response.Contents || []).map((item) => ({
       key: item.Key || '',
       size: item.Size || 0,
@@ -337,7 +334,7 @@ export class StorageService {
     if (this.cdnDomain) {
       return `https://${this.cdnDomain}/${key}`;
     }
-    
+
     if (this.isLocal) {
       return `http://localhost:4566/${this.bucketName}/${key}`;
     }
@@ -351,7 +348,7 @@ export class StorageService {
   extractKeyFromUrl(url: string): string | null {
     try {
       const urlObj = new URL(url);
-      
+
       // Handle CDN URLs
       if (this.cdnDomain && urlObj.hostname === this.cdnDomain) {
         return urlObj.pathname.slice(1); // Remove leading slash
@@ -378,7 +375,10 @@ export class StorageService {
   // Private Helper Methods
   // ============================================
 
-  private async createSignedUrl(command: PutObjectCommand | GetObjectCommand, expiresIn: number): Promise<string> {
+  private async createSignedUrl(
+    command: PutObjectCommand | GetObjectCommand,
+    expiresIn: number,
+  ): Promise<string> {
     // Lazy-load to keep tests isolated from optional AWS presigner dependency
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');

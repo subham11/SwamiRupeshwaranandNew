@@ -186,7 +186,9 @@ export class DonationService {
 
     const updateExpression: string[] = ['#updatedAt = :updatedAt'];
     const expressionAttributeNames: Record<string, string> = { '#updatedAt': 'updatedAt' };
-    const expressionAttributeValues: Record<string, unknown> = { ':updatedAt': new Date().toISOString() };
+    const expressionAttributeValues: Record<string, unknown> = {
+      ':updatedAt': new Date().toISOString(),
+    };
 
     const fields = [
       'title',
@@ -223,10 +225,7 @@ export class DonationService {
   }
 
   async deleteConfig(id: string): Promise<void> {
-    await this.db.delete(
-      `${this.configEntityType}#${id}`,
-      `${this.configEntityType}#${id}`,
-    );
+    await this.db.delete(`${this.configEntityType}#${id}`, `${this.configEntityType}#${id}`);
   }
 
   // ============================================
@@ -323,7 +322,9 @@ export class DonationService {
 
     const updateExpression: string[] = ['#updatedAt = :updatedAt'];
     const expressionAttributeNames: Record<string, string> = { '#updatedAt': 'updatedAt' };
-    const expressionAttributeValues: Record<string, unknown> = { ':updatedAt': new Date().toISOString() };
+    const expressionAttributeValues: Record<string, unknown> = {
+      ':updatedAt': new Date().toISOString(),
+    };
 
     const fields = [
       'status',
@@ -361,15 +362,21 @@ export class DonationService {
   // Razorpay Integration
   // ============================================
 
-  async createRazorpayOrder(dto: CreateRazorpayOrderDto, userId?: string): Promise<RazorpayOrderResponseDto> {
+  async createRazorpayOrder(
+    dto: CreateRazorpayOrderDto,
+    userId?: string,
+  ): Promise<RazorpayOrderResponseDto> {
     // Create donation record first
-    const donation = await this.createDonation({
-      amount: dto.amount,
-      purpose: dto.purpose,
-      donorName: dto.donorName,
-      donorEmail: dto.donorEmail,
-      donorPhone: dto.donorPhone,
-    }, userId);
+    const donation = await this.createDonation(
+      {
+        amount: dto.amount,
+        purpose: dto.purpose,
+        donorName: dto.donorName,
+        donorEmail: dto.donorEmail,
+        donorPhone: dto.donorPhone,
+      },
+      userId,
+    );
 
     // In production, call Razorpay API to create order
     // For now, simulate order creation
@@ -423,9 +430,7 @@ export class DonationService {
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
 
-    const thisMonthDonations = donations.filter(
-      (d) => new Date(d.createdAt) >= thisMonth,
-    );
+    const thisMonthDonations = donations.filter((d) => new Date(d.createdAt) >= thisMonth);
     const lastMonthDonations = donations.filter(
       (d) => new Date(d.createdAt) >= lastMonth && new Date(d.createdAt) <= lastMonthEnd,
     );
@@ -440,13 +445,16 @@ export class DonationService {
       purposeCounts[donation.purpose] = (purposeCounts[donation.purpose] || 0) + 1;
     }
 
-    const topPurpose = Object.entries(purposeCounts)
-      .sort(([, a], [, b]) => b - a)[0]?.[0] as DonationPurpose || DonationPurpose.GENERAL;
+    const topPurpose =
+      (Object.entries(purposeCounts).sort(([, a], [, b]) => b - a)[0]?.[0] as DonationPurpose) ||
+      DonationPurpose.GENERAL;
 
     // Unique donors
     const donors = new Set(donations.filter((d) => d.donorEmail).map((d) => d.donorEmail));
     const recurringDonors = new Set(
-      donations.filter((d) => d.donationType === DonationType.RECURRING && d.donorEmail).map((d) => d.donorEmail),
+      donations
+        .filter((d) => d.donationType === DonationType.RECURRING && d.donorEmail)
+        .map((d) => d.donorEmail),
     );
 
     return {

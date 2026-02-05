@@ -153,9 +153,9 @@ export class BulkContentUploadDto {
   @IsString()
   planId!: string;
 
-  @ApiProperty({ 
-    type: [CreateSubscriptionContentWithFileDto], 
-    description: 'Array of content items to create' 
+  @ApiProperty({
+    type: [CreateSubscriptionContentWithFileDto],
+    description: 'Array of content items to create',
   })
   items!: CreateSubscriptionContentWithFileDto[];
 }
@@ -251,9 +251,9 @@ export class SecureDownloadRequestDto {
   @IsString()
   locale?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Get thumbnail instead of main file',
-    default: false 
+    default: false,
   })
   @IsOptional()
   @IsBoolean()

@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -76,7 +66,9 @@ export class PageComponentsController {
   async findAllPages(
     @Query('publishedOnly') publishedOnly?: boolean,
   ): Promise<PageListResponseDto> {
-    return this.pageComponentsService.findAllPages(publishedOnly === true || publishedOnly === 'true' as any);
+    return this.pageComponentsService.findAllPages(
+      publishedOnly === true || publishedOnly === ('true' as any),
+    );
   }
 
   @Get('pages/by-slug/:slug')

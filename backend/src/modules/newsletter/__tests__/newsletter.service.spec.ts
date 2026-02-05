@@ -94,17 +94,15 @@ describe('NewsletterService', () => {
         ],
       });
 
-      const updateSpy = jest
-        .spyOn(service, 'updateSubscriber')
-        .mockResolvedValue({
-          id: 'sub-2',
-          email: 'test@example.com',
-          status: SubscriberStatus.ACTIVE,
-          tags: [],
-          subscribedAt: '2026-01-01T00:00:00.000Z',
-          createdAt: '2026-01-01T00:00:00.000Z',
-          updatedAt: '2026-02-01T00:00:00.000Z',
-        } as any);
+      const updateSpy = jest.spyOn(service, 'updateSubscriber').mockResolvedValue({
+        id: 'sub-2',
+        email: 'test@example.com',
+        status: SubscriberStatus.ACTIVE,
+        tags: [],
+        subscribedAt: '2026-01-01T00:00:00.000Z',
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-02-01T00:00:00.000Z',
+      } as any);
 
       const result = await service.subscribe({ email: 'test@example.com' });
 
@@ -187,7 +185,8 @@ describe('NewsletterService', () => {
         updatedAt: '2026-02-01T00:00:00.000Z',
       };
 
-      jest.spyOn(service, 'findCampaignById')
+      jest
+        .spyOn(service, 'findCampaignById')
         .mockResolvedValueOnce(campaign as any)
         .mockResolvedValueOnce({ ...campaign, status: CampaignStatus.SENT } as any);
 
