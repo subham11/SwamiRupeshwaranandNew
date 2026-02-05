@@ -1,0 +1,9 @@
+export { BasePage } from './BasePage';
+export { HomePage } from './HomePage';
+export { LoginPage } from './LoginPage';
+export { RegisterPage } from './RegisterPage';
+export { DonationPage } from './DonationPage';
+export { NewsletterPage } from './NewsletterPage';
+export { SupportPage } from './SupportPage';
+export { SubscriptionsPage } from './SubscriptionsPage';
+export { AdminDashboardPage } from './AdminDashboardPage';

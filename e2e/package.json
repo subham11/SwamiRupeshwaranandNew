@@ -1,0 +1,21 @@
+{
+  "name": "swami-rupeshwaranand-e2e",
+  "version": "1.0.0",
+  "description": "E2E tests for Swami Rupeshwaranand website",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
+    "test:local": "BASE_URL=http://localhost:3000 playwright test",
+    "test:staging": "BASE_URL=https://main.d25c4jn4vz213v.amplifyapp.com playwright test",
+    "test:prod": "BASE_URL=https://main.d25c4jn4vz213v.amplifyapp.com playwright test",
+    "codegen": "playwright codegen"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.41.0",
+    "@types/node": "^20.11.0",
+    "dotenv": "^16.4.0"
+  }
+}
