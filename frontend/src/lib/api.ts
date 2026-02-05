@@ -307,6 +307,530 @@ export async function checkHealth(): Promise<{
   return apiRequest("/health");
 }
 
+// ============================================
+// CMS API (Page Components)
+// ============================================
+
+export interface LocalizedString {
+  en: string;
+  hi: string;
+}
+
+export interface CMSPage {
+  id: string;
+  title: LocalizedString;
+  slug: string;
+  description?: LocalizedString;
+  status: 'draft' | 'published' | 'archived';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ComponentFieldDefinition {
+  name: string;
+  label: LocalizedString;
+  type: 'text' | 'textarea' | 'richtext' | 'image' | 'video' | 'url' | 'number' | 'boolean' | 'select' | 'color' | 'date' | 'array' | 'json';
+  required?: boolean;
+  defaultValue?: unknown;
+  options?: Array<{ value: string; label: LocalizedString }>;
+  placeholder?: LocalizedString;
+}
+
+export interface ComponentFieldValue {
+  name: string;
+  value: unknown;
+}
+
+export interface CMSComponent {
+  id: string;
+  pageId: string;
+  componentType: string;
+  name: string;
+  fieldDefinitions: ComponentFieldDefinition[];
+  fieldValues: ComponentFieldValue[];
+  order: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ComponentTemplate {
+  type: string;
+  name: string;
+  description: string;
+  fields: ComponentFieldDefinition[];
+}
+
+/**
+ * Fetch all CMS pages
+ */
+export async function fetchCMSPages(accessToken: string): Promise<CMSPage[]> {
+  return apiRequest("/cms/pages", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+/**
+ * Fetch CMS page with components
+ */
+export async function fetchCMSPageWithComponents(
+  pageId: string,
+  accessToken: string
+): Promise<{ page: CMSPage; components: CMSComponent[] }> {
+  return apiRequest(`/cms/pages/${pageId}/with-components`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+/**
+ * Create a new CMS page
+ */
+export async function createCMSPage(
+  data: { title: LocalizedString; slug: string; description?: LocalizedString; status?: string },
+  accessToken: string
+): Promise<CMSPage> {
+  return apiRequest("/cms/pages", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Update a CMS page
+ */
+export async function updateCMSPage(
+  pageId: string,
+  data: Partial<{ title: LocalizedString; slug: string; description?: LocalizedString; status?: string }>,
+  accessToken: string
+): Promise<CMSPage> {
+  return apiRequest(`/cms/pages/${pageId}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Delete a CMS page
+ */
+export async function deleteCMSPage(pageId: string, accessToken: string): Promise<void> {
+  return apiRequest(`/cms/pages/${pageId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+/**
+ * Create a new CMS component
+ */
+export async function createCMSComponent(
+  data: {
+    pageId: string;
+    componentType: string;
+    name: string;
+    fieldValues?: ComponentFieldValue[];
+    order?: number;
+    isActive?: boolean;
+  },
+  accessToken: string
+): Promise<CMSComponent> {
+  return apiRequest("/cms/components", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Update a CMS component
+ */
+export async function updateCMSComponent(
+  componentId: string,
+  data: Partial<{
+    name: string;
+    fieldValues: ComponentFieldValue[];
+    order: number;
+    isActive: boolean;
+  }>,
+  accessToken: string
+): Promise<CMSComponent> {
+  return apiRequest(`/cms/components/${componentId}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Delete a CMS component
+ */
+export async function deleteCMSComponent(componentId: string, accessToken: string): Promise<void> {
+  return apiRequest(`/cms/components/${componentId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+/**
+ * Bulk update CMS components
+ */
+export async function bulkUpdateCMSComponents(
+  updates: Array<{ componentId: string; fieldValues?: ComponentFieldValue[]; order?: number; isActive?: boolean }>,
+  accessToken: string
+): Promise<CMSComponent[]> {
+  return apiRequest("/cms/components/bulk-update", {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ updates }),
+  });
+}
+
+/**
+ * Fetch component templates
+ */
+export async function fetchComponentTemplates(accessToken: string): Promise<ComponentTemplate[]> {
+  return apiRequest("/cms/templates", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+// ============================================
+// Newsletter API
+// ============================================
+
+export interface NewsletterSubscriber {
+  id: string;
+  email: string;
+  name?: string;
+  status: 'active' | 'unsubscribed' | 'bounced';
+  source?: string;
+  tags: string[];
+  subscribedAt: string;
+  createdAt: string;
+}
+
+export interface NewsletterCampaign {
+  id: string;
+  subject: LocalizedString;
+  content: LocalizedString;
+  status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed';
+  targetTags: string[];
+  scheduledAt?: string;
+  sentAt?: string;
+  stats: {
+    totalRecipients: number;
+    sent: number;
+    failed: number;
+  };
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface NewsletterStats {
+  totalSubscribers: number;
+  activeSubscribers: number;
+  unsubscribed: number;
+  thirtyDayGrowth: number;
+  totalCampaignsSent: number;
+}
+
+export async function subscribeNewsletter(email: string, name?: string): Promise<NewsletterSubscriber> {
+  return apiRequest("/newsletter/subscribe", {
+    method: "POST",
+    body: JSON.stringify({ email, name }),
+  });
+}
+
+export async function fetchNewsletterSubscribers(accessToken: string): Promise<NewsletterSubscriber[]> {
+  return apiRequest("/newsletter/subscribers", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function fetchNewsletterCampaigns(accessToken: string): Promise<NewsletterCampaign[]> {
+  return apiRequest("/newsletter/campaigns", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function createNewsletterCampaign(
+  data: { subject: LocalizedString; content: LocalizedString; targetTags?: string[] },
+  accessToken: string
+): Promise<NewsletterCampaign> {
+  return apiRequest("/newsletter/campaigns", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function sendNewsletterCampaign(
+  campaignId: string,
+  locale: 'en' | 'hi',
+  accessToken: string
+): Promise<NewsletterCampaign> {
+  return apiRequest(`/newsletter/campaigns/${campaignId}/send`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ sendNow: true, locale }),
+  });
+}
+
+export async function fetchNewsletterStats(accessToken: string): Promise<NewsletterStats> {
+  return apiRequest("/newsletter/stats", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+// ============================================
+// Donation API
+// ============================================
+
+export interface DonationConfig {
+  id: string;
+  purpose: string;
+  title: LocalizedString;
+  description?: LocalizedString;
+  suggestedAmounts: Array<{ amount: number; label?: LocalizedString; isPopular?: boolean }>;
+  minimumAmount: number;
+  maximumAmount?: number;
+  allowCustomAmount: boolean;
+  isActive: boolean;
+  displayOrder: number;
+}
+
+export interface Donation {
+  id: string;
+  donationNumber: string;
+  amount: number;
+  purpose: string;
+  donationType: 'one_time' | 'recurring';
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  donorName?: string;
+  donorEmail?: string;
+  donorPhone?: string;
+  isAnonymous: boolean;
+  wants80GCertificate: boolean;
+  createdAt: string;
+}
+
+export interface DonationStats {
+  totalDonations: number;
+  totalAmount: number;
+  thisMonthAmount: number;
+  lastMonthAmount: number;
+  averageDonation: number;
+  topPurpose: string;
+  donorCount: number;
+  recurringDonors: number;
+}
+
+export async function fetchDonationConfigs(): Promise<DonationConfig[]> {
+  return apiRequest("/donations/config?activeOnly=true");
+}
+
+export async function fetchAllDonations(accessToken: string): Promise<Donation[]> {
+  return apiRequest("/donations", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function fetchDonationStats(accessToken: string): Promise<DonationStats> {
+  return apiRequest("/donations/stats", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function createDonation(
+  data: { amount: number; purpose: string; donorName?: string; donorEmail?: string }
+): Promise<Donation> {
+  return apiRequest("/donations", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+// ============================================
+// Subscription Plans API
+// ============================================
+
+export interface ApiSubscriptionPlan {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  currency: string;
+  interval: 'month' | 'year';
+  features?: string[];
+  popular?: boolean;
+  isActive: boolean;
+}
+
+export async function fetchSubscriptionPlans(): Promise<ApiSubscriptionPlan[]> {
+  const response = await apiRequest("/subscriptions/plans");
+  return response?.items || response || [];
+}
+
+export async function fetchMySubscription(accessToken: string): Promise<unknown> {
+  return apiRequest("/subscriptions/my-subscription/active", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+// ============================================
+// Support Tickets API
+// ============================================
+
+export interface SupportTicket {
+  id: string;
+  ticketNumber: string;
+  subject: string;
+  message: string;
+  category: string;
+  status: 'open' | 'in_progress' | 'waiting_for_user' | 'resolved' | 'closed';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  userEmail: string;
+  userName?: string;
+  repliesCount: number;
+  lastReplyAt?: string;
+  createdAt: string;
+}
+
+export interface TicketReply {
+  id: string;
+  ticketId: string;
+  message: string;
+  isInternal: boolean;
+  isAdminReply: boolean;
+  repliedByName?: string;
+  createdAt: string;
+}
+
+export interface SupportStats {
+  totalTickets: number;
+  openTickets: number;
+  inProgressTickets: number;
+  resolvedTickets: number;
+  averageResolutionTime: number;
+  ticketsThisWeek: number;
+  ticketsLastWeek: number;
+}
+
+export async function createSupportTicket(
+  data: { subject: string; message: string; category?: string; name?: string; email?: string }
+): Promise<SupportTicket> {
+  return apiRequest("/support/tickets/guest", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function fetchAllTickets(accessToken: string): Promise<SupportTicket[]> {
+  return apiRequest("/support/tickets", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function fetchUserTickets(
+  accessToken: string,
+  options?: { limit?: number }
+): Promise<{ items: SupportTicket[] }> {
+  const params = new URLSearchParams();
+  if (options?.limit) params.append("limit", options.limit.toString());
+  const query = params.toString() ? `?${params.toString()}` : "";
+  return apiRequest(`/support/my-tickets${query}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function fetchTicketWithReplies(
+  ticketId: string,
+  accessToken: string
+): Promise<SupportTicket & { replies: TicketReply[] }> {
+  return apiRequest(`/support/tickets/${ticketId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function createTicketReply(
+  ticketId: string,
+  message: string,
+  isInternal: boolean,
+  accessToken: string
+): Promise<TicketReply> {
+  return apiRequest(`/support/tickets/${ticketId}/admin-reply`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ message, isInternal }),
+  });
+}
+
+export async function updateTicketStatus(
+  ticketId: string,
+  status: string,
+  accessToken: string
+): Promise<SupportTicket> {
+  return apiRequest(`/support/tickets/${ticketId}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ status }),
+  });
+}
+
+export async function fetchSupportStats(accessToken: string): Promise<SupportStats> {
+  return apiRequest("/support/stats", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+// ============================================
+// Uploads API
+// ============================================
+
+export interface UploadedFile {
+  key: string;
+  url: string;
+  name: string;
+  size: number;
+  contentType: string;
+  folder: string;
+  uploadedAt: string;
+}
+
+export interface FileMetadata {
+  key: string;
+  size: number;
+  contentType: string;
+  lastModified: string;
+}
+
+export async function getPresignedUploadUrl(
+  folder: string,
+  fileName: string,
+  contentType: string,
+  accessToken: string
+): Promise<{ uploadUrl: string; downloadUrl: string; key: string }> {
+  return apiRequest("/uploads/presigned-url", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ folder, fileName, contentType }),
+  });
+}
+
+export async function listUploadedFiles(folder: string, accessToken: string): Promise<FileMetadata[]> {
+  return apiRequest(`/uploads/list?folder=${folder}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function deleteUploadedFile(key: string, accessToken: string): Promise<void> {
+  return apiRequest(`/uploads/${encodeURIComponent(key)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
 export default {
   fetchPageContent,
   fetchPagesList,
@@ -319,4 +843,43 @@ export default {
   requestOtp,
   verifyOtp,
   checkHealth,
+  // CMS
+  fetchCMSPages,
+  fetchCMSPageWithComponents,
+  createCMSPage,
+  updateCMSPage,
+  deleteCMSPage,
+  createCMSComponent,
+  updateCMSComponent,
+  deleteCMSComponent,
+  bulkUpdateCMSComponents,
+  fetchComponentTemplates,
+  // Newsletter
+  subscribeNewsletter,
+  fetchNewsletterSubscribers,
+  fetchNewsletterCampaigns,
+  createNewsletterCampaign,
+  sendNewsletterCampaign,
+  fetchNewsletterStats,
+  // Donations
+  fetchDonationConfigs,
+  fetchAllDonations,
+  fetchDonationStats,
+  createDonation,
+  // Subscriptions
+  fetchSubscriptionPlans,
+  fetchMySubscription,
+  // Support
+  createSupportTicket,
+  fetchAllTickets,
+  fetchUserTickets,
+  fetchTicketWithReplies,
+  createTicketReply,
+  updateTicketStatus,
+  fetchSupportStats,
+  // Uploads
+  getPresignedUploadUrl,
+  listUploadedFiles,
+  deleteUploadedFile,
+};
 };

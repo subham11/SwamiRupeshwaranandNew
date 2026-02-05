@@ -4,6 +4,28 @@
 
 echo "Seeding sample data..."
 
+# Super Admin User - subham11@gmail.com
+echo "Creating Super Admin user..."
+aws dynamodb put-item \
+    --table-name swami-rupeshwaranand-api-local-main \
+    --item '{
+        "PK": {"S": "USER#super-admin-001"},
+        "SK": {"S": "USER#super-admin-001"},
+        "GSI1PK": {"S": "USER"},
+        "GSI1SK": {"S": "EMAIL#subham11@gmail.com"},
+        "id": {"S": "super-admin-001"},
+        "email": {"S": "subham11@gmail.com"},
+        "name": {"S": "Subham (Super Admin)"},
+        "role": {"S": "super_admin"},
+        "status": {"S": "active"},
+        "createdAt": {"S": "2026-02-05T00:00:00.000Z"},
+        "updatedAt": {"S": "2026-02-05T00:00:00.000Z"}
+    }' \
+    --endpoint-url http://localhost:8000 \
+    --region ap-south-1
+
+echo "Super Admin user created!"
+
 # Sample teaching
 aws dynamodb put-item \
     --table-name swami-rupeshwaranand-api-local-main \

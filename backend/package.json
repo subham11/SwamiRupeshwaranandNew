@@ -21,12 +21,21 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "seed:local": "bash scripts/seed-local-data.sh",
+    "seed:subscription-plans": "IS_LOCAL=true npx ts-node scripts/seed-subscription-plans.ts",
+    "seed:subscription-plans:prod": "npx ts-node scripts/seed-subscription-plans.ts",
+    "seed:pages": "IS_LOCAL=true npx ts-node scripts/seed-pages.ts",
+    "seed:pages:prod": "npx ts-node scripts/seed-pages.ts",
+    "create:super-admin": "IS_LOCAL=true npx ts-node scripts/create-super-admin.ts",
+    "create:super-admin:prod": "npx ts-node scripts/create-super-admin.ts"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.500.0",
     "@aws-sdk/client-dynamodb": "^3.500.0",
+    "@aws-sdk/client-s3": "^3.500.0",
     "@aws-sdk/lib-dynamodb": "^3.500.0",
+    "@aws-sdk/s3-request-presigner": "^3.500.0",
     "@aws-sdk/util-dynamodb": "^3.500.0",
     "@nestjs/common": "^10.3.0",
     "@nestjs/config": "^3.1.1",

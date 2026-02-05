@@ -7,9 +7,15 @@ import { AdminModule } from './modules/admin/admin.module';
 import { ContentModule } from './modules/content/content.module';
 import { EventsModule } from './modules/events/events.module';
 import { TeachingsModule } from './modules/teachings/teachings.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { PageComponentsModule } from './modules/page-components/page-components.module';
+import { NewsletterModule } from './modules/newsletter/newsletter.module';
+import { DonationModule } from './modules/donation/donation.module';
+import { SupportModule } from './modules/support/support.module';
 import { DatabaseModule } from './common/database/database.module';
 import { CognitoModule } from './common/cognito/cognito.module';
 import { EmailModule } from './common/email/email.module';
+import { StorageModule } from './common/storage/storage.module';
 
 @Module({
   imports: [
@@ -22,6 +28,7 @@ import { EmailModule } from './common/email/email.module';
     DatabaseModule.forRoot(),
     CognitoModule,
     EmailModule,
+    StorageModule,
     // Feature modules
     HealthModule,
     AuthModule,
@@ -30,6 +37,11 @@ import { EmailModule } from './common/email/email.module';
     ContentModule,
     EventsModule,
     TeachingsModule,
+    SubscriptionsModule,
+    PageComponentsModule,
+    NewsletterModule,
+    DonationModule,
+    SupportModule,
   ],
 })
 export class AppModule {}

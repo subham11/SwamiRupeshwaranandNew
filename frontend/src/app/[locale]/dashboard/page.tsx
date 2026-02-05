@@ -177,6 +177,12 @@ export default function DashboardPage() {
                   Profile
                 </button>
                 <button
+                  onClick={() => router.push('/dashboard/subscription')}
+                  className="px-6 py-4 font-medium text-sm transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
+                >
+                  Subscription
+                </button>
+                <button
                   onClick={() => setActiveTab('security')}
                   className={`px-6 py-4 font-medium text-sm transition-colors ${
                     activeTab === 'security'
