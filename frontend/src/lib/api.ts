@@ -161,6 +161,84 @@ export async function fetchEventBySlug(
   return apiRequest(`/events/${slug}?locale=${locale}`);
 }
 
+/**
+ * Fetch all events for admin (with auth)
+ */
+export async function fetchAllEventsAdmin(accessToken: string): Promise<{ items: EventItem[]; count: number }> {
+  return apiRequest("/events?limit=500", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+/**
+ * Create a new event (Editor+)
+ */
+export async function createEvent(
+  data: {
+    title: string;
+    description: string;
+    startDate: string;
+    endDate?: string;
+    location: string;
+    venue?: string;
+    image?: string;
+    registrationUrl?: string;
+    maxParticipants?: number;
+    status?: string;
+    locale?: string;
+  },
+  accessToken: string
+): Promise<EventItem> {
+  return apiRequest("/events", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Update an event (Editor+)
+ */
+export async function updateEvent(
+  id: string,
+  data: Partial<{
+    title: string;
+    description: string;
+    startDate: string;
+    endDate?: string;
+    location: string;
+    venue?: string;
+    image?: string;
+    registrationUrl?: string;
+    maxParticipants?: number;
+    status?: string;
+    locale?: string;
+  }>,
+  accessToken: string
+): Promise<EventItem> {
+  return apiRequest(`/events/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Delete an event (Editor+)
+ */
+export async function deleteEvent(id: string, accessToken: string): Promise<void> {
+  return apiRequest(`/events/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
 // ============================================
 // Teachings API
 // ============================================
@@ -565,6 +643,32 @@ export async function createNewsletterCampaign(
   });
 }
 
+export async function updateNewsletterCampaign(
+  campaignId: string,
+  data: Partial<{ subject: LocalizedString; content: LocalizedString; targetTags: string[] }>,
+  accessToken: string
+): Promise<NewsletterCampaign> {
+  return apiRequest(`/newsletter/campaigns/${campaignId}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteNewsletterCampaign(campaignId: string, accessToken: string): Promise<void> {
+  return apiRequest(`/newsletter/campaigns/${campaignId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function deleteNewsletterSubscriber(subscriberId: string, accessToken: string): Promise<void> {
+  return apiRequest(`/newsletter/subscribers/${subscriberId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
 export async function sendNewsletterCampaign(
   campaignId: string,
   locale: 'en' | 'hi',
@@ -651,6 +755,54 @@ export async function createDonation(
   });
 }
 
+export async function fetchAllDonationConfigs(accessToken: string): Promise<DonationConfig[]> {
+  return apiRequest("/donations/config", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function createDonationConfig(
+  data: Partial<DonationConfig>,
+  accessToken: string
+): Promise<DonationConfig> {
+  return apiRequest("/donations/config", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateDonationConfig(
+  configId: string,
+  data: Partial<DonationConfig>,
+  accessToken: string
+): Promise<DonationConfig> {
+  return apiRequest(`/donations/config/${configId}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteDonationConfig(configId: string, accessToken: string): Promise<void> {
+  return apiRequest(`/donations/config/${configId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function updateDonation(
+  donationId: string,
+  data: Partial<Donation>,
+  accessToken: string
+): Promise<Donation> {
+  return apiRequest(`/donations/${donationId}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
 // ============================================
 // Subscription Plans API
 // ============================================
@@ -675,6 +827,119 @@ export async function fetchSubscriptionPlans(): Promise<ApiSubscriptionPlan[]> {
 export async function fetchMySubscription(accessToken: string): Promise<unknown> {
   return apiRequest("/subscriptions/my-subscription/active", {
     headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+// ---- Admin Subscription Plan CRUD ----
+
+export async function createSubscriptionPlan(
+  data: Omit<ApiSubscriptionPlan, "id">,
+  accessToken: string
+): Promise<ApiSubscriptionPlan> {
+  return apiRequest("/subscriptions/plans", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateSubscriptionPlan(
+  id: string,
+  data: Partial<ApiSubscriptionPlan>,
+  accessToken: string
+): Promise<ApiSubscriptionPlan> {
+  return apiRequest(`/subscriptions/plans/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteSubscriptionPlan(id: string, accessToken: string): Promise<void> {
+  return apiRequest(`/subscriptions/plans/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+// ---- Admin User Subscription Management ----
+
+export interface UserSubscription {
+  id: string;
+  userId: string;
+  planId: string;
+  status: string;
+  startDate: string;
+  endDate?: string;
+  cancelledAt?: string;
+  cancelReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function fetchAllSubscriptions(
+  accessToken: string,
+  status?: string,
+  limit?: number
+): Promise<{ items: UserSubscription[]; count: number }> {
+  const params = new URLSearchParams();
+  if (status) params.set("status", status);
+  if (limit) params.set("limit", String(limit));
+  const qs = params.toString() ? `?${params.toString()}` : "";
+  return apiRequest(`/subscriptions/admin/all${qs}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function fetchSubscriptionById(
+  id: string,
+  accessToken: string
+): Promise<UserSubscription> {
+  return apiRequest(`/subscriptions/admin/${id}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function updateUserSubscription(
+  id: string,
+  data: Partial<UserSubscription>,
+  accessToken: string
+): Promise<UserSubscription> {
+  return apiRequest(`/subscriptions/admin/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function activateSubscription(id: string, accessToken: string): Promise<UserSubscription> {
+  return apiRequest(`/subscriptions/admin/${id}/activate`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function cancelSubscription(
+  id: string,
+  accessToken: string,
+  reason?: string
+): Promise<UserSubscription> {
+  return apiRequest(`/subscriptions/admin/${id}/cancel`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ reason }),
   });
 }
 
@@ -778,6 +1043,13 @@ export async function updateTicketStatus(
   });
 }
 
+export async function deleteSupportTicket(ticketId: string, accessToken: string): Promise<void> {
+  return apiRequest(`/support/tickets/${ticketId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
 export async function fetchSupportStats(accessToken: string): Promise<SupportStats> {
   return apiRequest("/support/stats", {
     headers: { Authorization: `Bearer ${accessToken}` },
@@ -831,6 +1103,17 @@ export async function deleteUploadedFile(key: string, accessToken: string): Prom
   });
 }
 
+export interface UploadFolder {
+  name: string;
+  key: string;
+}
+
+export async function fetchUploadFolders(accessToken: string): Promise<{ folders: UploadFolder[] }> {
+  return apiRequest("/uploads/folders", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
 export default {
   fetchPageContent,
   fetchPagesList,
@@ -859,16 +1142,39 @@ export default {
   fetchNewsletterSubscribers,
   fetchNewsletterCampaigns,
   createNewsletterCampaign,
+  updateNewsletterCampaign,
+  deleteNewsletterCampaign,
+  deleteNewsletterSubscriber,
   sendNewsletterCampaign,
   fetchNewsletterStats,
   // Donations
   fetchDonationConfigs,
+  fetchAllDonationConfigs,
   fetchAllDonations,
   fetchDonationStats,
   createDonation,
+  createDonationConfig,
+  updateDonationConfig,
+  deleteDonationConfig,
+  updateDonation,
+  // Events
+  fetchEvents,
+  fetchEventBySlug,
+  fetchAllEventsAdmin,
+  createEvent,
+  updateEvent,
+  deleteEvent,
   // Subscriptions
   fetchSubscriptionPlans,
   fetchMySubscription,
+  createSubscriptionPlan,
+  updateSubscriptionPlan,
+  deleteSubscriptionPlan,
+  fetchAllSubscriptions,
+  fetchSubscriptionById,
+  updateUserSubscription,
+  activateSubscription,
+  cancelSubscription,
   // Support
   createSupportTicket,
   fetchAllTickets,
@@ -876,9 +1182,11 @@ export default {
   fetchTicketWithReplies,
   createTicketReply,
   updateTicketStatus,
+  deleteSupportTicket,
   fetchSupportStats,
   // Uploads
   getPresignedUploadUrl,
   listUploadedFiles,
   deleteUploadedFile,
+  fetchUploadFolders,
 };

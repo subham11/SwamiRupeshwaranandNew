@@ -23,6 +23,8 @@ interface DashboardStats {
 const ADMIN_LINKS = [
   { href: '/admin/users', label: 'User Management', icon: '👥', description: 'Manage users and roles' },
   { href: '/admin/cms', label: 'Content Editor', icon: '📝', description: 'Edit page content' },
+  { href: '/admin/events', label: 'Events', icon: '📅', description: 'Manage events & schedules' },
+  { href: '/admin/subscriptions', label: 'Subscriptions', icon: '💳', description: 'Plans & user subscriptions' },
   { href: '/admin/newsletter', label: 'Newsletter', icon: '📧', description: 'Manage subscribers & campaigns' },
   { href: '/admin/donations', label: 'Donations', icon: '🙏', description: 'View donations & configure' },
   { href: '/admin/support', label: 'Support Tickets', icon: '🎫', description: 'Handle user queries' },
