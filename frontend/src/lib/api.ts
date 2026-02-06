@@ -9,7 +9,8 @@
 import type { AppLocale } from "@/i18n/config";
 
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:2026/api/v1";
+const _rawApiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:2026";
+const API_BASE_URL = `${_rawApiUrl.replace(/\/api\/v1\/?$/, '')}/api/v1`;
 
 // Request timeout (10 seconds)
 const REQUEST_TIMEOUT = 10000;

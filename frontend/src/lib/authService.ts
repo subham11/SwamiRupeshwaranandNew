@@ -1,4 +1,7 @@
+// API Configuration — NEXT_PUBLIC_API_URL should NOT include /api/v1
+// api.ts and fetchWithAuth.ts append /api/v1 themselves
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2026';
+const AUTH_BASE_URL = `${API_BASE_URL.replace(/\/api\/v1\/?$/, '')}/api/v1/auth`;
 
 interface ApiResponse<T> {
   success: boolean;
@@ -44,7 +47,7 @@ class AuthService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = `${API_BASE_URL}/api/v1/auth`;
+    this.baseUrl = AUTH_BASE_URL;
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {

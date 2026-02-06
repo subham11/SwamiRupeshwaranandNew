@@ -9,8 +9,9 @@
  * caused by expired access tokens.
  */
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2026/api/v1';
+const _rawApiUrl =
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2026';
+const API_BASE_URL = `${_rawApiUrl.replace(/\/api\/v1\/?$/, '')}/api/v1`;
 
 const STORAGE_KEYS = {
   ACCESS_TOKEN: 'auth_access_token',
