@@ -9,8 +9,8 @@ import {
 } from '@nestjs/swagger';
 import { EventsService } from './events.service';
 import { CreateEventDto, UpdateEventDto, EventResponseDto, EventListResponseDto } from './dto';
-import { JwtAuthGuard } from '@/common/guards';
-import { Public } from '@/common/decorators';
+import { JwtAuthGuard, RolesGuard } from '@/common/guards';
+import { Public, EditorOnly } from '@/common/decorators';
 
 @ApiTags('Events')
 @Controller('events')
@@ -18,9 +18,10 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @EditorOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Create a new event' })
+  @ApiOperation({ summary: 'Create a new event (Editor+)' })
   @ApiResponse({
     status: 201,
     description: 'Event created successfully',
@@ -68,9 +69,10 @@ export class EventsController {
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @EditorOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Update event' })
+  @ApiOperation({ summary: 'Update event (Editor+)' })
   @ApiParam({ name: 'id', description: 'Event ID' })
   @ApiResponse({
     status: 200,
@@ -85,9 +87,10 @@ export class EventsController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @EditorOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Delete event' })
+  @ApiOperation({ summary: 'Delete event (Editor+)' })
   @ApiParam({ name: 'id', description: 'Event ID' })
   @ApiResponse({ status: 200, description: 'Event deleted successfully' })
   async remove(@Param('id') id: string): Promise<void> {

@@ -14,8 +14,8 @@ import {
   ContentResponseDto,
   ContentListResponseDto,
 } from './dto';
-import { JwtAuthGuard } from '@/common/guards';
-import { Public } from '@/common/decorators';
+import { JwtAuthGuard, RolesGuard } from '@/common/guards';
+import { Public, EditorOnly } from '@/common/decorators';
 
 @ApiTags('Content')
 @Controller('content')
@@ -23,9 +23,10 @@ export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @EditorOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Create new content' })
+  @ApiOperation({ summary: 'Create new content (Editor+)' })
   @ApiResponse({
     status: 201,
     description: 'Content created successfully',
@@ -85,9 +86,10 @@ export class ContentController {
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @EditorOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Update content' })
+  @ApiOperation({ summary: 'Update content (Editor+)' })
   @ApiParam({ name: 'id', description: 'Content ID' })
   @ApiResponse({
     status: 200,
@@ -102,9 +104,10 @@ export class ContentController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @EditorOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Delete content' })
+  @ApiOperation({ summary: 'Delete content (Editor+)' })
   @ApiParam({ name: 'id', description: 'Content ID' })
   @ApiResponse({ status: 200, description: 'Content deleted successfully' })
   async remove(@Param('id') id: string): Promise<void> {
