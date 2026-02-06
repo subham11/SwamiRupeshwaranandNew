@@ -9,6 +9,8 @@ import {
   AdminRespondToAuthChallengeCommand,
   AdminUpdateUserAttributesCommand,
   AdminSetUserPasswordCommand,
+  InitiateAuthCommand,
+  RespondToAuthChallengeCommand,
   AuthFlowType,
   ChallengeNameType,
   MessageActionType,
@@ -29,6 +31,12 @@ export interface AuthResult {
   refreshToken: string;
   idToken: string;
   expiresIn: number;
+}
+
+export interface CustomAuthInitResult {
+  session: string;
+  challengeName: string;
+  challengeParameters: Record<string, string>;
 }
 
 @Injectable()
@@ -113,6 +121,9 @@ export class CognitoService {
     await this.client.send(command);
   }
 
+  /**
+   * Password-based login (USER_PASSWORD_AUTH via Admin API)
+   */
   async authenticate(email: string, password: string): Promise<AuthResult> {
     try {
       const command = new AdminInitiateAuthCommand({
@@ -149,6 +160,94 @@ export class CognitoService {
     } catch (error: any) {
       if (error.name === 'NotAuthorizedException' || error.name === 'UserNotFoundException') {
         throw new UnauthorizedException('Invalid credentials');
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Initiate CUSTOM_AUTH flow for OTP-based passwordless login.
+   * Triggers DefineAuthChallenge → CreateAuthChallenge (sends OTP email).
+   * Returns session token to be used with respondToCustomChallenge().
+   */
+  async initiateCustomAuth(email: string): Promise<CustomAuthInitResult> {
+    try {
+      const command = new InitiateAuthCommand({
+        ClientId: this.clientId,
+        AuthFlow: AuthFlowType.CUSTOM_AUTH,
+        AuthParameters: {
+          USERNAME: email,
+        },
+      });
+
+      const result = await this.client.send(command);
+
+      if (!result.Session || !result.ChallengeName) {
+        throw new UnauthorizedException('Failed to initiate OTP flow');
+      }
+
+      return {
+        session: result.Session,
+        challengeName: result.ChallengeName,
+        challengeParameters: result.ChallengeParameters || {},
+      };
+    } catch (error: any) {
+      if (error.name === 'UserNotFoundException') {
+        throw new UnauthorizedException('User not found');
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Respond to CUSTOM_CHALLENGE with OTP answer.
+   * If OTP is correct, returns Cognito tokens.
+   * If wrong, returns a new challenge for retry.
+   */
+  async respondToCustomChallenge(
+    email: string,
+    answer: string,
+    session: string,
+  ): Promise<AuthResult | CustomAuthInitResult> {
+    try {
+      const command = new RespondToAuthChallengeCommand({
+        ClientId: this.clientId,
+        ChallengeName: ChallengeNameType.CUSTOM_CHALLENGE,
+        ChallengeResponses: {
+          USERNAME: email,
+          ANSWER: answer,
+        },
+        Session: session,
+      });
+
+      const result = await this.client.send(command);
+
+      // If tokens are returned, authentication succeeded
+      if (result.AuthenticationResult) {
+        return {
+          accessToken: result.AuthenticationResult.AccessToken || '',
+          refreshToken: result.AuthenticationResult.RefreshToken || '',
+          idToken: result.AuthenticationResult.IdToken || '',
+          expiresIn: result.AuthenticationResult.ExpiresIn || 3600,
+        };
+      }
+
+      // Another challenge issued (wrong OTP, retry)
+      if (result.ChallengeName && result.Session) {
+        return {
+          session: result.Session,
+          challengeName: result.ChallengeName,
+          challengeParameters: result.ChallengeParameters || {},
+        };
+      }
+
+      throw new UnauthorizedException('Authentication failed');
+    } catch (error: any) {
+      if (error.name === 'NotAuthorizedException') {
+        throw new UnauthorizedException('Too many failed attempts. Please request a new OTP.');
+      }
+      if (error.name === 'CodeMismatchException') {
+        throw new UnauthorizedException('Invalid OTP');
       }
       throw error;
     }

@@ -45,9 +45,11 @@ async function refreshAccessToken(): Promise<string | null> {
 
       const data = await response.json();
       if (data.accessToken && data.refreshToken) {
-        localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.accessToken);
+        // Use idToken as Bearer token (Cognito ID tokens contain email claim)
+        const authToken = data.idToken || data.accessToken;
+        localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, authToken);
         localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.refreshToken);
-        return data.accessToken as string;
+        return authToken as string;
       }
       return null;
     } catch {

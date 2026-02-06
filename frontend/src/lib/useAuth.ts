@@ -85,10 +85,11 @@ export function useAuth() {
     dispatch(setLoading(true));
     try {
       const response = await authService.verifyOtp(email, otp);
-      const { accessToken, refreshToken, user } = response;
+      const { accessToken, refreshToken, idToken, user } = response;
       
-      // Store tokens and user
-      storage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+      // Store ID token as Bearer token (Cognito ID tokens contain email claim)
+      const authToken = idToken || accessToken;
+      storage.setItem(STORAGE_KEYS.ACCESS_TOKEN, authToken);
       storage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
       storage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
       
@@ -101,7 +102,7 @@ export function useAuth() {
           isVerified: user.isVerified,
           role: user.role || 'user',
         },
-        accessToken,
+        accessToken: authToken,
         refreshToken,
       }));
       
@@ -118,9 +119,11 @@ export function useAuth() {
     dispatch(setLoading(true));
     try {
       const response = await authService.loginWithPassword(email, password);
-      const { accessToken, refreshToken, user } = response;
+      const { accessToken, refreshToken, idToken, user } = response;
       
-      storage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+      // Store ID token as Bearer token (Cognito ID tokens contain email claim)
+      const authToken = idToken || accessToken;
+      storage.setItem(STORAGE_KEYS.ACCESS_TOKEN, authToken);
       storage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
       storage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
       
@@ -133,7 +136,7 @@ export function useAuth() {
           isVerified: user.isVerified,
           role: user.role || 'user',
         },
-        accessToken,
+        accessToken: authToken,
         refreshToken,
       }));
       
@@ -258,10 +261,11 @@ export function useAuth() {
 
     try {
       const response = await authService.refreshToken(refreshToken);
-      storage.setItem(STORAGE_KEYS.ACCESS_TOKEN, response.accessToken);
+      const newAuthToken = response.idToken || response.accessToken;
+      storage.setItem(STORAGE_KEYS.ACCESS_TOKEN, newAuthToken);
       storage.setItem(STORAGE_KEYS.REFRESH_TOKEN, response.refreshToken);
       dispatch(refreshTokenSuccess({
-        accessToken: response.accessToken,
+        accessToken: newAuthToken,
         refreshToken: response.refreshToken,
       }));
       return true;

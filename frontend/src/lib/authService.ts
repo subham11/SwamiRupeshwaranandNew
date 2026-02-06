@@ -14,6 +14,7 @@ interface LoginResponse {
   message: string;
   accessToken: string;
   refreshToken: string;
+  idToken?: string;
   expiresIn: number;
   user: {
     id: string;
@@ -142,6 +143,7 @@ class AuthService {
     success: boolean;
     accessToken: string;
     refreshToken: string;
+    idToken?: string;
     expiresIn: number;
   }> {
     return this.request('/refresh', {

@@ -1,5 +1,5 @@
 # Serverless Framework Configuration
-# Optimized for AWS Free Tier and Cost Efficiency
+# AWS Cognito-based Auth with OTP (CUSTOM_AUTH) + Password flows
 
 service: swami-rupeshwaranand-api
 
@@ -14,14 +14,11 @@ provider:
   # Cost Optimization: Use ARM64 for better price-performance
   architecture: arm64
   
-  # Increased memory for faster cold starts with MongoDB connection
+  # Increased memory for faster cold starts
   memorySize: 512
   
-  # Increased timeout for cold start with MongoDB connection
+  # Increased timeout for cold start
   timeout: 30
-  
-  # Cost Optimization: Enable provisioned concurrency only for prod critical paths
-  # For dev/local, keep it disabled
   
   # API Gateway Configuration (Free Tier: 1M API calls/month for 12 months)
   apiGateway:
@@ -36,8 +33,7 @@ provider:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1'
     USE_DYNAMODB: 'true'
     DYNAMODB_TABLE_PREFIX: ${self:service}-${self:provider.stage}
-    COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID, ''}
-    COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID, ''}
+    MAIN_TABLE: !Ref MainTable
     COGNITO_REGION: ${self:provider.region}
   
   # IAM Role for Lambda
@@ -57,6 +53,7 @@ provider:
           Resource:
             - !GetAtt MainTable.Arn
             - !Join ['/', [!GetAtt MainTable.Arn, 'index/*']]
+            - !GetAtt OtpTable.Arn
         - Effect: Allow
           Action:
             - cognito-idp:AdminCreateUser
@@ -65,6 +62,14 @@ provider:
             - cognito-idp:AdminUpdateUserAttributes
             - cognito-idp:AdminInitiateAuth
             - cognito-idp:AdminRespondToAuthChallenge
+            - cognito-idp:AdminSetUserPassword
+            - cognito-idp:InitiateAuth
+            - cognito-idp:RespondToAuthChallenge
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+            - ses:SendRawEmail
           Resource: '*'
         - Effect: Allow
           Action:
@@ -100,6 +105,9 @@ functions:
   # Single Lambda for all routes (Cost Optimization: Reduces cold starts)
   api:
     handler: dist/lambda.handler
+    environment:
+      COGNITO_USER_POOL_ID: !Ref CognitoUserPool
+      COGNITO_CLIENT_ID: !Ref CognitoUserPoolClient
     events:
       - http:
           method: ANY
@@ -109,17 +117,50 @@ functions:
           method: ANY
           path: '{proxy+}'
           cors: true
-    # Cost Optimization: Reserved concurrency removed to stay within account limits
-    # reservedConcurrency: 10
+
+  # ─── Cognito Lambda Triggers ───────────────────────────────
+
+  defineAuthChallenge:
+    handler: dist/cognito-triggers/define-auth-challenge.handler
+    memorySize: 128
+    timeout: 5
+
+  createAuthChallenge:
+    handler: dist/cognito-triggers/create-auth-challenge.handler
+    memorySize: 128
+    timeout: 10
+    environment:
+      OTP_TABLE: !Ref OtpTable
+      SES_FROM_EMAIL: ${env:SES_FROM_EMAIL, 'noreply@swamirupeshwaranand.in'}
+      SES_REGION: ${self:provider.region}
+
+  verifyAuthChallenge:
+    handler: dist/cognito-triggers/verify-auth-challenge.handler
+    memorySize: 128
+    timeout: 5
+    environment:
+      OTP_TABLE: !Ref OtpTable
+
+  preSignUp:
+    handler: dist/cognito-triggers/pre-sign-up.handler
+    memorySize: 128
+    timeout: 5
+
+  postAuthentication:
+    handler: dist/cognito-triggers/post-authentication.handler
+    memorySize: 128
+    timeout: 10
+    environment:
+      MAIN_TABLE: !Ref MainTable
 
 resources:
   Resources:
-    # DynamoDB Table (Free Tier: 25 GB storage, 25 RCU, 25 WCU)
+    # ─── DynamoDB: Main Table ────────────────────────────────
     MainTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:service}-${self:provider.stage}-main
-        BillingMode: PAY_PER_REQUEST  # Cost Optimization: On-demand for unpredictable workloads
+        BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: PK
             AttributeType: S
@@ -143,11 +184,9 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
-        # Cost Optimization: Enable TTL to auto-delete old data
         TimeToLiveSpecification:
           AttributeName: ttl
           Enabled: true
-        # Cost Optimization: Point-in-time recovery disabled for dev
         PointInTimeRecoverySpecification:
           PointInTimeRecoveryEnabled: false
         Tags:
@@ -156,17 +195,41 @@ resources:
           - Key: Project
             Value: ${self:service}
 
-    # Cognito User Pool (Free Tier: 50,000 MAU)
+    # ─── DynamoDB: OTP Tracking Table ────────────────────────
+    OtpTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${self:provider.stage}-otp
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+          - Key: Project
+            Value: ${self:service}
+
+    # ─── Cognito User Pool ───────────────────────────────────
     CognitoUserPool:
       Type: AWS::Cognito::UserPool
-      Condition: CreateCognitoResources
       Properties:
         UserPoolName: ${self:service}-${self:provider.stage}-user-pool
         AutoVerifiedAttributes:
           - email
         UsernameAttributes:
           - email
-        MfaConfiguration: 'OFF'  # Cost Optimization: MFA disabled for free tier
+        MfaConfiguration: 'OFF'
         Policies:
           PasswordPolicy:
             MinimumLength: 8
@@ -183,23 +246,74 @@ resources:
             Name: name
             Required: false
             Mutable: true
+        LambdaConfig:
+          DefineAuthChallenge: !GetAtt DefineAuthChallengeLambdaFunction.Arn
+          CreateAuthChallenge: !GetAtt CreateAuthChallengeLambdaFunction.Arn
+          VerifyAuthChallengeResponse: !GetAtt VerifyAuthChallengeLambdaFunction.Arn
+          PreSignUp: !GetAtt PreSignUpLambdaFunction.Arn
+          PostAuthentication: !GetAtt PostAuthenticationLambdaFunction.Arn
 
+    # Cognito User Pool Client (supports password + OTP flows)
     CognitoUserPoolClient:
       Type: AWS::Cognito::UserPoolClient
-      Condition: CreateCognitoResources
       Properties:
         ClientName: ${self:service}-${self:provider.stage}-client
         UserPoolId: !Ref CognitoUserPool
         ExplicitAuthFlows:
           - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_CUSTOM_AUTH
           - ALLOW_REFRESH_TOKEN_AUTH
           - ALLOW_ADMIN_USER_PASSWORD_AUTH
         GenerateSecret: false
         PreventUserExistenceErrors: ENABLED
+        AccessTokenValidity: 1
+        IdTokenValidity: 1
+        RefreshTokenValidity: 7
+        TokenValidityUnits:
+          AccessToken: hours
+          IdToken: hours
+          RefreshToken: days
 
-  Conditions:
-    CreateCognitoResources:
-      !Equals ['${self:provider.stage}', 'prod']
+    # ─── Lambda Invoke Permissions for Cognito ───────────────
+    DefineAuthChallengePermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName: !GetAtt DefineAuthChallengeLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        Action: lambda:InvokeFunction
+        SourceArn: !GetAtt CognitoUserPool.Arn
+
+    CreateAuthChallengePermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName: !GetAtt CreateAuthChallengeLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        Action: lambda:InvokeFunction
+        SourceArn: !GetAtt CognitoUserPool.Arn
+
+    VerifyAuthChallengePermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName: !GetAtt VerifyAuthChallengeLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        Action: lambda:InvokeFunction
+        SourceArn: !GetAtt CognitoUserPool.Arn
+
+    PreSignUpPermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName: !GetAtt PreSignUpLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        Action: lambda:InvokeFunction
+        SourceArn: !GetAtt CognitoUserPool.Arn
+
+    PostAuthenticationPermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName: !GetAtt PostAuthenticationLambdaFunction.Arn
+        Principal: cognito-idp.amazonaws.com
+        Action: lambda:InvokeFunction
+        SourceArn: !GetAtt CognitoUserPool.Arn
 
   Outputs:
     ApiGatewayRestApiId:
@@ -208,9 +322,9 @@ resources:
       Value: !Ref MainTable
     MainTableArn:
       Value: !GetAtt MainTable.Arn
+    OtpTableName:
+      Value: !Ref OtpTable
     CognitoUserPoolId:
-      Condition: CreateCognitoResources
       Value: !Ref CognitoUserPool
     CognitoUserPoolClientId:
-      Condition: CreateCognitoResources
       Value: !Ref CognitoUserPoolClient

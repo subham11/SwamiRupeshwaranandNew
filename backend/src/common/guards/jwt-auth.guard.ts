@@ -1,21 +1,41 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, Logger } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, Logger, Inject } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import * as crypto from 'crypto';
+import { CognitoJwtVerifier } from 'aws-jwt-verify';
+import { DATABASE_SERVICE, DatabaseService } from '../database/database.interface';
 
 export const IS_PUBLIC_KEY = 'isPublic';
+
+interface UserRecord {
+  PK: string;
+  SK: string;
+  id: string;
+  email: string;
+  name?: string;
+  role: 'super_admin' | 'admin' | 'content_editor' | 'user';
+}
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   private readonly logger = new Logger(JwtAuthGuard.name);
-  private readonly jwtSecret: string;
+  private verifier: any;
 
   constructor(
     private reflector: Reflector,
     private configService: ConfigService,
+    @Inject(DATABASE_SERVICE) private readonly databaseService: DatabaseService,
   ) {
-    this.jwtSecret = this.configService.get('JWT_SECRET', 'ashram-jwt-secret-key-2024');
+    const userPoolId = this.configService.get<string>('COGNITO_USER_POOL_ID', '');
+    const clientId = this.configService.get<string>('COGNITO_CLIENT_ID', '');
+
+    if (userPoolId && clientId) {
+      this.verifier = CognitoJwtVerifier.create({
+        userPoolId,
+        clientId,
+        tokenUse: 'id',
+      });
+    }
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -35,74 +55,46 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('No token provided');
     }
 
-    const payload = this.verifyAndDecodeToken(token);
+    if (!this.verifier) {
+      this.logger.error('Cognito JWT verifier not configured (missing COGNITO_USER_POOL_ID or COGNITO_CLIENT_ID)');
+      throw new UnauthorizedException('Authentication not configured');
+    }
 
-    if (!payload) {
+    try {
+      // Verify Cognito access token (RSA signature, expiration, issuer, audience)
+      const payload = await this.verifier.verify(token);
+
+      // Extract email from Cognito ID token claims
+      const email = payload.email || payload['cognito:username'];
+      if (!email) {
+        this.logger.warn('No email claim found in Cognito ID token');
+        throw new UnauthorizedException('Invalid token: missing email claim');
+      }
+
+      // Look up user in app's DynamoDB table to get role
+      const user = await this.databaseService.get<UserRecord>(
+        `USER#${email.toLowerCase()}`,
+        'PROFILE',
+      );
+
+      // Attach user to request
+      (request as any).user = {
+        sub: user?.id || payload.sub,
+        email: email.toLowerCase(),
+        name: user?.name,
+        role: user?.role || 'user',
+        cognitoSub: payload.sub,
+      };
+
+      return true;
+    } catch (error) {
+      this.logger.warn(`Cognito JWT verification failed: ${error instanceof Error ? error.message : 'unknown'}`);
       throw new UnauthorizedException('Invalid or expired token');
     }
-
-    // Only allow access tokens, not refresh tokens
-    if (payload.type === 'refresh') {
-      throw new UnauthorizedException('Access token required');
-    }
-
-    // Attach user to request
-    (request as any).user = {
-      sub: payload.sub,
-      email: payload.email,
-      name: payload.name,
-      role: payload.role || 'user',
-    };
-
-    return true;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
-  }
-
-  /**
-   * Verify JWT signature (HMAC-SHA256) and decode payload.
-   * Uses base64url encoding matching OtpAuthService token generation.
-   * Returns decoded payload or null if invalid/expired.
-   */
-  private verifyAndDecodeToken(token: string): any | null {
-    try {
-      const parts = token.split('.');
-      if (parts.length !== 3) return null;
-
-      const [header, payload, signature] = parts;
-
-      // Verify HMAC-SHA256 signature
-      const expectedSignature = crypto
-        .createHmac('sha256', this.jwtSecret)
-        .update(`${header}.${payload}`)
-        .digest('base64url');
-
-      if (!crypto.timingSafeEqual(
-        Buffer.from(signature),
-        Buffer.from(expectedSignature),
-      )) {
-        this.logger.warn('JWT signature verification failed');
-        return null;
-      }
-
-      // Decode payload using base64url (matching OtpAuthService)
-      const decoded = JSON.parse(
-        Buffer.from(payload, 'base64url').toString('utf-8'),
-      );
-
-      // Check expiration (exp is in milliseconds, matching OtpAuthService)
-      if (decoded.exp && decoded.exp < Date.now()) {
-        this.logger.debug('JWT token expired');
-        return null;
-      }
-
-      return decoded;
-    } catch (error) {
-      this.logger.warn(`JWT verification error: ${error instanceof Error ? error.message : 'unknown'}`);
-      return null;
-    }
   }
 }
