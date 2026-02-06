@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { OtpAuthService } from '../otp-auth.service';
-import { EmailService } from '../../../common/email/email.service';
+import { CognitoService } from '../../../common/cognito/cognito.service';
 import { DATABASE_SERVICE } from '../../../common/database/database.interface';
 
 describe('OtpAuthService', () => {
@@ -13,14 +13,18 @@ describe('OtpAuthService', () => {
     delete: jest.Mock;
     update: jest.Mock;
   };
-  let mockEmailService: {
-    sendOtpEmail: jest.Mock;
-    sendPasswordResetOtpEmail: jest.Mock;
-    sendWelcomeEmail: jest.Mock;
+  let mockCognitoService: {
+    getUser: jest.Mock;
+    createUser: jest.Mock;
+    setUserPassword: jest.Mock;
+    initiateCustomAuth: jest.Mock;
+    respondToCustomChallenge: jest.Mock;
+    authenticate: jest.Mock;
+    refreshToken: jest.Mock;
+    updateUserAttributes: jest.Mock;
   };
 
   beforeEach(async () => {
-    // Create mock services
     mockDatabaseService = {
       get: jest.fn(),
       put: jest.fn(),
@@ -28,17 +32,26 @@ describe('OtpAuthService', () => {
       update: jest.fn(),
     };
 
-    mockEmailService = {
-      sendOtpEmail: jest.fn().mockResolvedValue(undefined),
-      sendPasswordResetOtpEmail: jest.fn().mockResolvedValue(undefined),
-      sendWelcomeEmail: jest.fn().mockResolvedValue(undefined),
+    mockCognitoService = {
+      getUser: jest.fn().mockResolvedValue({ username: 'test-sub', email: 'test@example.com' }),
+      createUser: jest.fn().mockResolvedValue(undefined),
+      setUserPassword: jest.fn().mockResolvedValue(undefined),
+      initiateCustomAuth: jest.fn().mockResolvedValue({
+        session: 'cognito-session-token',
+        challengeName: 'CUSTOM_CHALLENGE',
+        challengeParameters: {},
+      }),
+      respondToCustomChallenge: jest.fn(),
+      authenticate: jest.fn(),
+      refreshToken: jest.fn(),
+      updateUserAttributes: jest.fn().mockResolvedValue(undefined),
     };
 
     const mockConfigService = {
       get: jest.fn((key: string, defaultValue?: any) => {
         const config: Record<string, any> = {
-          JWT_SECRET: 'test-jwt-secret',
-          PASSWORD_SALT: 'test-password-salt',
+          COGNITO_USER_POOL_ID: 'test-pool-id',
+          COGNITO_CLIENT_ID: 'test-client-id',
         };
         return config[key] || defaultValue;
       }),
@@ -48,7 +61,7 @@ describe('OtpAuthService', () => {
       providers: [
         OtpAuthService,
         { provide: DATABASE_SERVICE, useValue: mockDatabaseService },
-        { provide: EmailService, useValue: mockEmailService },
+        { provide: CognitoService, useValue: mockCognitoService },
         { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
@@ -61,211 +74,149 @@ describe('OtpAuthService', () => {
   });
 
   describe('requestOtp', () => {
-    it('should send OTP successfully for new request', async () => {
-      mockDatabaseService.get.mockResolvedValue(null);
-      mockDatabaseService.put.mockResolvedValue({} as any);
-
+    it('should initiate Cognito CUSTOM_AUTH and return success', async () => {
       const result = await service.requestOtp('test@example.com');
 
       expect(result.success).toBe(true);
       expect(result.message).toContain('OTP sent successfully');
-      expect(result.expiresIn).toBe(10);
-      expect(mockEmailService.sendOtpEmail).toHaveBeenCalledWith(
-        'test@example.com',
-        expect.any(String),
-      );
-      expect(mockDatabaseService.put).toHaveBeenCalled();
+      expect(result.expiresIn).toBe(5);
+      expect(mockCognitoService.initiateCustomAuth).toHaveBeenCalledWith('test@example.com');
     });
 
-    it('should throw error if OTP request is on cooldown', async () => {
-      const recentOtp = {
-        PK: 'OTP#test@example.com',
-        SK: 'PENDING',
-        createdAt: new Date().toISOString(),
-        expiresAt: Date.now() + 600000,
-        attempts: 0,
-      };
-      mockDatabaseService.get.mockResolvedValue(recentOtp);
+    it('should auto-create Cognito user if not found', async () => {
+      mockCognitoService.getUser.mockResolvedValueOnce(null);
 
-      await expect(service.requestOtp('test@example.com')).rejects.toThrow(BadRequestException);
+      const result = await service.requestOtp('new@example.com');
+
+      expect(result.success).toBe(true);
+      expect(mockCognitoService.createUser).toHaveBeenCalledWith('new@example.com', expect.any(String));
+      expect(mockCognitoService.setUserPassword).toHaveBeenCalled();
     });
 
-    it('should delete old OTP if cooldown expired', async () => {
-      const oldOtp = {
-        PK: 'OTP#test@example.com',
-        SK: 'PENDING',
-        createdAt: new Date(Date.now() - 120000).toISOString(), // 2 minutes ago
-        expiresAt: Date.now() + 600000,
-        attempts: 0,
-      };
-      mockDatabaseService.get.mockResolvedValue(oldOtp);
-      mockDatabaseService.delete.mockResolvedValue(undefined);
-      mockDatabaseService.put.mockResolvedValue({} as any);
-
+    it('should not create Cognito user if already exists', async () => {
       const result = await service.requestOtp('test@example.com');
 
       expect(result.success).toBe(true);
-      expect(mockDatabaseService.delete).toHaveBeenCalledWith('OTP#test@example.com', 'PENDING');
+      expect(mockCognitoService.createUser).not.toHaveBeenCalled();
     });
 
     it('should normalize email to lowercase', async () => {
-      mockDatabaseService.get.mockResolvedValue(null);
-      mockDatabaseService.put.mockResolvedValue({} as any);
-
       await service.requestOtp('Test@Example.COM');
 
-      const putCall = mockDatabaseService.put.mock.calls[0][0];
-      expect(putCall.email).toBe('test@example.com');
+      expect(mockCognitoService.initiateCustomAuth).toHaveBeenCalledWith('test@example.com');
     });
   });
 
   describe('verifyOtp', () => {
-    const validOtpRecord = {
-      PK: 'OTP#test@example.com',
-      SK: 'PENDING',
-      email: 'test@example.com',
-      otp: '', // Will be set dynamically
-      expiresAt: Date.now() + 600000,
-      attempts: 0,
-      purpose: 'login',
+    const mockAuthResult = {
+      accessToken: 'cognito-access-token',
+      refreshToken: 'cognito-refresh-token',
+      idToken: 'cognito-id-token',
+      expiresIn: 3600,
     };
 
-    it('should verify OTP and create new user', async () => {
-      // Generate OTP and hash it the same way the service does
-      const otp = '123456';
-      const crypto = require('crypto');
-      const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
+    beforeEach(async () => {
+      // First request OTP to store a session
+      await service.requestOtp('test@example.com');
+    });
 
-      mockDatabaseService.get
-        .mockResolvedValueOnce({ ...validOtpRecord, otp: hashedOtp }) // OTP record
-        .mockResolvedValueOnce(null); // No existing user
-      mockDatabaseService.delete.mockResolvedValue(undefined);
+    it('should verify OTP and return tokens for existing user', async () => {
+      const existingUser = {
+        PK: 'USER#test@example.com',
+        SK: 'PROFILE',
+        id: 'user-123',
+        email: 'test@example.com',
+        hasPassword: false,
+        isVerified: true,
+        role: 'user',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      mockCognitoService.respondToCustomChallenge.mockResolvedValue(mockAuthResult);
+      mockDatabaseService.get.mockResolvedValue(existingUser);
+
+      const result = await service.verifyOtp('test@example.com', '123456');
+
+      expect(result.success).toBe(true);
+      expect(result.accessToken).toBe('cognito-access-token');
+      expect(result.idToken).toBe('cognito-id-token');
+      expect(result.refreshToken).toBe('cognito-refresh-token');
+      expect(result.user?.email).toBe('test@example.com');
+      expect(result.user?.isNewUser).toBe(false);
+    });
+
+    it('should create app user record if not found', async () => {
+      mockCognitoService.respondToCustomChallenge.mockResolvedValue(mockAuthResult);
+      mockDatabaseService.get.mockResolvedValue(null);
       mockDatabaseService.put.mockResolvedValue({} as any);
 
-      const result = await service.verifyOtp('test@example.com', otp);
+      const result = await service.verifyOtp('test@example.com', '123456');
 
       expect(result.success).toBe(true);
       expect(result.user?.isNewUser).toBe(true);
-      expect(result.accessToken).toBeDefined();
-      expect(result.refreshToken).toBeDefined();
-      expect(mockEmailService.sendWelcomeEmail).toHaveBeenCalled();
+      expect(mockDatabaseService.put).toHaveBeenCalled();
     });
 
-    it('should throw error if no OTP request found', async () => {
-      mockDatabaseService.get.mockResolvedValue(null);
-
-      await expect(service.verifyOtp('test@example.com', '123456')).rejects.toThrow(
+    it('should throw error if no OTP session found', async () => {
+      await expect(service.verifyOtp('unknown@example.com', '123456')).rejects.toThrow(
         BadRequestException,
       );
     });
 
-    it('should throw error if OTP expired', async () => {
-      const expiredOtp = {
-        ...validOtpRecord,
-        otp: 'somehash',
-        expiresAt: Date.now() - 1000, // Expired
-      };
-      mockDatabaseService.get.mockResolvedValue(expiredOtp);
-      mockDatabaseService.delete.mockResolvedValue(undefined);
+    it('should throw error on wrong OTP (Cognito returns new challenge)', async () => {
+      mockCognitoService.respondToCustomChallenge.mockResolvedValue({
+        session: 'new-session',
+        challengeName: 'CUSTOM_CHALLENGE',
+        challengeParameters: {},
+      });
 
-      await expect(service.verifyOtp('test@example.com', '123456')).rejects.toThrow(
-        BadRequestException,
-      );
-      expect(mockDatabaseService.delete).toHaveBeenCalled();
-    });
-
-    it('should throw error after max attempts', async () => {
-      const maxAttemptsOtp = {
-        ...validOtpRecord,
-        otp: 'somehash',
-        attempts: 3,
-      };
-      mockDatabaseService.get.mockResolvedValue(maxAttemptsOtp);
-      mockDatabaseService.delete.mockResolvedValue(undefined);
-
-      await expect(service.verifyOtp('test@example.com', '123456')).rejects.toThrow(
+      await expect(service.verifyOtp('test@example.com', 'wrong')).rejects.toThrow(
         UnauthorizedException,
       );
-    });
-
-    it('should increment attempts on wrong OTP', async () => {
-      const wrongOtpRecord = {
-        ...validOtpRecord,
-        otp: 'different-hash',
-        attempts: 0,
-      };
-      mockDatabaseService.get.mockResolvedValue(wrongOtpRecord);
-      mockDatabaseService.update.mockResolvedValue({} as any);
-
-      await expect(service.verifyOtp('test@example.com', '123456')).rejects.toThrow(
-        UnauthorizedException,
-      );
-      expect(mockDatabaseService.update).toHaveBeenCalled();
     });
   });
 
   describe('loginWithPassword', () => {
-    const existingUser = {
-      PK: 'USER#test@example.com',
-      SK: 'PROFILE',
-      id: 'user-123',
-      email: 'test@example.com',
-      name: 'Test User',
-      hasPassword: true,
-      passwordHash: '', // Will be set dynamically
-      isVerified: true,
+    const mockAuthResult = {
+      accessToken: 'cognito-access-token',
+      refreshToken: 'cognito-refresh-token',
+      idToken: 'cognito-id-token',
+      expiresIn: 3600,
     };
 
     it('should login successfully with correct password', async () => {
-      // Hash password the same way the service does
-      const crypto = require('crypto');
-      const salt = 'test-password-salt';
-      const passwordHash = crypto
-        .pbkdf2Sync('TestPassword123!', salt, 100000, 64, 'sha512')
-        .toString('hex');
+      const existingUser = {
+        PK: 'USER#test@example.com',
+        SK: 'PROFILE',
+        id: 'user-123',
+        email: 'test@example.com',
+        hasPassword: true,
+        isVerified: true,
+        role: 'user',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
 
-      mockDatabaseService.get.mockResolvedValue({ ...existingUser, passwordHash });
-      mockDatabaseService.update.mockResolvedValue({} as any);
+      mockCognitoService.authenticate.mockResolvedValue(mockAuthResult);
+      mockDatabaseService.get.mockResolvedValue(existingUser);
 
       const result = await service.loginWithPassword('test@example.com', 'TestPassword123!');
 
       expect(result.success).toBe(true);
-      expect(result.accessToken).toBeDefined();
+      expect(result.accessToken).toBe('cognito-access-token');
       expect(result.user?.email).toBe('test@example.com');
+      expect(mockCognitoService.authenticate).toHaveBeenCalledWith('test@example.com', 'TestPassword123!');
     });
 
-    it('should throw error for non-existent user', async () => {
-      mockDatabaseService.get.mockResolvedValue(null);
+    it('should throw error for invalid credentials', async () => {
+      mockCognitoService.authenticate.mockRejectedValue(
+        new UnauthorizedException('Incorrect username or password'),
+      );
 
       await expect(
-        service.loginWithPassword('nonexistent@example.com', 'password'),
+        service.loginWithPassword('test@example.com', 'WrongPassword'),
       ).rejects.toThrow(UnauthorizedException);
-    });
-
-    it('should throw error for user without password set', async () => {
-      mockDatabaseService.get.mockResolvedValue({
-        ...existingUser,
-        hasPassword: false,
-        passwordHash: undefined,
-      });
-
-      await expect(service.loginWithPassword('test@example.com', 'password')).rejects.toThrow(
-        BadRequestException,
-      );
-    });
-
-    it('should throw error for wrong password', async () => {
-      const crypto = require('crypto');
-      const salt = 'test-password-salt';
-      const passwordHash = crypto
-        .pbkdf2Sync('CorrectPassword', salt, 100000, 64, 'sha512')
-        .toString('hex');
-
-      mockDatabaseService.get.mockResolvedValue({ ...existingUser, passwordHash });
-
-      await expect(service.loginWithPassword('test@example.com', 'WrongPassword')).rejects.toThrow(
-        UnauthorizedException,
-      );
     });
   });
 
@@ -277,9 +228,12 @@ describe('OtpAuthService', () => {
       email: 'test@example.com',
       hasPassword: false,
       isVerified: true,
+      role: 'user',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
-    it('should set password successfully', async () => {
+    it('should set password via Cognito successfully', async () => {
       mockDatabaseService.get.mockResolvedValue(existingUser);
       mockDatabaseService.update.mockResolvedValue({} as any);
 
@@ -292,6 +246,11 @@ describe('OtpAuthService', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toContain('Password set successfully');
+      expect(mockCognitoService.setUserPassword).toHaveBeenCalledWith(
+        'test@example.com',
+        'NewPassword123!',
+        true,
+      );
       expect(mockDatabaseService.update).toHaveBeenCalled();
     });
 
@@ -318,165 +277,30 @@ describe('OtpAuthService', () => {
     });
   });
 
-  describe('verifyToken', () => {
-    it('should verify valid token', async () => {
-      // Generate a token using the service's method
-      const user = {
-        id: 'user-123',
-        email: 'test@example.com',
-        name: 'Test User',
-        hasPassword: true,
-        isVerified: true,
-        PK: 'USER#test@example.com',
-        SK: 'PROFILE',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      mockDatabaseService.get.mockResolvedValue(user);
-      mockDatabaseService.update.mockResolvedValue({} as any);
-      mockDatabaseService.delete.mockResolvedValue(undefined);
-      mockDatabaseService.put.mockResolvedValue({} as any);
-
-      // Create a valid token manually (3-part JWT)
-      const crypto = require('crypto');
-      const header = { alg: 'HS256', typ: 'JWT' };
-      const payload = {
-        sub: 'user-123',
-        email: 'test@example.com',
-        type: 'access',
-        iat: Date.now(),
-        exp: Date.now() + 3600000,
-      };
-      const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url');
-      const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64url');
-      const signature = crypto
-        .createHmac('sha256', 'test-jwt-secret')
-        .update(`${base64Header}.${base64Payload}`)
-        .digest('base64url');
-      const token = `${base64Header}.${base64Payload}.${signature}`;
-
-      const result = service.verifyToken(token);
-
-      expect(result).not.toBeNull();
-      expect(result?.sub).toBe('user-123');
-      expect(result?.email).toBe('test@example.com');
-    });
-
-    it('should return null for expired token', () => {
-      const crypto = require('crypto');
-      const header = { alg: 'HS256', typ: 'JWT' };
-      const payload = {
-        sub: 'user-123',
-        email: 'test@example.com',
-        type: 'access',
-        iat: Date.now() - 7200000,
-        exp: Date.now() - 3600000, // Expired
-      };
-      const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url');
-      const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64url');
-      const signature = crypto
-        .createHmac('sha256', 'test-jwt-secret')
-        .update(`${base64Header}.${base64Payload}`)
-        .digest('base64url');
-      const token = `${base64Header}.${base64Payload}.${signature}`;
-
-      const result = service.verifyToken(token);
-
-      expect(result).toBeNull();
-    });
-
-    it('should return null for invalid signature', () => {
-      const header = { alg: 'HS256', typ: 'JWT' };
-      const payload = {
-        sub: 'user-123',
-        email: 'test@example.com',
-        type: 'access',
-        iat: Date.now(),
-        exp: Date.now() + 3600000,
-      };
-      const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url');
-      const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64url');
-      const token = `${base64Header}.${base64Payload}.invalidsignature`;
-
-      const result = service.verifyToken(token);
-
-      expect(result).toBeNull();
-    });
-
-    it('should return null for malformed token', () => {
-      expect(service.verifyToken('invalid')).toBeNull();
-      expect(service.verifyToken('')).toBeNull();
-      expect(service.verifyToken('a.b.c')).toBeNull();
-    });
-  });
-
   describe('refreshToken', () => {
-    it('should refresh tokens successfully', async () => {
-      const user = {
-        PK: 'USER#test@example.com',
-        SK: 'PROFILE',
-        id: 'user-123',
-        email: 'test@example.com',
-        name: 'Test User',
-        hasPassword: true,
-        isVerified: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+    it('should refresh tokens via Cognito successfully', async () => {
+      mockCognitoService.refreshToken.mockResolvedValue({
+        accessToken: 'new-access-token',
+        refreshToken: 'new-refresh-token',
+        idToken: 'new-id-token',
+        expiresIn: 3600,
+      });
 
-      mockDatabaseService.get.mockResolvedValue(user);
-
-      // Create a valid refresh token (3-part JWT)
-      const crypto = require('crypto');
-      const header = { alg: 'HS256', typ: 'JWT' };
-      const payload = {
-        sub: 'user-123',
-        email: 'test@example.com',
-        type: 'refresh',
-        iat: Date.now(),
-        exp: Date.now() + 604800000, // 7 days
-      };
-      const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url');
-      const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64url');
-      const signature = crypto
-        .createHmac('sha256', 'test-jwt-secret')
-        .update(`${base64Header}.${base64Payload}`)
-        .digest('base64url');
-      const refreshToken = `${base64Header}.${base64Payload}.${signature}`;
-
-      const result = await service.refreshToken(refreshToken);
+      const result = await service.refreshToken('old-refresh-token');
 
       expect(result.success).toBe(true);
-      expect(result.accessToken).toBeDefined();
-      expect(result.refreshToken).toBeDefined();
+      expect(result.accessToken).toBe('new-access-token');
+      expect(result.refreshToken).toBe('new-refresh-token');
+      expect(result.idToken).toBe('new-id-token');
+      expect(mockCognitoService.refreshToken).toHaveBeenCalledWith('old-refresh-token');
     });
 
     it('should throw error for invalid refresh token', async () => {
+      mockCognitoService.refreshToken.mockRejectedValue(
+        new UnauthorizedException('Invalid refresh token'),
+      );
+
       await expect(service.refreshToken('invalid-token')).rejects.toThrow(UnauthorizedException);
-    });
-
-    it('should throw error if user not found', async () => {
-      mockDatabaseService.get.mockResolvedValue(null);
-
-      const crypto = require('crypto');
-      const header = { alg: 'HS256', typ: 'JWT' };
-      const payload = {
-        sub: 'user-123',
-        email: 'deleted@example.com',
-        type: 'refresh',
-        iat: Date.now(),
-        exp: Date.now() + 604800000,
-      };
-      const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url');
-      const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64url');
-      const signature = crypto
-        .createHmac('sha256', 'test-jwt-secret')
-        .update(`${base64Header}.${base64Payload}`)
-        .digest('base64url');
-      const refreshToken = `${base64Header}.${base64Payload}.${signature}`;
-
-      await expect(service.refreshToken(refreshToken)).rejects.toThrow(UnauthorizedException);
     });
   });
 
@@ -489,16 +313,17 @@ describe('OtpAuthService', () => {
         email: 'test@example.com',
         hasPassword: true,
         isVerified: true,
+        role: 'user',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       mockDatabaseService.get.mockResolvedValue(user);
-      mockDatabaseService.delete.mockResolvedValue(undefined);
-      mockDatabaseService.put.mockResolvedValue({} as any);
 
       const result = await service.requestPasswordResetOtp('test@example.com');
 
       expect(result.success).toBe(true);
-      expect(mockEmailService.sendPasswordResetOtpEmail).toHaveBeenCalled();
+      expect(mockCognitoService.initiateCustomAuth).toHaveBeenCalled();
     });
 
     it('should return success even for non-existent user (security)', async () => {
@@ -506,9 +331,8 @@ describe('OtpAuthService', () => {
 
       const result = await service.requestPasswordResetOtp('nonexistent@example.com');
 
-      // Should return success to not reveal if user exists
       expect(result.success).toBe(true);
-      expect(mockEmailService.sendPasswordResetOtpEmail).not.toHaveBeenCalled();
+      expect(mockCognitoService.initiateCustomAuth).not.toHaveBeenCalled();
     });
   });
 });
