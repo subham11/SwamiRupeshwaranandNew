@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/useAuth';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
 import Container from '@/components/ui/Container';
 import Button from '@/components/ui/Button';
 
@@ -54,20 +55,10 @@ export default function AdminUsersPage() {
   const isSuperAdmin = user?.role === 'super_admin';
   const isAdmin = user?.role === 'admin' || isSuperAdmin;
 
-  // Ensure API_BASE always has /api/v1 suffix
-  const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://x3cgcqhhub.execute-api.ap-south-1.amazonaws.com/dev';
-  const API_BASE = rawApiUrl.endsWith('/api/v1') ? rawApiUrl : `${rawApiUrl.replace(/\/$/, '')}/api/v1`;
-
   const fetchUsers = useCallback(async () => {
-    if (!accessToken) return;
-
     try {
       setLoadingUsers(true);
-      const response = await fetch(`${API_BASE}/admin/users`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await fetchWithAuth(`/admin/users`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch users');
@@ -80,7 +71,7 @@ export default function AdminUsersPage() {
     } finally {
       setLoadingUsers(false);
     }
-  }, [accessToken, API_BASE]);
+  }, []);
 
   // Redirect if not authenticated or not admin
   useEffect(() => {
@@ -93,10 +84,10 @@ export default function AdminUsersPage() {
 
   // Fetch users on load
   useEffect(() => {
-    if (isAuthenticated && isAdmin && accessToken) {
+    if (isAuthenticated && isAdmin) {
       fetchUsers();
     }
-  }, [isAuthenticated, isAdmin, accessToken, fetchUsers]);
+  }, [isAuthenticated, isAdmin, fetchUsers]);
 
   // Clear messages after timeout
   useEffect(() => {
@@ -115,18 +106,13 @@ export default function AdminUsersPage() {
 
   const handleInviteUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!accessToken) return;
 
     setInviting(true);
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE}/admin/invite`, {
+      const response = await fetchWithAuth(`/admin/invite`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
         body: JSON.stringify({
           email: inviteEmail,
           name: inviteName,
@@ -153,18 +139,14 @@ export default function AdminUsersPage() {
   };
 
   const handleRoleChange = async (userId: string, newRole: string) => {
-    if (!accessToken || !isSuperAdmin) return;
+    if (!isSuperAdmin) return;
 
     setChangingRole(userId);
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE}/admin/users/${userId}/role`, {
+      const response = await fetchWithAuth(`/admin/users/${userId}/role`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
         body: JSON.stringify({ role: newRole }),
       });
 
@@ -183,18 +165,15 @@ export default function AdminUsersPage() {
   };
 
   const handleDeleteUser = async (userId: string, userEmail: string) => {
-    if (!accessToken || !isSuperAdmin) return;
+    if (!isSuperAdmin) return;
 
     if (!confirm(`Are you sure you want to delete ${userEmail}? This action cannot be undone.`)) {
       return;
     }
 
     try {
-      const response = await fetch(`${API_BASE}/admin/users/${userId}`, {
+      const response = await fetchWithAuth(`/admin/users/${userId}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
       });
 
       if (!response.ok) {

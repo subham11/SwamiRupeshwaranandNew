@@ -1,25 +1,21 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
+import * as crypto from 'crypto';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  private verifier: any;
+  private readonly logger = new Logger(JwtAuthGuard.name);
+  private readonly jwtSecret: string;
 
   constructor(
     private reflector: Reflector,
     private configService: ConfigService,
   ) {
-    const userPoolId = this.configService.get<string>('COGNITO_USER_POOL_ID');
-    const clientId = this.configService.get<string>('COGNITO_CLIENT_ID');
-
-    if (userPoolId && clientId) {
-      // Note: aws-jwt-verify is optional, we'll do basic validation
-      // For production, consider adding this package
-    }
+    this.jwtSecret = this.configService.get('JWT_SECRET', 'ashram-jwt-secret-key-2024');
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -39,26 +35,26 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('No token provided');
     }
 
-    try {
-      // Basic JWT validation (decode and check expiration)
-      const payload = this.decodeToken(token);
+    const payload = this.verifyAndDecodeToken(token);
 
-      if (!payload || this.isTokenExpired(payload)) {
-        throw new UnauthorizedException('Token expired');
-      }
-
-      // Attach user to request
-      (request as any).user = {
-        sub: payload.sub,
-        email: payload.email,
-        name: payload.name,
-        role: payload.role || 'user',
-      };
-
-      return true;
-    } catch {
-      throw new UnauthorizedException('Invalid token');
+    if (!payload) {
+      throw new UnauthorizedException('Invalid or expired token');
     }
+
+    // Only allow access tokens, not refresh tokens
+    if (payload.type === 'refresh') {
+      throw new UnauthorizedException('Access token required');
+    }
+
+    // Attach user to request
+    (request as any).user = {
+      sub: payload.sub,
+      email: payload.email,
+      name: payload.name,
+      role: payload.role || 'user',
+    };
+
+    return true;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
@@ -66,25 +62,47 @@ export class JwtAuthGuard implements CanActivate {
     return type === 'Bearer' ? token : undefined;
   }
 
-  private decodeToken(token: string): any {
+  /**
+   * Verify JWT signature (HMAC-SHA256) and decode payload.
+   * Uses base64url encoding matching OtpAuthService token generation.
+   * Returns decoded payload or null if invalid/expired.
+   */
+  private verifyAndDecodeToken(token: string): any | null {
     try {
       const parts = token.split('.');
-      if (parts.length !== 3) {
+      if (parts.length !== 3) return null;
+
+      const [header, payload, signature] = parts;
+
+      // Verify HMAC-SHA256 signature
+      const expectedSignature = crypto
+        .createHmac('sha256', this.jwtSecret)
+        .update(`${header}.${payload}`)
+        .digest('base64url');
+
+      if (!crypto.timingSafeEqual(
+        Buffer.from(signature),
+        Buffer.from(expectedSignature),
+      )) {
+        this.logger.warn('JWT signature verification failed');
         return null;
       }
-      const payload = Buffer.from(parts[1], 'base64').toString('utf-8');
-      return JSON.parse(payload);
-    } catch {
+
+      // Decode payload using base64url (matching OtpAuthService)
+      const decoded = JSON.parse(
+        Buffer.from(payload, 'base64url').toString('utf-8'),
+      );
+
+      // Check expiration (exp is in milliseconds, matching OtpAuthService)
+      if (decoded.exp && decoded.exp < Date.now()) {
+        this.logger.debug('JWT token expired');
+        return null;
+      }
+
+      return decoded;
+    } catch (error) {
+      this.logger.warn(`JWT verification error: ${error instanceof Error ? error.message : 'unknown'}`);
       return null;
     }
-  }
-
-  private isTokenExpired(payload: any): boolean {
-    if (!payload.exp) {
-      return false;
-    }
-    // Token exp is in milliseconds, compare with current time in ms
-    const now = Date.now();
-    return payload.exp < now;
   }
 }
