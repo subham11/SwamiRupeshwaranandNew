@@ -1157,9 +1157,7 @@ export default {
   updateDonationConfig,
   deleteDonationConfig,
   updateDonation,
-  // Events
-  fetchEvents,
-  fetchEventBySlug,
+  // Events (fetchEvents, fetchEventBySlug listed above)
   fetchAllEventsAdmin,
   createEvent,
   updateEvent,
