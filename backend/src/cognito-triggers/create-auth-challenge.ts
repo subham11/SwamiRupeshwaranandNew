@@ -23,7 +23,7 @@ const ddbClient = DynamoDBDocumentClient.from(
 const sesClient = new SESClient({ region: process.env.SES_REGION || process.env.AWS_REGION || 'ap-south-1' });
 
 const OTP_TABLE = process.env.OTP_TABLE || '';
-const SES_FROM_EMAIL = process.env.SES_FROM_EMAIL || 'noreply@swamirupeshwaranand.in';
+const SES_FROM_EMAIL = process.env.SES_FROM_EMAIL || 'satyam@elevatephysique.com';
 const OTP_EXPIRY_SECONDS = 300; // 5 minutes
 
 function generateOtp(): string {

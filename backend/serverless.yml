@@ -131,7 +131,7 @@ functions:
     timeout: 10
     environment:
       OTP_TABLE: !Ref OtpTable
-      SES_FROM_EMAIL: ${env:SES_FROM_EMAIL, 'noreply@swamirupeshwaranand.in'}
+      SES_FROM_EMAIL: ${env:SES_FROM_EMAIL, 'satyam@elevatephysique.com'}
       SES_REGION: ${self:provider.region}
 
   verifyAuthChallenge:
