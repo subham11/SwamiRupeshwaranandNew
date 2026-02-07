@@ -1113,6 +1113,145 @@ export async function cancelSubscription(
 }
 
 // ============================================
+// Payment API (Razorpay Integration)
+// ============================================
+
+export interface SubscriptionPaymentResponse {
+  subscriptionId: string;
+  razorpayOrderId?: string;
+  razorpaySubscriptionId?: string;
+  amount: number;
+  currency: string;
+  razorpayKeyId: string;
+  planName: string;
+  planDescription: string;
+  isAutopay: boolean;
+  notes?: Record<string, string>;
+}
+
+export interface DonationPaymentResponse {
+  donationId: string;
+  razorpayOrderId: string;
+  amount: number;
+  currency: string;
+  razorpayKeyId: string;
+  notes?: Record<string, string>;
+}
+
+export interface PaymentVerificationResponse {
+  success: boolean;
+  message: string;
+  entityId?: string;
+  status?: string;
+}
+
+/**
+ * Initiate a subscription payment - creates Razorpay Order or Subscription
+ */
+export async function initiateSubscriptionPayment(
+  planId: string,
+  accessToken: string
+): Promise<SubscriptionPaymentResponse> {
+  return apiRequest("/payments/subscription/initiate", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ planId }),
+  });
+}
+
+/**
+ * Verify a one-time order payment (for 5100/21000 plans)
+ */
+export async function verifyOrderPayment(
+  data: {
+    razorpayOrderId: string;
+    razorpayPaymentId: string;
+    razorpaySignature: string;
+    subscriptionId: string;
+  },
+  accessToken: string
+): Promise<PaymentVerificationResponse> {
+  return apiRequest("/payments/subscription/verify-order", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Verify an autopay subscription payment
+ */
+export async function verifySubscriptionPayment(
+  data: {
+    razorpaySubscriptionId: string;
+    razorpayPaymentId: string;
+    razorpaySignature: string;
+    subscriptionId: string;
+  },
+  accessToken: string
+): Promise<PaymentVerificationResponse> {
+  return apiRequest("/payments/subscription/verify-subscription", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Initiate a donation payment
+ */
+export async function initiateDonationPayment(
+  data: {
+    amount: number;
+    purpose: string;
+    donorName?: string;
+    donorEmail?: string;
+    donorPhone?: string;
+  }
+): Promise<DonationPaymentResponse> {
+  return apiRequest("/payments/donation/initiate", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Verify a donation payment
+ */
+export async function verifyDonationPayment(
+  data: {
+    razorpayOrderId: string;
+    razorpayPaymentId: string;
+    razorpaySignature: string;
+    donationId: string;
+  }
+): Promise<PaymentVerificationResponse> {
+  return apiRequest("/payments/donation/verify", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Get current user's payment history
+ */
+export async function fetchMyPayments(accessToken: string): Promise<any[]> {
+  return apiRequest("/payments/user-payments", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+/**
+ * Get payment failures (admin only)
+ */
+export async function fetchPaymentFailures(accessToken: string, limit?: number): Promise<any[]> {
+  const qs = limit ? `?limit=${limit}` : "";
+  return apiRequest(`/payments/failures${qs}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+// ============================================
 // Support Tickets API
 // ============================================
 
@@ -1359,4 +1498,12 @@ export default {
   listUploadedFiles,
   deleteUploadedFile,
   fetchUploadFolders,
+  // Payments (Razorpay)
+  initiateSubscriptionPayment,
+  verifyOrderPayment,
+  verifySubscriptionPayment,
+  initiateDonationPayment,
+  verifyDonationPayment,
+  fetchMyPayments,
+  fetchPaymentFailures,
 };

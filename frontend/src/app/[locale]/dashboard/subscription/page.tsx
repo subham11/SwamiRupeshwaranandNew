@@ -366,9 +366,12 @@ export default function SubscriptionDashboardPage() {
                           ₹{plan.price}/{plan.interval === 'year' ? 'yr' : 'mo'}
                         </p>
                       </div>
-                      <button className="mt-4 w-full py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
+                      <Link
+                        href={`/subscribe?plan=${plan.id}`}
+                        className="mt-4 block w-full py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-center"
+                      >
                         Upgrade to {plan.name}
-                      </button>
+                      </Link>
                     </div>
                   ))}
               </div>
