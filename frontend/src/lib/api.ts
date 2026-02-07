@@ -392,51 +392,69 @@ export async function checkHealth(): Promise<{
 
 export interface LocalizedString {
   en: string;
-  hi: string;
+  hi?: string;
 }
 
 export interface CMSPage {
   id: string;
-  title: LocalizedString;
   slug: string;
+  title: LocalizedString;
   description?: LocalizedString;
+  path?: string;
+  heroImage?: string;
   status: 'draft' | 'published' | 'archived';
+  displayOrder: number;
+  metaTitle?: LocalizedString;
+  metaDescription?: LocalizedString;
+  componentIds: string[];
   createdAt: string;
   updatedAt: string;
 }
 
+/** Field schema definition from a component template */
 export interface ComponentFieldDefinition {
-  name: string;
-  label: LocalizedString;
+  key: string;
+  label: string;
   type: 'text' | 'textarea' | 'richtext' | 'image' | 'video' | 'url' | 'number' | 'boolean' | 'select' | 'color' | 'date' | 'array' | 'json';
   required?: boolean;
+  localized?: boolean;
   defaultValue?: unknown;
-  options?: Array<{ value: string; label: LocalizedString }>;
-  placeholder?: LocalizedString;
+  placeholder?: string;
+  helpText?: string;
+  options?: string[];
 }
 
+/** Runtime field value stored on a component */
 export interface ComponentFieldValue {
-  name: string;
-  value: unknown;
+  key: string;
+  value?: unknown;
+  localizedValue?: LocalizedString;
 }
 
 export interface CMSComponent {
   id: string;
   pageId: string;
   componentType: string;
-  name: string;
-  fieldDefinitions: ComponentFieldDefinition[];
-  fieldValues: ComponentFieldValue[];
-  order: number;
-  isActive: boolean;
+  name: LocalizedString;
+  description?: LocalizedString;
+  fields: ComponentFieldValue[];
+  displayOrder: number;
+  isVisible: boolean;
+  customClasses?: string;
+  customStyles?: Record<string, string>;
   createdAt: string;
   updatedAt: string;
 }
 
+export interface CMSPageWithComponents extends CMSPage {
+  components: CMSComponent[];
+}
+
 export interface ComponentTemplate {
-  type: string;
+  componentType: string;
   name: string;
   description: string;
+  icon: string;
   fields: ComponentFieldDefinition[];
 }
 
@@ -444,9 +462,10 @@ export interface ComponentTemplate {
  * Fetch all CMS pages
  */
 export async function fetchCMSPages(accessToken: string): Promise<CMSPage[]> {
-  return apiRequest("/cms/pages", {
+  const res: { items: CMSPage[]; count: number } = await apiRequest("/cms/pages", {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
+  return res.items;
 }
 
 /**
@@ -455,17 +474,30 @@ export async function fetchCMSPages(accessToken: string): Promise<CMSPage[]> {
 export async function fetchCMSPageWithComponents(
   pageId: string,
   accessToken: string
-): Promise<{ page: CMSPage; components: CMSComponent[] }> {
+): Promise<CMSPageWithComponents> {
   return apiRequest(`/cms/pages/${pageId}/with-components`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 }
 
 /**
+ * Fetch components for a page
+ */
+export async function fetchCMSPageComponents(
+  pageId: string,
+  accessToken: string
+): Promise<CMSComponent[]> {
+  const res: { items: CMSComponent[]; count: number } = await apiRequest(`/cms/components/page/${pageId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return res.items;
+}
+
+/**
  * Create a new CMS page
  */
 export async function createCMSPage(
-  data: { title: LocalizedString; slug: string; description?: LocalizedString; status?: string },
+  data: { title: LocalizedString; slug: string; description?: LocalizedString; status?: string; path?: string; displayOrder?: number },
   accessToken: string
 ): Promise<CMSPage> {
   return apiRequest("/cms/pages", {
@@ -480,7 +512,7 @@ export async function createCMSPage(
  */
 export async function updateCMSPage(
   pageId: string,
-  data: Partial<{ title: LocalizedString; slug: string; description?: LocalizedString; status?: string }>,
+  data: Partial<{ title: LocalizedString; slug: string; description?: LocalizedString; status?: string; path?: string; displayOrder?: number }>,
   accessToken: string
 ): Promise<CMSPage> {
   return apiRequest(`/cms/pages/${pageId}`, {
@@ -507,10 +539,11 @@ export async function createCMSComponent(
   data: {
     pageId: string;
     componentType: string;
-    name: string;
-    fieldValues?: ComponentFieldValue[];
-    order?: number;
-    isActive?: boolean;
+    name: LocalizedString;
+    description?: LocalizedString;
+    fields?: ComponentFieldValue[];
+    displayOrder?: number;
+    isVisible?: boolean;
   },
   accessToken: string
 ): Promise<CMSComponent> {
@@ -527,10 +560,11 @@ export async function createCMSComponent(
 export async function updateCMSComponent(
   componentId: string,
   data: Partial<{
-    name: string;
-    fieldValues: ComponentFieldValue[];
-    order: number;
-    isActive: boolean;
+    name: LocalizedString;
+    description: LocalizedString;
+    fields: ComponentFieldValue[];
+    displayOrder: number;
+    isVisible: boolean;
   }>,
   accessToken: string
 ): Promise<CMSComponent> {
@@ -552,26 +586,29 @@ export async function deleteCMSComponent(componentId: string, accessToken: strin
 }
 
 /**
- * Bulk update CMS components
+ * Reorder CMS components within a page
  */
-export async function bulkUpdateCMSComponents(
-  updates: Array<{ componentId: string; fieldValues?: ComponentFieldValue[]; order?: number; isActive?: boolean }>,
+export async function reorderCMSComponents(
+  pageId: string,
+  componentIds: string[],
   accessToken: string
 ): Promise<CMSComponent[]> {
-  return apiRequest("/cms/components/bulk-update", {
+  const res: { items: CMSComponent[]; count: number } = await apiRequest("/cms/components/reorder", {
     method: "PUT",
     headers: { Authorization: `Bearer ${accessToken}` },
-    body: JSON.stringify({ updates }),
+    body: JSON.stringify({ pageId, componentIds }),
   });
+  return res.items;
 }
 
 /**
  * Fetch component templates
  */
 export async function fetchComponentTemplates(accessToken: string): Promise<ComponentTemplate[]> {
-  return apiRequest("/cms/templates", {
+  const res: { items: ComponentTemplate[]; count: number } = await apiRequest("/cms/templates", {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
+  return res.items;
 }
 
 // ============================================
@@ -1130,13 +1167,14 @@ export default {
   // CMS
   fetchCMSPages,
   fetchCMSPageWithComponents,
+  fetchCMSPageComponents,
   createCMSPage,
   updateCMSPage,
   deleteCMSPage,
   createCMSComponent,
   updateCMSComponent,
   deleteCMSComponent,
-  bulkUpdateCMSComponents,
+  reorderCMSComponents,
   fetchComponentTemplates,
   // Newsletter
   subscribeNewsletter,

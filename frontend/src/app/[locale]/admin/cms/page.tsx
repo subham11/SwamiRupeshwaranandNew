@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/useAuth';
 import Container from '@/components/ui/Container';
 import Button from '@/components/ui/Button';
+import MediaPickerModal from '@/components/admin/MediaPickerModal';
 import {
-  CMSPage,
-  CMSComponent,
-  ComponentTemplate,
-  ComponentFieldValue,
-  LocalizedString,
+  type CMSPage,
+  type CMSComponent,
+  type ComponentTemplate,
+  type ComponentFieldValue,
+  type ComponentFieldDefinition,
+  type LocalizedString,
   fetchCMSPages,
   fetchCMSPageWithComponents,
   createCMSPage,
@@ -35,17 +37,17 @@ const COMPONENT_TYPE_ICONS: Record<string, string> = {
   sacred_teachings: '📿',
   upcoming_events: '📅',
   words_of_wisdom: '💭',
-  about_section: 'ℹ️',
+  services_grid: '🙏',
   gallery: '🖼️',
   contact_form: '📧',
   text_block: '📝',
-  image_banner: '🎨',
-  video_section: '🎬',
-  testimonials: '💬',
+  image_block: '📷',
+  video_block: '🎬',
+  donation_section: '💰',
+  newsletter_signup: '✉️',
   faq_section: '❓',
-  cta_section: '🎯',
-  stats_section: '📊',
-  team_section: '👥',
+  testimonials: '⭐',
+  custom: '⚙️',
 };
 
 export default function CMSEditorPage() {
@@ -69,23 +71,24 @@ export default function CMSEditorPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Form state for editing
-  const [editedFieldValues, setEditedFieldValues] = useState<ComponentFieldValue[]>([]);
+  // Edited field values (working copy)
+  const [editedFields, setEditedFields] = useState<ComponentFieldValue[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
 
   // Modals
   const [showAddPageModal, setShowAddPageModal] = useState(false);
   const [showAddComponentModal, setShowAddComponentModal] = useState(false);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [mediaPickerFieldKey, setMediaPickerFieldKey] = useState<string | null>(null);
   const [newPageTitle, setNewPageTitle] = useState<LocalizedString>({ en: '', hi: '' });
   const [newPageSlug, setNewPageSlug] = useState('');
 
-  // Auth check
   const isEditor = user?.role === 'super_admin' || user?.role === 'admin' || user?.role === 'content_editor';
 
-  const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:2026';
-  const API_BASE = rawApiUrl.endsWith('/api/v1') ? rawApiUrl : `${rawApiUrl.replace(/\/$/, '')}/api/v1`;
+  // ============================================
+  // Data Loading
+  // ============================================
 
-  // Fetch pages
   const loadPages = useCallback(async () => {
     if (!accessToken) return;
     try {
@@ -99,7 +102,6 @@ export default function CMSEditorPage() {
     }
   }, [accessToken]);
 
-  // Fetch page components
   const loadPageComponents = useCallback(async (pageId: string) => {
     if (!accessToken) return;
     try {
@@ -113,7 +115,6 @@ export default function CMSEditorPage() {
     }
   }, [accessToken]);
 
-  // Fetch templates
   const loadTemplates = useCallback(async () => {
     if (!accessToken) return;
     try {
@@ -124,7 +125,10 @@ export default function CMSEditorPage() {
     }
   }, [accessToken]);
 
-  // Redirect if not authenticated
+  // ============================================
+  // Auth guard
+  // ============================================
+
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push('/login?redirect=/admin/cms');
@@ -133,7 +137,6 @@ export default function CMSEditorPage() {
     }
   }, [isAuthenticated, isLoading, isEditor, router]);
 
-  // Load initial data
   useEffect(() => {
     if (isAuthenticated && isEditor && accessToken) {
       loadPages();
@@ -141,76 +144,81 @@ export default function CMSEditorPage() {
     }
   }, [isAuthenticated, isEditor, accessToken, loadPages, loadTemplates]);
 
-  // Load components when page selected
   useEffect(() => {
     if (selectedPage) {
       loadPageComponents(selectedPage.id);
       setSelectedComponent(null);
-      setEditedFieldValues([]);
+      setEditedFields([]);
       setHasChanges(false);
     }
   }, [selectedPage, loadPageComponents]);
 
-  // Set edited values when component selected
   useEffect(() => {
     if (selectedComponent) {
-      setEditedFieldValues([...selectedComponent.fieldValues]);
+      setEditedFields(JSON.parse(JSON.stringify(selectedComponent.fields || [])));
       setHasChanges(false);
     }
   }, [selectedComponent]);
 
-  // Clear messages
+  // Auto-clear messages
   useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => setSuccessMessage(null), 3000);
-      return () => clearTimeout(timer);
-    }
+    if (successMessage) { const t = setTimeout(() => setSuccessMessage(null), 3000); return () => clearTimeout(t); }
   }, [successMessage]);
-
   useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => setError(null), 5000);
-      return () => clearTimeout(timer);
-    }
+    if (error) { const t = setTimeout(() => setError(null), 5000); return () => clearTimeout(t); }
   }, [error]);
 
+  // ============================================
+  // Get the template schema for the selected component
+  // ============================================
+
+  const getTemplateForComponent = (comp: CMSComponent): ComponentTemplate | undefined => {
+    return templates.find((t) => t.componentType === comp.componentType);
+  };
+
+  // ============================================
+  // Field value helpers
+  // ============================================
+
+  const getFieldValue = (key: string): ComponentFieldValue | undefined => {
+    return editedFields.find((f) => f.key === key);
+  };
+
+  const updateFieldValue = (key: string, update: Partial<ComponentFieldValue>) => {
+    setEditedFields((prev) => {
+      const idx = prev.findIndex((f) => f.key === key);
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy[idx] = { ...copy[idx], ...update };
+        return copy;
+      }
+      return [...prev, { key, ...update }];
+    });
+    setHasChanges(true);
+  };
+
+  // ============================================
   // Handlers
+  // ============================================
+
   const handleSelectPage = (page: CMSPage) => {
-    if (hasChanges) {
-      if (!confirm('You have unsaved changes. Discard them?')) return;
-    }
+    if (hasChanges && !confirm('You have unsaved changes. Discard them?')) return;
     setSelectedPage(page);
   };
 
   const handleSelectComponent = (component: CMSComponent) => {
-    if (hasChanges) {
-      if (!confirm('You have unsaved changes. Discard them?')) return;
-    }
+    if (hasChanges && !confirm('You have unsaved changes. Discard them?')) return;
     setSelectedComponent(component);
-  };
-
-  const handleFieldChange = (fieldName: string, value: unknown) => {
-    setEditedFieldValues((prev) => {
-      const existing = prev.find((f) => f.name === fieldName);
-      if (existing) {
-        return prev.map((f) => (f.name === fieldName ? { ...f, value } : f));
-      }
-      return [...prev, { name: fieldName, value }];
-    });
-    setHasChanges(true);
   };
 
   const handleSave = async () => {
     if (!selectedComponent || !accessToken) return;
     try {
       setSaving(true);
-      await updateCMSComponent(selectedComponent.id, { fieldValues: editedFieldValues }, accessToken);
+      await updateCMSComponent(selectedComponent.id, { fields: editedFields }, accessToken);
       setSuccessMessage('Component saved successfully!');
       setHasChanges(false);
-      // Refresh components
-      if (selectedPage) {
-        loadPageComponents(selectedPage.id);
-      }
+      if (selectedPage) loadPageComponents(selectedPage.id);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save component');
     } finally {
@@ -220,7 +228,7 @@ export default function CMSEditorPage() {
 
   const handleReset = () => {
     if (selectedComponent) {
-      setEditedFieldValues([...selectedComponent.fieldValues]);
+      setEditedFields(JSON.parse(JSON.stringify(selectedComponent.fields || [])));
       setHasChanges(false);
     }
   };
@@ -229,7 +237,7 @@ export default function CMSEditorPage() {
     if (!accessToken || !newPageTitle.en || !newPageSlug) return;
     try {
       setSaving(true);
-      await createCMSPage({ title: newPageTitle, slug: newPageSlug }, accessToken);
+      await createCMSPage({ title: newPageTitle, slug: newPageSlug, path: `/${newPageSlug}` }, accessToken);
       setSuccessMessage('Page created successfully!');
       setShowAddPageModal(false);
       setNewPageTitle({ en: '', hi: '' });
@@ -243,12 +251,11 @@ export default function CMSEditorPage() {
   };
 
   const handleDeletePage = async (pageId: string) => {
-    if (!accessToken) return;
-    if (!confirm('Are you sure you want to delete this page? This will also delete all its components.')) return;
+    if (!accessToken || !confirm('Delete this page and all its components?')) return;
     try {
       setSaving(true);
       await deleteCMSPage(pageId, accessToken);
-      setSuccessMessage('Page deleted successfully!');
+      setSuccessMessage('Page deleted!');
       if (selectedPage?.id === pageId) {
         setSelectedPage(null);
         setComponents([]);
@@ -266,16 +273,26 @@ export default function CMSEditorPage() {
     if (!accessToken || !selectedPage) return;
     try {
       setSaving(true);
+      // Build default fields from template schema
+      const defaultFields: ComponentFieldValue[] = template.fields.map((fd) => {
+        if (fd.localized) {
+          return { key: fd.key, localizedValue: { en: (fd.defaultValue as string) || '', hi: '' } };
+        }
+        return { key: fd.key, value: fd.defaultValue ?? '' };
+      });
+
       await createCMSComponent(
         {
           pageId: selectedPage.id,
-          componentType: template.type,
-          name: template.name,
-          order: components.length,
+          componentType: template.componentType,
+          name: { en: template.name, hi: template.name },
+          displayOrder: components.length,
+          isVisible: true,
+          fields: defaultFields,
         },
         accessToken
       );
-      setSuccessMessage('Component added successfully!');
+      setSuccessMessage('Component added!');
       setShowAddComponentModal(false);
       loadPageComponents(selectedPage.id);
     } catch (err) {
@@ -286,19 +303,16 @@ export default function CMSEditorPage() {
   };
 
   const handleDeleteComponent = async (componentId: string) => {
-    if (!accessToken) return;
-    if (!confirm('Are you sure you want to delete this component?')) return;
+    if (!accessToken || !confirm('Delete this component?')) return;
     try {
       setSaving(true);
       await deleteCMSComponent(componentId, accessToken);
-      setSuccessMessage('Component deleted successfully!');
+      setSuccessMessage('Component deleted!');
       if (selectedComponent?.id === componentId) {
         setSelectedComponent(null);
-        setEditedFieldValues([]);
+        setEditedFields([]);
       }
-      if (selectedPage) {
-        loadPageComponents(selectedPage.id);
-      }
+      if (selectedPage) loadPageComponents(selectedPage.id);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete component');
     } finally {
@@ -306,44 +320,43 @@ export default function CMSEditorPage() {
     }
   };
 
-  const handleToggleComponentActive = async (component: CMSComponent) => {
+  const handleToggleVisibility = async (component: CMSComponent) => {
     if (!accessToken) return;
     try {
-      await updateCMSComponent(component.id, { isActive: !component.isActive }, accessToken);
-      if (selectedPage) {
-        loadPageComponents(selectedPage.id);
-      }
+      await updateCMSComponent(component.id, { isVisible: !component.isVisible }, accessToken);
+      if (selectedPage) loadPageComponents(selectedPage.id);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update component');
+      setError(err instanceof Error ? err.message : 'Failed to toggle visibility');
     }
   };
 
-  // Get field value for display
-  const getFieldValue = (fieldName: string): unknown => {
-    const field = editedFieldValues.find((f) => f.name === fieldName);
-    return field?.value;
-  };
+  // ============================================
+  // Dynamic form renderer
+  // ============================================
 
-  // Render field editor based on type
-  const renderFieldEditor = (field: CMSComponent['fieldDefinitions'][0]) => {
-    const value = getFieldValue(field.name);
-    const localizedValue = value as LocalizedString | undefined;
-    const isLocalized = field.type === 'text' || field.type === 'textarea' || field.type === 'richtext';
+  const renderField = (fieldDef: ComponentFieldDefinition) => {
+    const fieldVal = getFieldValue(fieldDef.key);
 
-    if (isLocalized) {
-      const currentValue = localizedValue?.[activeLanguage] || '';
-      
-      if (field.type === 'textarea' || field.type === 'richtext') {
+    // Localized field: edit per-language via the toggle
+    if (fieldDef.localized) {
+      const locVal = fieldVal?.localizedValue || { en: '', hi: '' };
+      const currentText = locVal[activeLanguage] || '';
+
+      const handleLocChange = (text: string) => {
+        updateFieldValue(fieldDef.key, {
+          localizedValue: { ...locVal, [activeLanguage]: text },
+        });
+      };
+
+      if (fieldDef.type === 'textarea' || fieldDef.type === 'richtext') {
         return (
           <textarea
-            value={currentValue}
-            onChange={(e) => {
-              const newLocalized = { ...localizedValue, [activeLanguage]: e.target.value };
-              handleFieldChange(field.name, newLocalized);
-            }}
-            placeholder={field.placeholder?.[activeLanguage] || ''}
-            rows={field.type === 'richtext' ? 6 : 3}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            value={currentText}
+            onChange={(e) => handleLocChange(e.target.value)}
+            placeholder={fieldDef.placeholder || fieldDef.label}
+            aria-label={`${fieldDef.label} (${activeLanguage.toUpperCase()})`}
+            rows={fieldDef.type === 'richtext' ? 6 : 3}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
           />
         );
       }
@@ -351,106 +364,200 @@ export default function CMSEditorPage() {
       return (
         <input
           type="text"
-          value={currentValue}
-          onChange={(e) => {
-            const newLocalized = { ...localizedValue, [activeLanguage]: e.target.value };
-            handleFieldChange(field.name, newLocalized);
-          }}
-          placeholder={field.placeholder?.[activeLanguage] || ''}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          value={currentText}
+          onChange={(e) => handleLocChange(e.target.value)}
+          placeholder={fieldDef.placeholder || fieldDef.label}
+          aria-label={`${fieldDef.label} (${activeLanguage.toUpperCase()})`}
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
         />
       );
     }
 
     // Non-localized fields
-    switch (field.type) {
-      case 'image':
-      case 'video':
+    const simpleVal = fieldVal?.value;
+
+    switch (fieldDef.type) {
+      case 'text':
       case 'url':
         return (
           <input
-            type="url"
-            value={(value as string) || ''}
-            onChange={(e) => handleFieldChange(field.name, e.target.value)}
-            placeholder={field.type === 'image' ? 'Enter image URL...' : field.type === 'video' ? 'Enter video URL...' : 'Enter URL...'}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            type={fieldDef.type === 'url' ? 'url' : 'text'}
+            value={(simpleVal as string) || ''}
+            onChange={(e) => updateFieldValue(fieldDef.key, { value: e.target.value })}
+            placeholder={fieldDef.placeholder || (fieldDef.type === 'url' ? 'https://...' : '')}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
           />
         );
+
+      case 'textarea':
+      case 'richtext':
+        return (
+          <textarea
+            value={(simpleVal as string) || ''}
+            onChange={(e) => updateFieldValue(fieldDef.key, { value: e.target.value })}
+            aria-label={fieldDef.label}
+            placeholder={fieldDef.label}
+            rows={fieldDef.type === 'richtext' ? 6 : 3}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+          />
+        );
+
+      case 'image':
+        return (
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={(simpleVal as string) || ''}
+                onChange={(e) => updateFieldValue(fieldDef.key, { value: e.target.value })}
+                placeholder="Image URL or path..."
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setMediaPickerFieldKey(fieldDef.key);
+                  setShowMediaPicker(true);
+                }}
+                className="px-3 py-2 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-lg hover:bg-orange-200 dark:hover:bg-orange-900/50 text-sm font-medium whitespace-nowrap"
+              >
+                📁 Browse
+              </button>
+            </div>
+            {simpleVal && typeof simpleVal === 'string' && (
+              <div className="relative w-24 h-24 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <img src={simpleVal} alt="Preview" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              </div>
+            )}
+          </div>
+        );
+
+      case 'video':
+        return (
+          <input
+            type="url"
+            value={(simpleVal as string) || ''}
+            onChange={(e) => updateFieldValue(fieldDef.key, { value: e.target.value })}
+            placeholder="Video URL (YouTube/Vimeo)..."
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+          />
+        );
+
       case 'number':
         return (
           <input
             type="number"
-            value={(value as number) || 0}
-            onChange={(e) => handleFieldChange(field.name, parseFloat(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            value={(simpleVal as number) ?? ''}
+            onChange={(e) => updateFieldValue(fieldDef.key, { value: e.target.value === '' ? '' : parseFloat(e.target.value) })}
+            aria-label={fieldDef.label}
+            placeholder={fieldDef.label}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
           />
         );
+
       case 'boolean':
         return (
           <label className="inline-flex items-center cursor-pointer">
             <input
               type="checkbox"
-              checked={(value as boolean) || false}
-              onChange={(e) => handleFieldChange(field.name, e.target.checked)}
+              checked={!!simpleVal}
+              onChange={(e) => updateFieldValue(fieldDef.key, { value: e.target.checked })}
               className="w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
             />
-            <span className="ml-2 text-gray-700 dark:text-gray-300">Enabled</span>
+            <span className="ml-2 text-gray-700 dark:text-gray-300 text-sm">
+              {simpleVal ? 'Enabled' : 'Disabled'}
+            </span>
           </label>
         );
+
       case 'color':
         return (
-          <input
-            type="color"
-            value={(value as string) || '#000000'}
-            onChange={(e) => handleFieldChange(field.name, e.target.value)}
-            className="w-20 h-10 border border-gray-300 rounded cursor-pointer"
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="color"
+              value={(simpleVal as string) || '#000000'}
+              onChange={(e) => updateFieldValue(fieldDef.key, { value: e.target.value })}
+              aria-label={`${fieldDef.label} color picker`}
+              title={`${fieldDef.label} color picker`}
+              className="w-10 h-10 border border-gray-300 rounded cursor-pointer"
+            />
+            <input
+              type="text"
+              value={(simpleVal as string) || ''}
+              onChange={(e) => updateFieldValue(fieldDef.key, { value: e.target.value })}
+              placeholder="#000000"
+              aria-label={`${fieldDef.label} hex value`}
+              className="w-32 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+            />
+          </div>
         );
+
+      case 'select':
+        return (
+          <select
+            value={(simpleVal as string) || ''}
+            onChange={(e) => updateFieldValue(fieldDef.key, { value: e.target.value })}
+            aria-label={fieldDef.label}
+            title={fieldDef.label}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+          >
+            <option value="">Select...</option>
+            {fieldDef.options?.map((opt) => (
+              <option key={opt} value={opt}>{opt}</option>
+            ))}
+          </select>
+        );
+
       case 'date':
         return (
           <input
             type="date"
-            value={(value as string) || ''}
-            onChange={(e) => handleFieldChange(field.name, e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            value={(simpleVal as string) || ''}
+            onChange={(e) => updateFieldValue(fieldDef.key, { value: e.target.value })}
+            aria-label={fieldDef.label}
+            title={fieldDef.label}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
           />
         );
-      case 'select':
-        return (
-          <select
-            value={(value as string) || ''}
-            onChange={(e) => handleFieldChange(field.name, e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-          >
-            <option value="">Select...</option>
-            {field.options?.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label[activeLanguage]}
-              </option>
-            ))}
-          </select>
-        );
+
       case 'json':
       case 'array':
         return (
           <textarea
-            value={JSON.stringify(value || (field.type === 'array' ? [] : {}), null, 2)}
+            value={typeof simpleVal === 'string' ? simpleVal : JSON.stringify(simpleVal || (fieldDef.type === 'array' ? [] : {}), null, 2)}
             onChange={(e) => {
               try {
                 const parsed = JSON.parse(e.target.value);
-                handleFieldChange(field.name, parsed);
+                updateFieldValue(fieldDef.key, { value: parsed });
               } catch {
-                // Invalid JSON, don't update
+                // Keep raw string if invalid JSON — user is still typing
+                updateFieldValue(fieldDef.key, { value: e.target.value });
               }
             }}
+            aria-label={fieldDef.label}
+            placeholder={`${fieldDef.label} (JSON)`}
             rows={6}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono text-xs focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           />
         );
+
       default:
-        return null;
+        return (
+          <input
+            type="text"
+            value={String(simpleVal || '')}
+            onChange={(e) => updateFieldValue(fieldDef.key, { value: e.target.value })}
+            aria-label={fieldDef.label}
+            placeholder={fieldDef.label}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+          />
+        );
     }
   };
+
+  // ============================================
+  // Render
+  // ============================================
 
   if (isLoading || loadingPages) {
     return (
@@ -462,12 +569,14 @@ export default function CMSEditorPage() {
     );
   }
 
+  const selectedTemplate = selectedComponent ? getTemplateForComponent(selectedComponent) : null;
+
   return (
     <Container className="py-8">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Content Editor</h1>
-        <p className="text-gray-600 dark:text-gray-400">Manage page content and components</p>
+        <p className="text-gray-600 dark:text-gray-400">Manage page content and components in English &amp; Hindi</p>
       </div>
 
       {/* Messages */}
@@ -484,62 +593,73 @@ export default function CMSEditorPage() {
 
       {/* Main Layout - 3 Columns */}
       <div className="grid grid-cols-12 gap-6">
-        {/* Pages List - Left Column */}
+        {/* ====== Pages List (Left) ====== */}
         <div className="col-span-12 md:col-span-3">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
               <h2 className="font-semibold text-gray-900 dark:text-white">Pages</h2>
-              <button
-                onClick={() => setShowAddPageModal(true)}
-                className="p-1 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded"
-                title="Add Page"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-              </button>
-            </div>
-            <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-[60vh] overflow-y-auto">
-              {pages.map((page) => (
-                <div
-                  key={page.id}
-                  className={`p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
-                    selectedPage?.id === page.id ? 'bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-500' : ''
-                  }`}
-                  onClick={() => handleSelectPage(page)}
+              {(user?.role === 'super_admin' || user?.role === 'admin') && (
+                <button
+                  onClick={() => setShowAddPageModal(true)}
+                  className="p-1 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded"
+                  title="Add Page"
                 >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium text-gray-900 dark:text-white text-sm">
-                        {page.title.en}
-                      </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">/{page.slug}</p>
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeletePage(page.id);
-                      }}
-                      className="p-1 text-gray-400 hover:text-red-500 rounded"
-                      title="Delete Page"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              ))}
-              {pages.length === 0 && (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-[65vh] overflow-y-auto">
+              {pages.length === 0 ? (
                 <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
                   No pages yet. Create one to get started.
                 </div>
+              ) : (
+                pages
+                  .sort((a, b) => a.displayOrder - b.displayOrder)
+                  .map((page) => (
+                    <div
+                      key={page.id}
+                      className={`p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
+                        selectedPage?.id === page.id ? 'bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-500' : ''
+                      }`}
+                      onClick={() => handleSelectPage(page)}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-medium text-gray-900 dark:text-white text-sm truncate">
+                            {page.title.en}
+                          </h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">/{page.slug}</p>
+                          <span className={`inline-block mt-1 text-xs px-1.5 py-0.5 rounded ${
+                            page.status === 'published'
+                              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                              : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                          }`}>
+                            {page.status}
+                          </span>
+                        </div>
+                        {(user?.role === 'super_admin' || user?.role === 'admin') && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDeletePage(page.id); }}
+                            className="p-1 text-gray-400 hover:text-red-500 rounded flex-shrink-0"
+                            title="Delete Page"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))
               )}
             </div>
           </div>
         </div>
 
-        {/* Components List - Middle Column */}
+        {/* ====== Components List (Middle) ====== */}
         <div className="col-span-12 md:col-span-3">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
@@ -562,61 +682,65 @@ export default function CMSEditorPage() {
               <div className="p-8 flex justify-center">
                 <div className="animate-spin w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full" />
               </div>
+            ) : !selectedPage ? (
+              <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
+                Select a page to view its components
+              </div>
+            ) : components.length === 0 ? (
+              <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
+                No components yet. Add one to get started.
+              </div>
             ) : (
-              <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-[60vh] overflow-y-auto">
-                {!selectedPage ? (
-                  <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
-                    Select a page to view components
-                  </div>
-                ) : components.length === 0 ? (
-                  <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
-                    No components yet. Add one to get started.
-                  </div>
-                ) : (
-                  components.sort((a, b) => a.order - b.order).map((component) => (
+              <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-[65vh] overflow-y-auto">
+                {components
+                  .sort((a, b) => a.displayOrder - b.displayOrder)
+                  .map((comp) => (
                     <div
-                      key={component.id}
+                      key={comp.id}
                       className={`p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
-                        selectedComponent?.id === component.id ? 'bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-500' : ''
+                        selectedComponent?.id === comp.id ? 'bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-500' : ''
                       }`}
-                      onClick={() => handleSelectComponent(component)}
+                      onClick={() => handleSelectComponent(comp)}
                     >
                       <div className="flex justify-between items-start">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">{COMPONENT_TYPE_ICONS[component.componentType] || '📦'}</span>
-                          <div>
-                            <h3 className="font-medium text-gray-900 dark:text-white text-sm">
-                              {component.name}
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="text-lg flex-shrink-0">
+                            {COMPONENT_TYPE_ICONS[comp.componentType] || '📦'}
+                          </span>
+                          <div className="min-w-0">
+                            <h3 className="font-medium text-gray-900 dark:text-white text-sm truncate">
+                              {comp.name?.en || comp.name?.hi || comp.componentType}
                             </h3>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {component.componentType.replace(/_/g, ' ')}
+                              {comp.componentType.replace(/_/g, ' ')}
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 flex-shrink-0">
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleToggleComponentActive(component);
-                            }}
+                            onClick={(e) => { e.stopPropagation(); handleToggleVisibility(comp); }}
                             className={`p-1 rounded ${
-                              component.isActive
+                              comp.isVisible
                                 ? 'text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20'
                                 : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                             }`}
-                            title={component.isActive ? 'Active' : 'Inactive'}
+                            title={comp.isVisible ? 'Visible' : 'Hidden'}
                           >
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                              <circle cx="12" cy="12" r="8" />
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              {comp.isVisible ? (
+                                <>
+                                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10z" clipRule="evenodd" />
+                                </>
+                              ) : (
+                                <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-14-14z" clipRule="evenodd" />
+                              )}
                             </svg>
                           </button>
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteComponent(component.id);
-                            }}
+                            onClick={(e) => { e.stopPropagation(); handleDeleteComponent(comp.id); }}
                             className="p-1 text-gray-400 hover:text-red-500 rounded"
-                            title="Delete Component"
+                            title="Delete"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -625,19 +749,20 @@ export default function CMSEditorPage() {
                         </div>
                       </div>
                     </div>
-                  ))
-                )}
+                  ))}
               </div>
             )}
           </div>
         </div>
 
-        {/* Component Editor - Right Column */}
+        {/* ====== Component Editor (Right) ====== */}
         <div className="col-span-12 md:col-span-6">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
               <h2 className="font-semibold text-gray-900 dark:text-white">
-                {selectedComponent ? `Edit: ${selectedComponent.name}` : 'Component Editor'}
+                {selectedComponent
+                  ? `Edit: ${selectedComponent.name?.en || selectedComponent.componentType}`
+                  : 'Component Editor'}
               </h2>
               {selectedComponent && (
                 <div className="flex items-center gap-2">
@@ -647,7 +772,7 @@ export default function CMSEditorPage() {
                       <button
                         key={lang}
                         onClick={() => setActiveLanguage(lang)}
-                        className={`px-3 py-1 text-sm font-medium transition-colors ${
+                        className={`px-3 py-1.5 text-sm font-medium transition-colors ${
                           activeLanguage === lang
                             ? 'bg-orange-500 text-white'
                             : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
@@ -670,32 +795,79 @@ export default function CMSEditorPage() {
               </div>
             ) : (
               <div className="p-4">
+                {/* Active language indicator */}
+                <div className="mb-4 p-2 bg-gray-50 dark:bg-gray-900 rounded-lg flex items-center gap-2 text-sm">
+                  <span className="text-gray-500 dark:text-gray-400">Editing:</span>
+                  <span className="font-semibold text-orange-600 dark:text-orange-400">
+                    {activeLanguage === 'en' ? '🇬🇧 English' : '🇮🇳 हिंदी'}
+                  </span>
+                  <span className="text-gray-400">•</span>
+                  <span className="text-gray-500 dark:text-gray-400 text-xs">
+                    Localized fields update for the selected language only
+                  </span>
+                </div>
+
+                {/* Schema-driven fields */}
                 <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2">
-                  {selectedComponent.fieldDefinitions.map((field) => (
-                    <div key={field.name}>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {field.label[activeLanguage] || field.label.en}
-                        {field.required && <span className="text-red-500 ml-1">*</span>}
-                      </label>
-                      {renderFieldEditor(field)}
-                    </div>
-                  ))}
+                  {selectedTemplate ? (
+                    selectedTemplate.fields.map((fieldDef) => (
+                      <div key={fieldDef.key}>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          {fieldDef.label}
+                          {fieldDef.required && <span className="text-red-500 ml-1">*</span>}
+                          {fieldDef.localized && (
+                            <span className="ml-2 text-xs text-orange-500 font-normal">
+                              🌐 {activeLanguage.toUpperCase()}
+                            </span>
+                          )}
+                        </label>
+                        {fieldDef.helpText && (
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">{fieldDef.helpText}</p>
+                        )}
+                        {renderField(fieldDef)}
+                      </div>
+                    ))
+                  ) : (
+                    /* Fallback: render raw fields if no template found */
+                    editedFields.map((field) => (
+                      <div key={field.key}>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          {field.key}
+                        </label>
+                        {field.localizedValue ? (
+                          <input
+                            type="text"
+                            value={field.localizedValue[activeLanguage] || ''}
+                            onChange={(e) =>
+                              updateFieldValue(field.key, {
+                                localizedValue: { ...field.localizedValue!, [activeLanguage]: e.target.value },
+                              })
+                            }
+                            aria-label={`${field.key} (${activeLanguage.toUpperCase()})`}
+                            placeholder={field.key}
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                          />
+                        ) : (
+                          <input
+                            type="text"
+                            value={String(field.value ?? '')}
+                            onChange={(e) => updateFieldValue(field.key, { value: e.target.value })}
+                            aria-label={field.key}
+                            placeholder={field.key}
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                          />
+                        )}
+                      </div>
+                    ))
+                  )}
                 </div>
 
                 {/* Action Buttons */}
                 <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
-                  <Button
-                    variant="outline"
-                    onClick={handleReset}
-                    disabled={!hasChanges || saving}
-                  >
+                  <Button variant="outline" onClick={handleReset} disabled={!hasChanges || saving}>
                     Reset
                   </Button>
-                  <Button
-                    variant="primary"
-                    onClick={handleSave}
-                    disabled={!hasChanges || saving}
-                  >
+                  <Button variant="primary" onClick={handleSave} disabled={!hasChanges || saving}>
                     {saving ? 'Saving...' : 'Save Changes'}
                   </Button>
                 </div>
@@ -705,7 +877,7 @@ export default function CMSEditorPage() {
         </div>
       </div>
 
-      {/* Add Page Modal */}
+      {/* ====== Add Page Modal ====== */}
       {showAddPageModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 shadow-xl">
@@ -718,7 +890,12 @@ export default function CMSEditorPage() {
                 <input
                   type="text"
                   value={newPageTitle.en}
-                  onChange={(e) => setNewPageTitle((prev) => ({ ...prev, en: e.target.value }))}
+                  onChange={(e) => {
+                    setNewPageTitle((prev) => ({ ...prev, en: e.target.value }));
+                    if (!newPageSlug) {
+                      setNewPageSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
+                    }
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   placeholder="e.g., About Us"
                 />
@@ -729,7 +906,7 @@ export default function CMSEditorPage() {
                 </label>
                 <input
                   type="text"
-                  value={newPageTitle.hi}
+                  value={newPageTitle.hi || ''}
                   onChange={(e) => setNewPageTitle((prev) => ({ ...prev, hi: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   placeholder="e.g., हमारे बारे में"
@@ -749,14 +926,8 @@ export default function CMSEditorPage() {
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-3">
-              <Button variant="outline" onClick={() => setShowAddPageModal(false)}>
-                Cancel
-              </Button>
-              <Button
-                variant="primary"
-                onClick={handleAddPage}
-                disabled={!newPageTitle.en || !newPageSlug || saving}
-              >
+              <Button variant="outline" onClick={() => setShowAddPageModal(false)}>Cancel</Button>
+              <Button variant="primary" onClick={handleAddPage} disabled={!newPageTitle.en || !newPageSlug || saving}>
                 {saving ? 'Creating...' : 'Create Page'}
               </Button>
             </div>
@@ -764,32 +935,53 @@ export default function CMSEditorPage() {
         </div>
       )}
 
-      {/* Add Component Modal */}
+      {/* ====== Add Component Modal ====== */}
       {showAddComponentModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-2xl mx-4 shadow-xl max-h-[80vh] overflow-y-auto">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add Component</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Choose a component type to add to &ldquo;{selectedPage?.title.en}&rdquo;
+            </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {templates.map((template) => (
                 <button
-                  key={template.type}
+                  key={template.componentType}
                   onClick={() => handleAddComponent(template)}
                   disabled={saving}
                   className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors text-left"
                 >
-                  <span className="text-2xl mb-2 block">{COMPONENT_TYPE_ICONS[template.type] || '📦'}</span>
+                  <span className="text-2xl mb-2 block">
+                    {template.icon || COMPONENT_TYPE_ICONS[template.componentType] || '📦'}
+                  </span>
                   <h4 className="font-medium text-gray-900 dark:text-white text-sm">{template.name}</h4>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{template.description}</p>
                 </button>
               ))}
             </div>
             <div className="mt-6 flex justify-end">
-              <Button variant="outline" onClick={() => setShowAddComponentModal(false)}>
-                Cancel
-              </Button>
+              <Button variant="outline" onClick={() => setShowAddComponentModal(false)}>Cancel</Button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* ====== Media Picker Modal ====== */}
+      {showMediaPicker && accessToken && (
+        <MediaPickerModal
+          accessToken={accessToken}
+          onSelect={(url) => {
+            if (mediaPickerFieldKey) {
+              updateFieldValue(mediaPickerFieldKey, { value: url });
+            }
+            setShowMediaPicker(false);
+            setMediaPickerFieldKey(null);
+          }}
+          onClose={() => {
+            setShowMediaPicker(false);
+            setMediaPickerFieldKey(null);
+          }}
+        />
       )}
     </Container>
   );
