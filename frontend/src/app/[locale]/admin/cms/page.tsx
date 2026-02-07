@@ -75,13 +75,9 @@ export default function CMSEditorPage() {
   // Edited field values (working copy)
   const [editedFields, setEditedFields] = useState<ComponentFieldValue[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
-  const originalFieldsRef = useRef<string>('[]');
-
-  // Detect real changes by comparing current fields to original snapshot
-  useEffect(() => {
-    const current = JSON.stringify(editedFields);
-    setHasChanges(current !== originalFieldsRef.current);
-  }, [editedFields]);
+  // Guard: suppress change tracking during component initialization
+  // (Quill fires onChange on mount even for source='api' in some edge cases)
+  const isInitializingRef = useRef(false);
 
   // Modals
   const [showAddPageModal, setShowAddPageModal] = useState(false);
@@ -163,11 +159,18 @@ export default function CMSEditorPage() {
 
   useEffect(() => {
     if (selectedComponent) {
-      const fieldsJson = JSON.stringify(selectedComponent.fields || []);
-      setEditedFields(JSON.parse(fieldsJson));
-      originalFieldsRef.current = fieldsJson;
+      isInitializingRef.current = true;
+      setEditedFields(JSON.parse(JSON.stringify(selectedComponent.fields || [])));
       setHasChanges(false);
+      // Allow Quill and other components to mount and settle before
+      // enabling change tracking. requestAnimationFrame waits for the
+      // browser to paint, then the setTimeout fires after React's
+      // commit phase so all mount-triggered onChange calls are done.
+      requestAnimationFrame(() => {
+        setTimeout(() => { isInitializingRef.current = false; }, 50);
+      });
     }
+    return () => { isInitializingRef.current = false; };
   }, [selectedComponent]);
 
   // Auto-clear messages
@@ -204,6 +207,10 @@ export default function CMSEditorPage() {
       }
       return [...prev, { key, ...update }];
     });
+    // Only mark dirty for real user edits, not mount-triggered callbacks
+    if (!isInitializingRef.current) {
+      setHasChanges(true);
+    }
   };
 
   // ============================================
