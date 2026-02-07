@@ -111,6 +111,7 @@ export default async function Footer({ locale }: { locale: AppLocale }) {
                     border: '1px solid var(--color-border)'
                   }}
                   title={link.name}
+                  aria-label={link.name}
                 >
                   {link.icon}
                 </a>

@@ -99,6 +99,7 @@ export default async function Header({ locale }: { locale: AppLocale }) {
                 rel="noopener noreferrer"
                 className="text-lg hover:scale-110 transition-transform"
                 title={link.name}
+                aria-label={link.name}
               >
                 {link.icon}
               </a>
