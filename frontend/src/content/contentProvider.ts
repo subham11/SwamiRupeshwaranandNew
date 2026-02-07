@@ -10,7 +10,8 @@
  */
 
 import type { AppLocale } from "@/i18n/config";
-import { fetchPageContent, ApiError } from "@/lib/api";
+import { fetchPageContent, fetchCMSPageBySlug, ApiError } from "@/lib/api";
+import type { CMSPageWithComponents, CMSComponent, ComponentFieldValue } from "@/lib/api";
 import {
   homeContent,
   type HomePageContent,
@@ -268,13 +269,18 @@ class ContentProvider {
   }
 
   /**
-   * Get home page specific content
+   * Get home page specific content - fetches from CMS API first, falls back to static
    */
   async getHomeContent(locale: AppLocale): Promise<HomePageContent> {
     if (this.options.useApi) {
       try {
-        const response = await fetchPageContent<HomePageContent>(PAGE_IDS.HOME, locale);
-        return response.data;
+        // Fetch from CMS by slug (public, no auth)
+        const cmsPage = await fetchCMSPageBySlug("home");
+        if (cmsPage && cmsPage.components && cmsPage.components.length > 0) {
+          return this.transformCMSToHomeContent(cmsPage);
+        }
+        // If no CMS page found, fall through to static
+        console.warn("No CMS page found for home, using fallback");
       } catch (error) {
         if (this.options.enableFallback) {
           console.warn("API error for home content, using fallback:", error);
@@ -284,6 +290,99 @@ class ContentProvider {
       }
     }
     return homeContent;
+  }
+
+  /**
+   * Transform CMS page+components into HomePageContent shape
+   */
+  private transformCMSToHomeContent(cmsPage: CMSPageWithComponents): HomePageContent {
+    const components = cmsPage.components || [];
+
+    // Helper to get field value from a component
+    const getField = (comp: CMSComponent, key: string): ComponentFieldValue | undefined =>
+      comp.fields.find((f) => f.key === key);
+
+    const getFieldValue = (comp: CMSComponent, key: string): unknown =>
+      getField(comp, key)?.value;
+
+    const getLocalizedField = (comp: CMSComponent, key: string): LocalizedText =>
+      (getField(comp, key)?.localizedValue as LocalizedText) || { en: "", hi: "" };
+
+    // Find components by type
+    const heroComp = components.find((c) => c.componentType === "hero_section" && c.isVisible);
+    const announcementComp = components.find((c) => c.componentType === "announcement_bar" && c.isVisible);
+    const teachingsComp = components.find((c) => c.componentType === "sacred_teachings" && c.isVisible);
+    const eventsComp = components.find((c) => c.componentType === "upcoming_events" && c.isVisible);
+    const wisdomComp = components.find((c) => c.componentType === "words_of_wisdom" && c.isVisible);
+
+    // Build hero slides from the hero component
+    const heroSlides: HeroSlide[] = heroComp
+      ? [
+          {
+            id: heroComp.id,
+            imageUrl: (getFieldValue(heroComp, "backgroundImage") as string) || "/images/hero-1.svg",
+            title: getLocalizedField(heroComp, "heading"),
+            subtitle: getLocalizedField(heroComp, "subheading"),
+            ctaText: getLocalizedField(heroComp, "ctaText"),
+            ctaLink: (getFieldValue(heroComp, "ctaLink") as string) || "/swamiji",
+          },
+        ]
+      : homeContent.heroSlides;
+
+    // Build announcements
+    const announcements: AnnouncementItem[] = announcementComp
+      ? [
+          {
+            id: announcementComp.id,
+            text: getLocalizedField(announcementComp, "text"),
+            link: (getFieldValue(announcementComp, "link") as string) || "/events",
+            icon: "🔔",
+          },
+        ]
+      : homeContent.announcements;
+
+    // Build sacred teachings section
+    const sacredTeachings = teachingsComp
+      ? {
+          section: {
+            title: getLocalizedField(teachingsComp, "title"),
+            subtitle: getLocalizedField(teachingsComp, "subtitle"),
+          },
+          cards: homeContent.sacredTeachings.cards, // cards are still from static (dynamic later)
+        }
+      : homeContent.sacredTeachings;
+
+    // Build quotes from words_of_wisdom component
+    let quotes: QuoteItem[] = homeContent.quotes;
+    if (wisdomComp) {
+      const quotesData = getFieldValue(wisdomComp, "quotes");
+      if (Array.isArray(quotesData)) {
+        quotes = quotesData.map((q: { text?: LocalizedText; author?: LocalizedText }, i: number) => ({
+          id: `quote-${i}`,
+          text: q.text || { en: "", hi: "" },
+          author: q.author || { en: "", hi: "" },
+        }));
+      }
+    }
+
+    // Build events section
+    const events: SectionContent = eventsComp
+      ? {
+          title: getLocalizedField(eventsComp, "title"),
+          subtitle: getLocalizedField(eventsComp, "subtitle"),
+        }
+      : homeContent.events;
+
+    return {
+      announcements,
+      heroSlides,
+      sacredTeachings,
+      aboutAshram: homeContent.aboutAshram, // static until CMS component exists
+      services: homeContent.services,
+      events,
+      quotes,
+      donation: homeContent.donation,
+    };
   }
 
   /**

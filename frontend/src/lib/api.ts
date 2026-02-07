@@ -469,6 +469,20 @@ export async function fetchCMSPages(accessToken: string): Promise<CMSPage[]> {
 }
 
 /**
+ * Fetch CMS page with components by slug (public, no auth needed)
+ * Uses short revalidation to serve fresh CMS content on the public site
+ */
+export async function fetchCMSPageBySlug(slug: string): Promise<CMSPageWithComponents | null> {
+  try {
+    return await apiRequest<CMSPageWithComponents>(`/cms/pages/by-slug/${slug}`, {
+      next: { revalidate: 60 }, // revalidate every 60 seconds
+    } as RequestInit);
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Fetch CMS page with components
  */
 export async function fetchCMSPageWithComponents(
@@ -1166,6 +1180,7 @@ export default {
   checkHealth,
   // CMS
   fetchCMSPages,
+  fetchCMSPageBySlug,
   fetchCMSPageWithComponents,
   fetchCMSPageComponents,
   createCMSPage,
