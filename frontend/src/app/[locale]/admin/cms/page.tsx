@@ -424,7 +424,7 @@ export default function CMSEditorPage() {
                 📁 Browse
               </button>
             </div>
-            {simpleVal && typeof simpleVal === 'string' && (
+            {typeof simpleVal === 'string' && simpleVal && (
               <div className="relative w-24 h-24 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                 <img src={simpleVal} alt="Preview" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               </div>
