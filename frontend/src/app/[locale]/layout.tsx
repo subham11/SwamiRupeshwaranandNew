@@ -8,7 +8,6 @@ import Footer from "@/components/layout/Footer";
 import type { AppLocale } from "@/i18n/config";
 import { isLocale, i18nConfig } from "@/i18n/config";
 import { buildMetadata } from "@/lib/seo";
-import { getAnnouncements } from "@/content/contentProvider";
 
 export const dynamicParams = false;
 
@@ -31,13 +30,12 @@ export default async function LocaleLayout({
 }) {
   const { locale: localeParam } = await params;
   const locale = (isLocale(localeParam) ? localeParam : i18nConfig.defaultLocale) as AppLocale;
-  const announcements = await getAnnouncements(locale);
 
   return (
     <html lang={locale}>
       <body>
         <Providers>
-          <AnnouncementBar locale={locale} announcements={announcements} />
+          <AnnouncementBar locale={locale} />
           <Suspense fallback={<div className="h-16 border-b border-zinc-100" />}>
             <Header locale={locale} />
           </Suspense>
