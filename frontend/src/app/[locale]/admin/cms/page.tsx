@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/useAuth';
 import Container from '@/components/ui/Container';
@@ -75,6 +75,7 @@ export default function CMSEditorPage() {
   // Edited field values (working copy)
   const [editedFields, setEditedFields] = useState<ComponentFieldValue[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
+  const originalFieldsRef = useRef<string>('[]');
 
   // Modals
   const [showAddPageModal, setShowAddPageModal] = useState(false);
@@ -156,7 +157,9 @@ export default function CMSEditorPage() {
 
   useEffect(() => {
     if (selectedComponent) {
-      setEditedFields(JSON.parse(JSON.stringify(selectedComponent.fields || [])));
+      const fieldsJson = JSON.stringify(selectedComponent.fields || []);
+      setEditedFields(JSON.parse(fieldsJson));
+      originalFieldsRef.current = fieldsJson;
       setHasChanges(false);
     }
   }, [selectedComponent]);
@@ -188,14 +191,17 @@ export default function CMSEditorPage() {
   const updateFieldValue = (key: string, update: Partial<ComponentFieldValue>) => {
     setEditedFields((prev) => {
       const idx = prev.findIndex((f) => f.key === key);
+      let next: ComponentFieldValue[];
       if (idx >= 0) {
-        const copy = [...prev];
-        copy[idx] = { ...copy[idx], ...update };
-        return copy;
+        next = [...prev];
+        next[idx] = { ...next[idx], ...update };
+      } else {
+        next = [...prev, { key, ...update }];
       }
-      return [...prev, { key, ...update }];
+      // Compare against original to detect real changes
+      setHasChanges(JSON.stringify(next) !== originalFieldsRef.current);
+      return next;
     });
-    setHasChanges(true);
   };
 
   // ============================================

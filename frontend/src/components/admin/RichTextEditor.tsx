@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
 // Dynamically import ReactQuill to avoid SSR issues
@@ -64,6 +64,34 @@ export default function RichTextEditor({
     'link',
   ];
 
+  // Suppress the initial onChange fired by Quill on mount (HTML normalization)
+  const isInitializing = useRef(true);
+  const lastExternalValue = useRef(value);
+
+  useEffect(() => {
+    // When parent changes value (e.g. switching component/language), re-arm the guard
+    if (value !== lastExternalValue.current) {
+      isInitializing.current = true;
+      lastExternalValue.current = value;
+    }
+  }, [value]);
+
+  const handleChange = useCallback(
+    (newValue: string) => {
+      if (isInitializing.current) {
+        isInitializing.current = false;
+        // Only suppress if content is semantically the same
+        // Quill normalizes HTML so we compare stripped text as a sanity check
+        const strip = (html: string) => html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+        if (strip(newValue) === strip(value)) {
+          return; // Quill just normalized the HTML, no real change
+        }
+      }
+      onChange(newValue);
+    },
+    [onChange, value]
+  );
+
   return (
     <div className={`rich-text-editor ${className}`}>
       {label && (
@@ -75,7 +103,7 @@ export default function RichTextEditor({
         <ReactQuill
           theme="snow"
           value={value}
-          onChange={onChange}
+          onChange={handleChange}
           modules={modules}
           formats={formats}
           placeholder={placeholder || 'Start writing...'}
