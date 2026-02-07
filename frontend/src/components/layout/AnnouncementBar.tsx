@@ -3,51 +3,14 @@
 import Link from "next/link";
 import { type AnnouncementItem } from "@/content/pageContent";
 
-// Static content for client component (will be passed as prop from server in future)
-const announcements: AnnouncementItem[] = [
-  {
-    id: "ann-1",
-    text: {
-      en: "🔔 Join us for Hanuman Chalisa Path every Tuesday at 7 AM",
-      hi: "🔔 हर मंगलवार को सुबह 7 बजे हनुमान चालीसा पाठ के लिए हमसे जुड़ें"
-    },
-    link: "/events"
-  },
-  {
-    id: "ann-2",
-    text: {
-      en: "🎉 Special Bhandara on Nov 25th",
-      hi: "🎉 25 नवंबर को विशेष भंडारा"
-    },
-    link: "/events"
-  },
-  {
-    id: "ann-3",
-    text: {
-      en: "📿 New Yoga Sessions starting Nov 20th",
-      hi: "📿 20 नवंबर से नई योग कक्षाएं"
-    },
-    link: "/services"
-  },
-  {
-    id: "ann-4",
-    text: {
-      en: "🙏 Daily Satsang at 6 PM",
-      hi: "🙏 रोज शाम 6 बजे सत्संग"
-    },
-    link: "/swamiji"
-  },
-  {
-    id: "ann-5",
-    text: {
-      en: "✨ Mahashivratri Special Programs - Feb 15, 2026",
-      hi: "✨ महाशिवरात्रि विशेष कार्यक्रम - 15 फरवरी 2026"
-    },
-    link: "/events"
-  }
-];
+interface AnnouncementBarProps {
+  locale: "en" | "hi";
+  announcements: AnnouncementItem[];
+}
 
-export default function AnnouncementBar({ locale }: { locale: "en" | "hi" }) {
+export default function AnnouncementBar({ locale, announcements }: AnnouncementBarProps) {
+  if (!announcements || announcements.length === 0) return null;
+
   return (
     <div 
       className="w-full overflow-hidden relative"

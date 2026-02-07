@@ -10,8 +10,8 @@
  */
 
 import type { AppLocale } from "@/i18n/config";
-import { fetchPageContent, fetchCMSPageBySlug, ApiError } from "@/lib/api";
-import type { CMSPageWithComponents, CMSComponent, ComponentFieldValue } from "@/lib/api";
+import { fetchPageContent, fetchCMSPageBySlug, fetchAllPublishedCMSPages, ApiError } from "@/lib/api";
+import type { CMSPageWithComponents, CMSPage, CMSComponent, ComponentFieldValue } from "@/lib/api";
 import {
   homeContent,
   type HomePageContent,
@@ -400,11 +400,59 @@ class ContentProvider {
   }
 
   /**
-   * Get announcements
+   * Get announcements from ALL published CMS pages that have announcement_bar components.
+   * This makes announcement bars a global/site-wide feature.
+   * Falls back to static content if no CMS data is available.
    */
   async getAnnouncements(locale: AppLocale): Promise<AnnouncementItem[]> {
-    const content = await this.getHomeContent(locale);
-    return content.announcements || [];
+    if (this.options.useApi) {
+      try {
+        // Fetch all published pages and check each for announcement_bar components
+        const pages = await fetchAllPublishedCMSPages();
+        const allAnnouncements: AnnouncementItem[] = [];
+
+        for (const page of pages) {
+          try {
+            const cmsPage = await fetchCMSPageBySlug(page.slug);
+            if (!cmsPage?.components) continue;
+
+            const announcementComps = cmsPage.components.filter(
+              (c) => c.componentType === "announcement_bar" && c.isVisible
+            );
+
+            for (const comp of announcementComps) {
+              const textField = comp.fields.find((f) => f.key === "text");
+              const linkField = comp.fields.find((f) => f.key === "link");
+              const bgColorField = comp.fields.find((f) => f.key === "bgColor");
+              const textColorField = comp.fields.find((f) => f.key === "textColor");
+
+              if (textField) {
+                allAnnouncements.push({
+                  id: comp.id,
+                  text: (textField.localizedValue as { en: string; hi: string }) || { en: String(textField.value || ""), hi: "" },
+                  link: (linkField?.value as string) || `/${page.slug}`,
+                  icon: "🔔",
+                  bgColor: (bgColorField?.value as string) || undefined,
+                  textColor: (textColorField?.value as string) || undefined,
+                });
+              }
+            }
+          } catch {
+            // Skip pages that fail to fetch
+            continue;
+          }
+        }
+
+        if (allAnnouncements.length > 0) {
+          return allAnnouncements;
+        }
+      } catch (error) {
+        console.warn("Failed to fetch announcements from CMS, using fallback:", error);
+      }
+    }
+
+    // Fallback to home page static content
+    return homeContent.announcements;
   }
 
   /**

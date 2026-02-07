@@ -22,6 +22,8 @@ export interface AnnouncementItem {
   text: LocalizedText;
   link: string;
   icon?: string;
+  bgColor?: string;
+  textColor?: string;
 }
 
 export interface TeachingCard {

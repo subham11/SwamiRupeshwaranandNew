@@ -585,6 +585,21 @@ export async function fetchCMSPageBySlug(slug: string): Promise<CMSPageWithCompo
 }
 
 /**
+ * Fetch all published CMS pages (public, no auth needed)
+ * Used for collecting global components like announcement bars across all pages
+ */
+export async function fetchAllPublishedCMSPages(): Promise<CMSPage[]> {
+  try {
+    const res: { items: CMSPage[]; count: number } = await apiRequest('/cms/pages?publishedOnly=true', {
+      next: { revalidate: 60 },
+    } as RequestInit);
+    return res.items || [];
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Fetch CMS page with components
  */
 export async function fetchCMSPageWithComponents(
@@ -1283,6 +1298,7 @@ export default {
   // CMS
   fetchCMSPages,
   fetchCMSPageBySlug,
+  fetchAllPublishedCMSPages,
   fetchCMSPageWithComponents,
   fetchCMSPageComponents,
   createCMSPage,
