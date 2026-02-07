@@ -124,6 +124,13 @@ export default function AnnouncementBar({ locale, announcements: initialAnnounce
 
   if (!announcements || announcements.length === 0) return null;
 
+  // Filter out announcements with empty text for the current locale
+  const validAnnouncements = announcements.filter(
+    (item) => item.text[locale]?.trim()
+  );
+
+  if (validAnnouncements.length === 0) return null;
+
   return (
     <div 
       className="w-full overflow-hidden relative"
@@ -135,20 +142,22 @@ export default function AnnouncementBar({ locale, announcements: initialAnnounce
       <div className="overflow-hidden py-2.5">
         <div className="marquee-container">
           <div className="marquee-content">
-            {announcements.map((item, idx) => (
+            {validAnnouncements.map((item, idx) => (
               <Link
                 key={`${item.id}-1-${idx}`}
                 href={`/${locale}${item.link}`}
+                aria-label={item.text[locale]}
                 className="inline-flex items-center text-white text-sm md:text-base font-medium hover:underline whitespace-nowrap mx-4"
               >
                 {item.text[locale]}
               </Link>
             ))}
             {/* Duplicate for seamless loop */}
-            {announcements.map((item, idx) => (
+            {validAnnouncements.map((item, idx) => (
               <Link
                 key={`${item.id}-2-${idx}`}
                 href={`/${locale}${item.link}`}
+                aria-label={item.text[locale]}
                 className="inline-flex items-center text-white text-sm md:text-base font-medium hover:underline whitespace-nowrap mx-4"
               >
                 {item.text[locale]}
