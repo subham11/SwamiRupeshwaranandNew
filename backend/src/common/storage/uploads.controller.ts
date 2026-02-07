@@ -10,11 +10,10 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
-  Req,
   Logger,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { IsString, IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum } from 'class-validator';
 import { StorageService, StorageFolder, PresignedUrlResult, FileMetadata } from './storage.service';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
@@ -70,7 +69,6 @@ export class UploadsController {
   async uploadFile(
     @UploadedFile() file: any,
     @Query('folder') folder: StorageFolder = StorageFolder.IMAGES,
-    @Req() req: any,
   ): Promise<UploadedFileDto> {
     // In Lambda, multer may not parse the file correctly
     if (!file) {
