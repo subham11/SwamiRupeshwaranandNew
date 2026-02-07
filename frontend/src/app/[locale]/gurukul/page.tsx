@@ -1,9 +1,9 @@
 import Link from "next/link";
-import Image from "next/image";
 import type { Metadata } from "next";
 import type { AppLocale } from "@/i18n/config";
 import { Container } from "@/components/ui/Container";
 import { SacredDivider, SectionHeading } from "@/components/ui/Decorative";
+import CMSTextBlocks from "@/components/CMSTextBlocks";
 
 // Generate metadata for SEO
 export async function generateMetadata({ 
@@ -28,6 +28,42 @@ export async function generateMetadata({
     description: descriptions[locale],
   };
 }
+
+// Static fallback — only shown when CMS text blocks are not available
+const fallbackSections = [
+  {
+    id: "intro",
+    title: { en: "One District One Gurukul", hi: "एक जिला एक गुरुकुल" },
+    content: {
+      en: "A visionary initiative to establish Gurukuls across every district, blending traditional Vedic education with contemporary learning to nurture spiritually grounded, morally upright, and intellectually capable citizens.",
+      hi: "हर जिले में गुरुकुल स्थापित करने की एक दूरदर्शी पहल, पारंपरिक वैदिक शिक्षा को समकालीन शिक्षा के साथ मिलाकर आध्यात्मिक रूप से स्थापित, नैतिक रूप से सही और बौद्धिक रूप से सक्षम नागरिकों का पोषण करना।"
+    }
+  },
+  {
+    id: "vision",
+    title: { en: "Our Vision", hi: "हमारी दृष्टि" },
+    content: {
+      en: "🕉️ Vedic Foundation — Rooted in the timeless wisdom of the Vedas, Upanishads, and ancient scriptures.\n📚 Holistic Curriculum — Integration of Sanskrit, Yoga, Meditation, Arts, and modern subjects.\n🌱 Character Building — Emphasis on moral values, discipline, respect for elders, and service to society.\n🏛️ Gurukul Environment — Residential learning in a serene, natural environment.",
+      hi: "🕉️ वैदिक आधार — वेदों, उपनिषदों और प्राचीन शास्त्रों के शाश्वत ज्ञान में निहित।\n📚 समग्र पाठ्यक्रम — संस्कृत, योग, ध्यान, कला और आधुनिक विषयों का एकीकरण।\n🌱 चरित्र निर्माण — नैतिक मूल्यों, अनुशासन, बड़ों के प्रति सम्मान पर जोर।\n🏛️ गुरुकुल वातावरण — शांत, प्राकृतिक वातावरण में आवासीय शिक्षा।"
+    }
+  },
+  {
+    id: "objectives",
+    title: { en: "Key Objectives", hi: "मुख्य उद्देश्य" },
+    content: {
+      en: "01 — Preserve Cultural Heritage: Safeguard India's rich spiritual and cultural heritage.\n02 — Bridge Ancient & Modern: Harmonious blend of traditional Gurukul with contemporary education.\n03 — Rural Empowerment: Bring quality spiritual education to rural areas.\n04 — Self-Reliant Citizens: Develop individuals who contribute positively to society.",
+      hi: "01 — सांस्कृतिक विरासत संरक्षण: भारत की समृद्ध आध्यात्मिक और सांस्कृतिक विरासत को संरक्षित करें।\n02 — प्राचीन और आधुनिक का सेतु: पारंपरिक गुरुकुल का समकालीन शिक्षा के साथ मिश्रण।\n03 — ग्रामीण सशक्तिकरण: ग्रामीण क्षेत्रों में गुणवत्तापूर्ण शिक्षा।\n04 — आत्मनिर्भर नागरिक: समाज में सकारात्मक योगदान देने वाले व्यक्तियों का विकास।"
+    }
+  },
+  {
+    id: "curriculum",
+    title: { en: "Gurukul Curriculum", hi: "गुरुकुल पाठ्यक्रम" },
+    content: {
+      en: "📜 Sanskrit & Vedic Studies\n🧘 Yoga & Meditation\n🌿 Ayurveda Basics\n🔬 Mathematics & Science\n🎨 Arts & Music\n🌾 Agriculture & Environment\n💡 Life Skills\n💻 Computer & Technology",
+      hi: "📜 संस्कृत और वैदिक अध्ययन\n🧘 योग और ध्यान\n🌿 आयुर्वेद की मूल बातें\n🔬 गणित और विज्ञान\n🎨 कला और संगीत\n🌾 कृषि और पर्यावरण\n💡 जीवन कौशल\n💻 कंप्यूटर और प्रौद्योगिकी"
+    }
+  }
+];
 
 // FUTURE: This content will come from API
 const pageContent = {
@@ -225,6 +261,19 @@ export default async function GurukulPage({
                 </div>
               </div>
             ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* CMS Text Blocks — editable content with fallback */}
+      <section className="py-12 sm:py-16">
+        <Container>
+          <div className="max-w-4xl mx-auto space-y-12 sm:space-y-16">
+            <CMSTextBlocks 
+              pageSlug="gurukul" 
+              locale={locale} 
+              fallbackSections={fallbackSections}
+            />
           </div>
         </Container>
       </section>

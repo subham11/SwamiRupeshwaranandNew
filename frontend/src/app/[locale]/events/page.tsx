@@ -4,6 +4,7 @@ import { Container } from "@/components/ui/Container";
 import { cms } from "@/cms";
 import { t } from "@/content/contentProvider";
 import Image from "next/image";
+import CMSTextBlocks from "@/components/CMSTextBlocks";
 
 // Generate metadata for SEO
 export async function generateMetadata({ 
@@ -38,6 +39,18 @@ const pageData = {
     hi: "इस समय कोई आगामी कार्यक्रम नहीं है। कृपया जल्दी ही दोबारा देखें!"
   }
 };
+
+// Static fallback — only shown when CMS text blocks are not available
+const fallbackSections = [
+  {
+    id: "events-intro",
+    title: { en: "Upcoming Events", hi: "आगामी कार्यक्रम" },
+    content: {
+      en: "Join us for spiritual gatherings and celebrations.",
+      hi: "आध्यात्मिक सभाओं और उत्सवों में हमसे जुड़ें।"
+    }
+  }
+];
 
 function fmtDate(iso: string, locale: AppLocale) {
   try {
@@ -84,6 +97,17 @@ export default async function EventsPage({
           </p>
         </Container>
       </section>
+
+      {/* CMS Text Blocks — editable intro content */}
+      <Container className="pb-8">
+        <div className="max-w-4xl mx-auto">
+          <CMSTextBlocks 
+            pageSlug="events" 
+            locale={locale} 
+            fallbackSections={fallbackSections}
+          />
+        </div>
+      </Container>
       
       {/* Events List */}
       <Container className="pb-16 sm:pb-20 md:pb-24">

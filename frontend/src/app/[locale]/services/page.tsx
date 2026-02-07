@@ -4,6 +4,7 @@ import { Container } from "@/components/ui/Container";
 import { cms } from "@/cms";
 import { t } from "@/content/contentProvider";
 import Image from "next/image";
+import CMSTextBlocks from "@/components/CMSTextBlocks";
 
 // Generate metadata for SEO
 export async function generateMetadata({ 
@@ -39,6 +40,18 @@ const pageData = {
   }
 };
 
+// Static fallback — only shown when CMS text blocks are not available
+const fallbackSections = [
+  {
+    id: "services-intro",
+    title: { en: "Our Services", hi: "हमारी सेवाएं" },
+    content: {
+      en: "We offer a variety of spiritual services to support your journey towards inner peace and divine connection.",
+      hi: "हम आंतरिक शांति और दिव्य संबंध की ओर आपकी यात्रा का समर्थन करने के लिए विभिन्न आध्यात्मिक सेवाएं प्रदान करते हैं।"
+    }
+  }
+];
+
 export default async function ServicesPage({ 
   params 
 }: { 
@@ -67,11 +80,19 @@ export default async function ServicesPage({
           <p className="text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-6">
             {t(pageData.subtitle, locale)}
           </p>
-          <p className="text-base text-zinc-500 dark:text-zinc-500 max-w-3xl mx-auto">
-            {t(pageData.description, locale)}
-          </p>
         </Container>
       </section>
+
+      {/* CMS Text Blocks — editable intro content */}
+      <Container className="pb-8">
+        <div className="max-w-4xl mx-auto">
+          <CMSTextBlocks 
+            pageSlug="services" 
+            locale={locale} 
+            fallbackSections={fallbackSections}
+          />
+        </div>
+      </Container>
       
       {/* Services Grid */}
       <Container className="pb-16 sm:pb-20 md:pb-24">
