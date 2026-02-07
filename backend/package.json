@@ -28,7 +28,11 @@
     "seed:pages": "IS_LOCAL=true npx ts-node scripts/seed-pages.ts",
     "seed:pages:prod": "npx ts-node scripts/seed-pages.ts",
     "create:super-admin": "IS_LOCAL=true npx ts-node scripts/create-super-admin.ts",
-    "create:super-admin:prod": "npx ts-node scripts/create-super-admin.ts"
+    "create:super-admin:prod": "npx ts-node scripts/create-super-admin.ts",
+    "seed:swamiji": "IS_LOCAL=true npx ts-node scripts/seed-swamiji-components.ts",
+    "seed:swamiji:prod": "npx ts-node scripts/seed-swamiji-components.ts",
+    "seed:text-blocks": "IS_LOCAL=true npx ts-node scripts/seed-all-text-blocks.ts",
+    "seed:text-blocks:prod": "npx ts-node scripts/seed-all-text-blocks.ts"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.500.0",

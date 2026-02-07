@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { AppLocale } from "@/i18n/config";
 import { Container } from "@/components/ui/Container";
 import { t } from "@/content/contentProvider";
+import CMSTextBlocks from "@/components/CMSTextBlocks";
 
 // Generate metadata for SEO
 export async function generateMetadata({ 
@@ -21,8 +22,8 @@ export async function generateMetadata({
   };
 }
 
-// Static page content (bilingual)
-const pageData = {
+// Static page header (bilingual)
+const pageHeader = {
   title: {
     en: "Contact Us",
     hi: "संपर्क करें"
@@ -31,32 +32,27 @@ const pageData = {
     en: "We'd love to hear from you",
     hi: "हम आपसे सुनना पसंद करेंगे"
   },
-  address: {
-    label: { en: "Address", hi: "पता" },
-    value: { 
-      en: "Swami Rupeshwaranand Ji Ashram, Village Name, District, State, India",
-      hi: "स्वामी रूपेश्वरानंद जी आश्रम, गाँव का नाम, जिला, राज्य, भारत"
+};
+
+// Static fallback — only shown when CMS text blocks are not available
+const fallbackSections = [
+  {
+    id: "contact-info",
+    title: { en: "Get in Touch", hi: "संपर्क में रहें" },
+    content: {
+      en: "📍 Address: Swami Rupeshwaranand Ji Ashram, Village Name, District, State, India\n📞 Phone: +91 XXXXXXXXXX\n✉️ Email: info@swamirupeshwaranand.in\n🕐 Visiting Hours: Daily: 6:00 AM - 8:00 PM",
+      hi: "📍 पता: स्वामी रूपेश्वरानंद जी आश्रम, गाँव का नाम, जिला, राज्य, भारत\n📞 फोन: +91 XXXXXXXXXX\n✉️ ईमेल: info@swamirupeshwaranand.in\n🕐 दर्शन का समय: प्रतिदिन: सुबह 6:00 - रात 8:00"
     }
-  },
-  phone: {
-    label: { en: "Phone", hi: "फोन" },
-    value: "+91 XXXXXXXXXX"
-  },
-  email: {
-    label: { en: "Email", hi: "ईमेल" },
-    value: "info@swamirupeshwaranand.in"
-  },
-  hours: {
-    label: { en: "Visiting Hours", hi: "दर्शन का समय" },
-    value: { en: "Daily: 6:00 AM - 8:00 PM", hi: "प्रतिदिन: सुबह 6:00 - रात 8:00" }
-  },
-  form: {
-    name: { en: "Your Name", hi: "आपका नाम" },
-    email: { en: "Email Address", hi: "ईमेल पता" },
-    subject: { en: "Subject", hi: "विषय" },
-    message: { en: "Your Message", hi: "आपका संदेश" },
-    submit: { en: "Send Message", hi: "संदेश भेजें" }
   }
+];
+
+// Static form labels (bilingual)
+const formLabels = {
+  name: { en: "Your Name", hi: "आपका नाम" },
+  email: { en: "Email Address", hi: "ईमेल पता" },
+  subject: { en: "Subject", hi: "विषय" },
+  message: { en: "Your Message", hi: "आपका संदेश" },
+  submit: { en: "Send Message", hi: "संदेश भेजें" }
 };
 
 export default async function ContactPage({ 
@@ -72,56 +68,24 @@ export default async function ContactPage({
       <section className="relative py-16 sm:py-20 overflow-hidden">
         <Container className="text-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold text-zinc-800 dark:text-zinc-100 mb-4">
-            {t(pageData.title, locale)}
+            {t(pageHeader.title, locale)}
           </h1>
           <p className="text-lg sm:text-xl text-zinc-600 dark:text-zinc-400">
-            {t(pageData.subtitle, locale)}
+            {t(pageHeader.subtitle, locale)}
           </p>
         </Container>
       </section>
       
       <Container className="pb-16 sm:pb-20 md:pb-24">
         <div className="grid gap-8 lg:gap-12 lg:grid-cols-2">
-          {/* Contact Info */}
+          {/* Contact Info — CMS text blocks with fallback */}
           <div className="space-y-6 sm:space-y-8">
             <div className="bg-white dark:bg-zinc-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-sm border border-zinc-100 dark:border-zinc-700">
-              <h2 className="text-xl sm:text-2xl font-semibold text-zinc-800 dark:text-zinc-100 mb-6">
-                {locale === "en" ? "Get in Touch" : "संपर्क में रहें"}
-              </h2>
-              
-              <div className="space-y-4">
-                <div className="flex gap-4">
-                  <span className="text-2xl">📍</span>
-                  <div>
-                    <p className="font-medium text-zinc-800 dark:text-zinc-100">{t(pageData.address.label, locale)}</p>
-                    <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400">{t(pageData.address.value, locale)}</p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-4">
-                  <span className="text-2xl">📞</span>
-                  <div>
-                    <p className="font-medium text-zinc-800 dark:text-zinc-100">{t(pageData.phone.label, locale)}</p>
-                    <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400">{pageData.phone.value}</p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-4">
-                  <span className="text-2xl">✉️</span>
-                  <div>
-                    <p className="font-medium text-zinc-800 dark:text-zinc-100">{t(pageData.email.label, locale)}</p>
-                    <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400">{pageData.email.value}</p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-4">
-                  <span className="text-2xl">🕐</span>
-                  <div>
-                    <p className="font-medium text-zinc-800 dark:text-zinc-100">{t(pageData.hours.label, locale)}</p>
-                    <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400">{t(pageData.hours.value, locale)}</p>
-                  </div>
-                </div>
-              </div>
+              <CMSTextBlocks 
+                pageSlug="contact" 
+                locale={locale} 
+                fallbackSections={fallbackSections}
+              />
             </div>
           </div>
           
@@ -134,7 +98,7 @@ export default async function ContactPage({
             <form className="space-y-4 sm:space-y-6">
               <div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                  {t(pageData.form.name, locale)}
+                  {t(formLabels.name, locale)}
                 </label>
                 <input 
                   type="text" 
@@ -144,7 +108,7 @@ export default async function ContactPage({
               
               <div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                  {t(pageData.form.email, locale)}
+                  {t(formLabels.email, locale)}
                 </label>
                 <input 
                   type="email" 
@@ -154,7 +118,7 @@ export default async function ContactPage({
               
               <div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                  {t(pageData.form.subject, locale)}
+                  {t(formLabels.subject, locale)}
                 </label>
                 <input 
                   type="text" 
@@ -164,7 +128,7 @@ export default async function ContactPage({
               
               <div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                  {t(pageData.form.message, locale)}
+                  {t(formLabels.message, locale)}
                 </label>
                 <textarea 
                   rows={5}
@@ -177,7 +141,7 @@ export default async function ContactPage({
                 className="w-full sm:w-auto px-8 py-3 rounded-lg font-semibold text-white transition-all hover:brightness-110"
                 style={{ backgroundColor: 'var(--color-accent)' }}
               >
-                {t(pageData.form.submit, locale)}
+                {t(formLabels.submit, locale)}
               </button>
             </form>
           </div>

@@ -28,18 +28,27 @@ interface TextBlock {
   order: number;
 }
 
+interface FallbackSection {
+  id: string;
+  title: Record<string, string>;
+  content: Record<string, string>;
+}
+
 interface CMSTextBlocksProps {
   pageSlug: string;
   locale: 'en' | 'hi';
+  /** Optional static fallback sections shown when CMS has no text_block components */
+  fallbackSections?: FallbackSection[];
 }
 
 /**
  * Client-side component that fetches text_block components from a CMS page
  * and renders them with rich HTML content.
  */
-export default function CMSTextBlocks({ pageSlug, locale }: CMSTextBlocksProps) {
+export default function CMSTextBlocks({ pageSlug, locale, fallbackSections }: CMSTextBlocksProps) {
   const [textBlocks, setTextBlocks] = useState<TextBlock[]>([]);
   const [loading, setLoading] = useState(true);
+  const [useFallback, setUseFallback] = useState(false);
 
   useEffect(() => {
     async function fetchTextBlocks() {
@@ -79,8 +88,14 @@ export default function CMSTextBlocks({ pageSlug, locale }: CMSTextBlocksProps) 
           });
 
         setTextBlocks(blocks);
+        if (blocks.length === 0 && fallbackSections?.length) {
+          setUseFallback(true);
+        }
       } catch {
-        // Silently fail — CMS content is supplementary
+        // CMS fetch failed — use fallback if available
+        if (fallbackSections?.length) {
+          setUseFallback(true);
+        }
       } finally {
         setLoading(false);
       }
@@ -89,7 +104,30 @@ export default function CMSTextBlocks({ pageSlug, locale }: CMSTextBlocksProps) 
     fetchTextBlocks();
   }, [pageSlug, locale]);
 
-  if (loading || textBlocks.length === 0) return null;
+  if (loading) return null;
+
+  // Render fallback static sections when CMS has no text blocks
+  if (useFallback && fallbackSections?.length) {
+    return (
+      <>
+        {fallbackSections.map((section, index) => (
+          <section
+            key={section.id}
+            className={index !== 0 ? 'pt-8 sm:pt-12 border-t border-zinc-200 dark:border-zinc-800' : ''}
+          >
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-heading font-semibold text-zinc-800 dark:text-zinc-100 mb-4 sm:mb-6">
+              {section.title[locale] || section.title.en}
+            </h2>
+            <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              {section.content[locale] || section.content.en}
+            </p>
+          </section>
+        ))}
+      </>
+    );
+  }
+
+  if (textBlocks.length === 0) return null;
 
   return (
     <div className="space-y-12 sm:space-y-16">

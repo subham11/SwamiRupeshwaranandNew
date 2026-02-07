@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import type { AppLocale } from "@/i18n/config";
 import { Container } from "@/components/ui/Container";
 import { SacredDivider } from "@/components/ui/Decorative";
+import CMSTextBlocks from "@/components/CMSTextBlocks";
 
 // Generate metadata for SEO
 export async function generateMetadata({ 
@@ -123,6 +124,18 @@ const pageContent = {
   viewAll: { en: "Read Teaching", hi: "शिक्षा पढ़ें" }
 };
 
+// Static fallback — only shown when CMS text blocks are not available
+const fallbackSections = [
+  {
+    id: "intro",
+    title: { en: "Sacred Teachings", hi: "पवित्र शिक्षाएं" },
+    content: {
+      en: "Explore the timeless teachings that guide us on the path of spiritual awakening. From meditation and mantras to selfless service and living with purpose, discover the wisdom that transforms lives.",
+      hi: "आध्यात्मिक जागृति के मार्ग पर हमें मार्गदर्शन करने वाली शाश्वत शिक्षाओं का अन्वेषण करें।"
+    }
+  }
+];
+
 export default async function TeachingsPage({ 
   params 
 }: { 
@@ -187,7 +200,18 @@ export default async function TeachingsPage({
           </blockquote>
         </Container>
       </section>
-
+      {/* CMS Text Blocks — editable intro content */}
+      <section className="py-12 sm:py-16">
+        <Container>
+          <div className="max-w-4xl mx-auto space-y-12 sm:space-y-16">
+            <CMSTextBlocks 
+              pageSlug="teachings" 
+              locale={locale} 
+              fallbackSections={fallbackSections}
+            />
+          </div>
+        </Container>
+      </section>
       <SacredDivider icon="📿" />
 
       {/* Teachings Grid */}

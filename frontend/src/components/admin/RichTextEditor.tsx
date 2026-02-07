@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 
 // Dynamically import ReactQuill to avoid SSR issues
@@ -64,6 +64,18 @@ export default function RichTextEditor({
     'link',
   ];
 
+  // Only propagate user-initiated changes, not Quill's internal HTML normalization.
+  // ReactQuill fires onChange with source='api' on mount/initialization and
+  // source='user' for actual user edits (typing, formatting, paste, etc.)
+  const handleChange = useCallback(
+    (newValue: string, _delta: unknown, source: string) => {
+      if (source === 'user') {
+        onChange(newValue);
+      }
+    },
+    [onChange]
+  );
+
   return (
     <div className={`rich-text-editor ${className}`}>
       {label && (
@@ -75,7 +87,7 @@ export default function RichTextEditor({
         <ReactQuill
           theme="snow"
           value={value}
-          onChange={onChange}
+          onChange={handleChange}
           modules={modules}
           formats={formats}
           placeholder={placeholder || 'Start writing...'}

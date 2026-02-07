@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { AppLocale } from "@/i18n/config";
 import { Container } from "@/components/ui/Container";
 import { t } from "@/content/contentProvider";
+import CMSTextBlocks from "@/components/CMSTextBlocks";
 
 // Generate metadata for SEO
 export async function generateMetadata({ 
@@ -74,6 +75,34 @@ const pageData = {
   }
 };
 
+// Static fallback — only shown when CMS text blocks are not available
+const fallbackSections = [
+  {
+    id: "description",
+    title: { en: "Support Our Mission", hi: "हमारे मिशन का समर्थन करें" },
+    content: {
+      en: "Every donation, no matter the size, helps us continue our spiritual services, maintain the ashram, and support those in need. Your generosity enables us to spread divine wisdom and serve humanity.",
+      hi: "हर दान, चाहे वह कितना भी हो, हमें अपनी आध्यात्मिक सेवाओं को जारी रखने, आश्रम का रखरखाव करने और जरूरतमंदों की सहायता करने में मदद करता है।"
+    }
+  },
+  {
+    id: "purposes",
+    title: { en: "Ways to Contribute", hi: "योगदान के तरीके" },
+    content: {
+      en: "🏠 Ashram Maintenance — Help maintain our sacred spaces.\n🍲 Anna Daan (Food) — Provide meals to devotees and visitors.\n📚 Vidya Daan (Education) — Support spiritual education programs.\n🙏 General Seva — Support all ashram activities.",
+      hi: "🏠 आश्रम रखरखाव — हमारे पवित्र स्थानों के रखरखाव में मदद करें।\n🍲 अन्न दान — भक्तों और आगंतुकों को भोजन प्रदान करें।\n📚 विद्या दान — आध्यात्मिक शिक्षा कार्यक्रमों का समर्थन करें।\n🙏 सामान्य सेवा — सभी आश्रम गतिविधियों का समर्थन करें।"
+    }
+  },
+  {
+    id: "bank-details",
+    title: { en: "Bank Transfer Details", hi: "बैंक ट्रांसफर विवरण" },
+    content: {
+      en: "Account Name: Swami Rupeshwaranand Ji Ashram Trust\nAccount Number: XXXXXXXXXXXXXXXX\nIFSC Code: XXXXXXXXX\nBank Name: Bank Name\nAll donations are tax-deductible under Section 80G of the Income Tax Act.",
+      hi: "खाते का नाम: Swami Rupeshwaranand Ji Ashram Trust\nखाता संख्या: XXXXXXXXXXXXXXXX\nIFSC कोड: XXXXXXXXX\nबैंक का नाम: Bank Name\nसभी दान आयकर अधिनियम की धारा 80G के तहत कर कटौती योग्य हैं।"
+    }
+  }
+];
+
 export default async function DonationPage({ 
   params 
 }: { 
@@ -111,11 +140,19 @@ export default async function DonationPage({
             {t(pageData.subtitle, locale)}
           </p>
           
-          <p className="text-base text-zinc-500 dark:text-zinc-500 max-w-3xl mx-auto">
-            {t(pageData.description, locale)}
-          </p>
         </Container>
       </section>
+
+      {/* CMS Text Blocks — editable content with fallback */}
+      <Container className="pb-12 sm:pb-16">
+        <div className="max-w-4xl mx-auto space-y-12 sm:space-y-16">
+          <CMSTextBlocks 
+            pageSlug="donation" 
+            locale={locale} 
+            fallbackSections={fallbackSections}
+          />
+        </div>
+      </Container>
       
       {/* Donation Purposes */}
       <Container className="pb-12 sm:pb-16">

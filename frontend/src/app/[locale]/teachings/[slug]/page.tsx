@@ -2,6 +2,7 @@ import type { AppLocale } from "@/i18n/config";
 import { Container } from "@/components/ui/Container";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import CMSTextBlocks from "@/components/CMSTextBlocks";
 
 // Teaching content - FUTURE: Fetch from API by slug
 const teachings: Record<string, {
@@ -121,6 +122,15 @@ export default async function TeachingPage({
     notFound();
   }
 
+  const pageSlug = `teaching-${slug}`;
+  const fallbackSections = [
+    {
+      id: `teaching-${slug}-content`,
+      title: teaching.title,
+      content: teaching.content,
+    }
+  ];
+
   return (
     <div style={{ backgroundColor: 'var(--color-background)' }}>
       {/* Hero Section */}
@@ -148,30 +158,25 @@ export default async function TeachingPage({
         </Container>
       </section>
 
-      {/* Content Section */}
+      {/* Content Section — CMS text blocks with static fallback */}
       <section className="py-16">
         <Container>
           <div className="max-w-3xl mx-auto">
-            <div 
-              className="prose prose-lg max-w-none"
-              style={{ color: 'var(--color-foreground)' }}
-            >
-              {teaching.content[locale].split('\n\n').map((paragraph, idx) => (
-                <p key={idx} className="mb-6 leading-relaxed text-lg">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
+            <CMSTextBlocks 
+              pageSlug={pageSlug} 
+              locale={locale} 
+              fallbackSections={fallbackSections}
+            />
 
             {/* Back Link */}
             <div className="mt-12 pt-8 border-t" style={{ borderColor: 'var(--color-border)' }}>
               <Link
-                href={`/${locale}`}
+                href={`/${locale}/teachings`}
                 className="inline-flex items-center gap-2 font-medium transition-colors hover:opacity-80"
                 style={{ color: 'var(--color-primary)' }}
               >
                 <span>←</span>
-                <span>{locale === "en" ? "Back to Home" : "होम पर वापस जाएं"}</span>
+                <span>{locale === "en" ? "Back to Teachings" : "शिक्षाओं पर वापस जाएं"}</span>
               </Link>
             </div>
           </div>
