@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNumber, IsOptional, IsEnum, Min } from 'class-validator';
+import { IsString, IsNumber, IsOptional, Min } from 'class-validator';
 
 // ============================================
 // Payment DTOs
