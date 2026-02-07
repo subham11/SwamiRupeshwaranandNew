@@ -121,17 +121,25 @@ export class PageComponentsSeedService implements OnModuleInit {
         displayOrder: 1,
         isVisible: true,
         fields: [
-          { key: 'heading', localizedValue: { en: 'Sri Pitambara Peeth', hi: 'श्री पीताम्बरा पीठ' } },
           {
-            key: 'subheading',
-            localizedValue: {
-              en: 'A sacred abode of spiritual wisdom and divine grace',
-              hi: 'आध्यात्मिक ज्ञान और दैवीय कृपा का पवित्र धाम',
-            },
+            key: 'slides',
+            value: [
+              {
+                imageUrl: '/images/hero-1.svg',
+                heading: { en: 'Sri Pitambara Peeth', hi: 'श्री पीताम्बरा पीठ' },
+                subheading: { en: 'A sacred abode of spiritual wisdom and divine grace', hi: 'आध्यात्मिक ज्ञान और दैवीय कृपा का पवित्र धाम' },
+                ctaText: { en: 'Learn More', hi: 'और जानें' },
+                ctaLink: '/swamiji',
+              },
+              {
+                imageUrl: '/images/hero-2.svg',
+                heading: { en: 'Daily Inspirations & Teachings', hi: 'दैनिक प्रेरणा और शिक्षाएं' },
+                subheading: { en: 'Ancient wisdom for contemporary challenges', hi: 'समकालीन चुनौतियों के लिए प्राचीन ज्ञान' },
+                ctaText: { en: 'Explore', hi: 'खोजें' },
+                ctaLink: '/teachings',
+              },
+            ],
           },
-          { key: 'backgroundImage', value: '/images/hero-bg.jpg' },
-          { key: 'ctaText', localizedValue: { en: 'Learn More', hi: 'और जानें' } },
-          { key: 'ctaLink', value: '/swamiji' },
           { key: 'overlayOpacity', value: 0.5 },
           { key: 'enableParallax', value: true },
         ],
@@ -158,8 +166,18 @@ export class PageComponentsSeedService implements OnModuleInit {
         fields: [
           { key: 'title', localizedValue: { en: 'Upcoming Events', hi: 'आगामी कार्यक्रम' } },
           { key: 'subtitle', localizedValue: { en: 'Join us for these divine occasions', hi: 'इन पवित्र अवसरों पर हमारे साथ जुड़ें' } },
-          { key: 'maxEvents', value: 4 },
-          { key: 'showPastEvents', value: false },
+          {
+            key: 'events',
+            value: [
+              {
+                title: { en: 'Hanuman Chalisa Path', hi: 'हनुमान चालीसा पाठ' },
+                description: { en: 'Weekly recitation of Hanuman Chalisa', hi: 'हनुमान चालीसा का साप्ताहिक पाठ' },
+                date: '2026-03-01T07:00:00',
+                location: { en: 'Main Temple Hall', hi: 'मुख्य मंदिर हॉल' },
+                link: '/events',
+              },
+            ],
+          },
           { key: 'viewAllLink', value: '/events' },
         ],
       },
@@ -173,12 +191,12 @@ export class PageComponentsSeedService implements OnModuleInit {
           { key: 'title', localizedValue: { en: 'Words of Wisdom', hi: 'ज्ञान के शब्द' } },
           {
             key: 'quotes',
-            value: JSON.stringify([
+            value: [
               {
                 text: { en: 'The purpose of life is to serve others.', hi: 'जीवन का उद्देश्य दूसरों की सेवा करना है।' },
                 author: { en: 'Swami Rupeshwaranand', hi: 'स्वामी रूपेश्वरानंद' },
               },
-            ]),
+            ],
           },
           { key: 'autoRotate', value: true },
           { key: 'rotateInterval', value: 5 },

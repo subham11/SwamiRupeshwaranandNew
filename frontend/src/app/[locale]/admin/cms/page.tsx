@@ -521,25 +521,289 @@ export default function CMSEditorPage() {
         );
 
       case 'json':
-      case 'array':
+      case 'array': {
+        // Parse the current value into an array
+        let items: Record<string, unknown>[] = [];
+        try {
+          if (Array.isArray(simpleVal)) items = simpleVal as Record<string, unknown>[];
+          else if (typeof simpleVal === 'string') items = JSON.parse(simpleVal);
+        } catch { /* keep empty */ }
+
+        // Determine the item schema based on the field key
+        const ARRAY_SCHEMAS: Record<string, { label: string; fields: { key: string; label: string; type: 'text' | 'textarea' | 'image' | 'url' | 'date' | 'localized' | 'localized-textarea' }[] }> = {
+          slides: {
+            label: 'Slide',
+            fields: [
+              { key: 'imageUrl', label: 'Image URL', type: 'image' },
+              { key: 'heading', label: 'Heading', type: 'localized' },
+              { key: 'subheading', label: 'Subheading', type: 'localized-textarea' },
+              { key: 'ctaText', label: 'Button Text', type: 'localized' },
+              { key: 'ctaLink', label: 'Button Link', type: 'url' },
+            ],
+          },
+          quotes: {
+            label: 'Quote',
+            fields: [
+              { key: 'text', label: 'Quote Text', type: 'localized-textarea' },
+              { key: 'author', label: 'Author', type: 'localized' },
+            ],
+          },
+          events: {
+            label: 'Event',
+            fields: [
+              { key: 'title', label: 'Title', type: 'localized' },
+              { key: 'description', label: 'Description', type: 'localized-textarea' },
+              { key: 'date', label: 'Date & Time', type: 'date' },
+              { key: 'location', label: 'Location', type: 'localized' },
+              { key: 'imageUrl', label: 'Image URL', type: 'image' },
+              { key: 'link', label: 'Link', type: 'url' },
+            ],
+          },
+          teachings: {
+            label: 'Teaching',
+            fields: [
+              { key: 'title', label: 'Title', type: 'localized' },
+              { key: 'description', label: 'Description', type: 'localized-textarea' },
+              { key: 'icon', label: 'Icon Emoji', type: 'text' },
+              { key: 'imageUrl', label: 'Image URL', type: 'image' },
+              { key: 'link', label: 'Link', type: 'url' },
+            ],
+          },
+          testimonials: {
+            label: 'Testimonial',
+            fields: [
+              { key: 'name', label: 'Name', type: 'localized' },
+              { key: 'text', label: 'Text', type: 'localized-textarea' },
+              { key: 'imageUrl', label: 'Photo', type: 'image' },
+            ],
+          },
+          faqs: {
+            label: 'FAQ',
+            fields: [
+              { key: 'question', label: 'Question', type: 'localized' },
+              { key: 'answer', label: 'Answer', type: 'localized-textarea' },
+            ],
+          },
+        };
+
+        const schema = ARRAY_SCHEMAS[fieldDef.key];
+
+        // Fallback: raw JSON textarea for unknown schemas
+        if (!schema) {
+          return (
+            <textarea
+              value={typeof simpleVal === 'string' ? simpleVal : JSON.stringify(simpleVal || [], null, 2)}
+              onChange={(e) => {
+                try {
+                  const parsed = JSON.parse(e.target.value);
+                  updateFieldValue(fieldDef.key, { value: parsed });
+                } catch {
+                  updateFieldValue(fieldDef.key, { value: e.target.value });
+                }
+              }}
+              aria-label={fieldDef.label}
+              placeholder={`${fieldDef.label} (JSON)`}
+              rows={6}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono text-xs focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            />
+          );
+        }
+
+        // Helper to update items array
+        const updateItems = (newItems: Record<string, unknown>[]) => {
+          updateFieldValue(fieldDef.key, { value: newItems });
+        };
+
+        const addItem = () => {
+          const newItem: Record<string, unknown> = {};
+          schema.fields.forEach((sf) => {
+            if (sf.type === 'localized' || sf.type === 'localized-textarea') {
+              newItem[sf.key] = { en: '', hi: '' };
+            } else {
+              newItem[sf.key] = '';
+            }
+          });
+          updateItems([...items, newItem]);
+        };
+
+        const removeItem = (idx: number) => {
+          updateItems(items.filter((_, i) => i !== idx));
+        };
+
+        const moveItem = (idx: number, dir: -1 | 1) => {
+          const newIdx = idx + dir;
+          if (newIdx < 0 || newIdx >= items.length) return;
+          const copy = [...items];
+          [copy[idx], copy[newIdx]] = [copy[newIdx], copy[idx]];
+          updateItems(copy);
+        };
+
+        const updateItemField = (itemIdx: number, fieldKey: string, value: unknown) => {
+          const copy = items.map((item, i) => (i === itemIdx ? { ...item, [fieldKey]: value } : item));
+          updateItems(copy);
+        };
+
         return (
-          <textarea
-            value={typeof simpleVal === 'string' ? simpleVal : JSON.stringify(simpleVal || (fieldDef.type === 'array' ? [] : {}), null, 2)}
-            onChange={(e) => {
-              try {
-                const parsed = JSON.parse(e.target.value);
-                updateFieldValue(fieldDef.key, { value: parsed });
-              } catch {
-                // Keep raw string if invalid JSON — user is still typing
-                updateFieldValue(fieldDef.key, { value: e.target.value });
-              }
-            }}
-            aria-label={fieldDef.label}
-            placeholder={`${fieldDef.label} (JSON)`}
-            rows={6}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono text-xs focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-          />
+          <div className="space-y-3">
+            {items.map((item, idx) => (
+              <div
+                key={idx}
+                className="border border-gray-200 dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-900/50"
+              >
+                {/* Item header */}
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {schema.label} {idx + 1}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => moveItem(idx, -1)}
+                      disabled={idx === 0}
+                      className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                      title="Move up"
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moveItem(idx, 1)}
+                      disabled={idx === items.length - 1}
+                      className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                      title="Move down"
+                    >
+                      ▼
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeItem(idx)}
+                      className="p-1 text-red-400 hover:text-red-600"
+                      title="Remove"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+
+                {/* Item fields */}
+                <div className="space-y-2">
+                  {schema.fields.map((sf) => {
+                    const itemVal = item[sf.key];
+
+                    if (sf.type === 'localized' || sf.type === 'localized-textarea') {
+                      const locObj = (itemVal && typeof itemVal === 'object' && !Array.isArray(itemVal))
+                        ? (itemVal as Record<string, string>)
+                        : { en: '', hi: '' };
+                      const currentLangVal = locObj[activeLanguage] || '';
+
+                      return (
+                        <div key={sf.key}>
+                          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
+                            {sf.label} <span className="text-orange-500">{activeLanguage.toUpperCase()}</span>
+                          </label>
+                          {sf.type === 'localized-textarea' ? (
+                            <textarea
+                              value={currentLangVal}
+                              onChange={(e) =>
+                                updateItemField(idx, sf.key, { ...locObj, [activeLanguage]: e.target.value })
+                              }
+                              rows={2}
+                              className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                            />
+                          ) : (
+                            <input
+                              type="text"
+                              value={currentLangVal}
+                              onChange={(e) =>
+                                updateItemField(idx, sf.key, { ...locObj, [activeLanguage]: e.target.value })
+                              }
+                              className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                            />
+                          )}
+                        </div>
+                      );
+                    }
+
+                    if (sf.type === 'image') {
+                      return (
+                        <div key={sf.key}>
+                          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
+                            {sf.label}
+                          </label>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={(itemVal as string) || ''}
+                              onChange={(e) => updateItemField(idx, sf.key, e.target.value)}
+                              placeholder="Image URL..."
+                              className="flex-1 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setMediaPickerFieldKey(`__array__${fieldDef.key}__${idx}__${sf.key}`);
+                                setShowMediaPicker(true);
+                              }}
+                              className="px-2 py-1.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded text-xs font-medium whitespace-nowrap"
+                            >
+                              📁
+                            </button>
+                          </div>
+                          {typeof itemVal === 'string' && itemVal && (
+                            <div className="mt-1 relative w-16 h-16 border border-gray-200 dark:border-gray-700 rounded overflow-hidden">
+                              <img src={itemVal} alt="Preview" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+
+                    if (sf.type === 'date') {
+                      return (
+                        <div key={sf.key}>
+                          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
+                            {sf.label}
+                          </label>
+                          <input
+                            type="datetime-local"
+                            value={(itemVal as string) || ''}
+                            onChange={(e) => updateItemField(idx, sf.key, e.target.value)}
+                            className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                          />
+                        </div>
+                      );
+                    }
+
+                    // text / url
+                    return (
+                      <div key={sf.key}>
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
+                          {sf.label}
+                        </label>
+                        <input
+                          type={sf.type === 'url' ? 'url' : 'text'}
+                          value={(itemVal as string) || ''}
+                          onChange={(e) => updateItemField(idx, sf.key, e.target.value)}
+                          placeholder={sf.type === 'url' ? 'https://...' : ''}
+                          className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            <button
+              type="button"
+              onClick={addItem}
+              className="w-full py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-400 hover:border-orange-500 hover:text-orange-500 transition-colors text-sm font-medium"
+            >
+              + Add {schema.label}
+            </button>
+          </div>
         );
+      }
 
       default:
         return (
@@ -972,7 +1236,26 @@ export default function CMSEditorPage() {
           accessToken={accessToken}
           onSelect={(url) => {
             if (mediaPickerFieldKey) {
-              updateFieldValue(mediaPickerFieldKey, { value: url });
+              // Handle array item image fields: __array__<fieldKey>__<idx>__<subKey>
+              const arrayMatch = mediaPickerFieldKey.match(/^__array__(.+?)__(\d+)__(.+)$/);
+              if (arrayMatch) {
+                const [, parentKey, idxStr, subKey] = arrayMatch;
+                const idx = parseInt(idxStr, 10);
+                // Get current array value for the parent field from editedFields
+                const parentField = editedFields.find((f) => f.key === parentKey);
+                let items: Record<string, unknown>[] = [];
+                try {
+                  const raw = parentField?.value;
+                  if (Array.isArray(raw)) items = [...raw] as Record<string, unknown>[];
+                  else if (typeof raw === 'string') items = JSON.parse(raw);
+                } catch { /* keep empty */ }
+                if (items[idx]) {
+                  items[idx] = { ...items[idx], [subKey]: url };
+                  updateFieldValue(parentKey, { value: items });
+                }
+              } else {
+                updateFieldValue(mediaPickerFieldKey, { value: url });
+              }
             }
             setShowMediaPicker(false);
             setMediaPickerFieldKey(null);

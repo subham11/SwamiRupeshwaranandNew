@@ -315,9 +315,22 @@ class ContentProvider {
     const eventsComp = components.find((c) => c.componentType === "upcoming_events" && c.isVisible);
     const wisdomComp = components.find((c) => c.componentType === "words_of_wisdom" && c.isVisible);
 
-    // Build hero slides from the hero component
-    const heroSlides: HeroSlide[] = heroComp
-      ? [
+    // Build hero slides from the hero component's slides array
+    let heroSlides: HeroSlide[] = homeContent.heroSlides;
+    if (heroComp) {
+      const slidesData = getFieldValue(heroComp, "slides");
+      if (Array.isArray(slidesData) && slidesData.length > 0) {
+        heroSlides = slidesData.map((s: { imageUrl?: string; heading?: LocalizedText; subheading?: LocalizedText; ctaText?: LocalizedText; ctaLink?: string }, i: number) => ({
+          id: `slide-${i}`,
+          imageUrl: s.imageUrl || "/images/hero-1.svg",
+          title: s.heading || { en: "", hi: "" },
+          subtitle: s.subheading || { en: "", hi: "" },
+          ctaText: s.ctaText || { en: "", hi: "" },
+          ctaLink: s.ctaLink || "/swamiji",
+        }));
+      } else {
+        // Backward compat: old individual fields format
+        heroSlides = [
           {
             id: heroComp.id,
             imageUrl: (getFieldValue(heroComp, "backgroundImage") as string) || "/images/hero-1.svg",
@@ -326,8 +339,9 @@ class ContentProvider {
             ctaText: getLocalizedField(heroComp, "ctaText"),
             ctaLink: (getFieldValue(heroComp, "ctaLink") as string) || "/swamiji",
           },
-        ]
-      : homeContent.heroSlides;
+        ];
+      }
+    }
 
     // Build announcements
     const announcements: AnnouncementItem[] = announcementComp
