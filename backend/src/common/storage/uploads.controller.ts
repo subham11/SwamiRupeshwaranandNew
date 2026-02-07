@@ -10,7 +10,6 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
-  Req,
   Logger,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -70,7 +69,6 @@ export class UploadsController {
   async uploadFile(
     @UploadedFile() file: any,
     @Query('folder') folder: StorageFolder = StorageFolder.IMAGES,
-    @Req() _req: any,
   ): Promise<UploadedFileDto> {
     // In Lambda, multer may not parse the file correctly
     if (!file) {
