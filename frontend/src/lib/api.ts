@@ -56,7 +56,83 @@ export class ApiError extends Error {
 }
 
 /**
- * Generic API request handler
+ * Try to refresh the access token using the stored refresh token.
+ * Returns the new token or null on failure.
+ */
+let _refreshPromise: Promise<string | null> | null = null;
+
+async function tryRefreshToken(): Promise<string | null> {
+  if (typeof window === "undefined") return null;
+  if (_refreshPromise) return _refreshPromise;
+
+  _refreshPromise = (async () => {
+    const refreshToken = localStorage.getItem("auth_refresh_token");
+    if (!refreshToken) return null;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (data.accessToken && data.refreshToken) {
+        const authToken = data.idToken || data.accessToken;
+        localStorage.setItem("auth_access_token", authToken);
+        localStorage.setItem("auth_refresh_token", data.refreshToken);
+        // Notify React state (useAuth) about the refreshed token
+        window.dispatchEvent(new CustomEvent("auth_token_refreshed", {
+          detail: { accessToken: authToken, refreshToken: data.refreshToken },
+        }));
+        return authToken as string;
+      }
+      return null;
+    } catch {
+      return null;
+    } finally {
+      _refreshPromise = null;
+    }
+  })();
+
+  return _refreshPromise;
+}
+
+/**
+ * Get the freshest access token from localStorage.
+ * This avoids stale tokens held in React state after Cognito ID tokens expire (1 hr).
+ */
+function getFreshAccessToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("auth_access_token");
+}
+
+/**
+ * Build headers for an API request, injecting the freshest token from localStorage.
+ * Any Authorization header passed by the caller is replaced with the fresh one.
+ */
+function buildHeaders(callerHeaders?: HeadersInit): Record<string, string> {
+  const merged: Record<string, string> = {};
+  if (callerHeaders) {
+    if (callerHeaders instanceof Headers) {
+      callerHeaders.forEach((v, k) => { merged[k] = v; });
+    } else if (Array.isArray(callerHeaders)) {
+      callerHeaders.forEach(([k, v]) => { merged[k] = v; });
+    } else {
+      Object.assign(merged, callerHeaders);
+    }
+  }
+  // Always use the freshest token from localStorage
+  const token = getFreshAccessToken();
+  if (token) {
+    merged["Authorization"] = `Bearer ${token}`;
+  }
+  return merged;
+}
+
+/**
+ * Generic API request handler with automatic 401 retry via token refresh.
+ * Always uses the freshest token from localStorage (not stale React state).
  */
 async function apiRequest<T>(
   endpoint: string,
@@ -65,7 +141,33 @@ async function apiRequest<T>(
   const url = `${API_BASE_URL}${endpoint}`;
 
   try {
-    const response = await fetchWithTimeout(url, options);
+    // Use fresh token for the initial request
+    const freshOptions = { ...options, headers: buildHeaders(options.headers) };
+    const response = await fetchWithTimeout(url, freshOptions);
+
+    // On 401, attempt token refresh and retry once
+    if (response.status === 401 && typeof window !== "undefined") {
+      const newToken = await tryRefreshToken();
+      if (newToken) {
+        const retryHeaders = buildHeaders(options.headers);
+        retryHeaders["Authorization"] = `Bearer ${newToken}`;
+
+        const retryResponse = await fetchWithTimeout(url, {
+          ...options,
+          headers: retryHeaders,
+        });
+
+        if (!retryResponse.ok) {
+          const errorData = await retryResponse.json().catch(() => ({}));
+          throw new ApiError(
+            errorData.message || `HTTP error ${retryResponse.status}`,
+            retryResponse.status,
+            errorData.code
+          );
+        }
+        return retryResponse.json();
+      }
+    }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));

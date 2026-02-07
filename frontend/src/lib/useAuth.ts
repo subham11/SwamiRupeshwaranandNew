@@ -66,6 +66,59 @@ export function useAuth() {
     }
   }, [dispatch]);
 
+  // Listen for token refresh events (fired by api.ts tryRefreshToken)
+  // This keeps Redux state in sync when tokens are refreshed outside React
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.accessToken && detail?.refreshToken) {
+        dispatch(refreshTokenSuccess({
+          accessToken: detail.accessToken,
+          refreshToken: detail.refreshToken,
+        }));
+      }
+    };
+    window.addEventListener('auth_token_refreshed', handler);
+    return () => window.removeEventListener('auth_token_refreshed', handler);
+  }, [dispatch]);
+
+  // Proactive token refresh: decode JWT exp and schedule refresh 5 min before expiry
+  useEffect(() => {
+    const token = storage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    if (!token) return;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const exp = payload.exp;
+      if (!exp) return;
+
+      // Refresh 5 minutes before expiry (Cognito ID tokens expire after 1 hour)
+      const msUntilExpiry = exp * 1000 - Date.now();
+      const refreshIn = Math.max(msUntilExpiry - 5 * 60 * 1000, 0);
+
+      const timer = setTimeout(async () => {
+        const rt = storage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+        if (!rt) return;
+        try {
+          const response = await authService.refreshToken(rt);
+          const newAuthToken = response.idToken || response.accessToken;
+          storage.setItem(STORAGE_KEYS.ACCESS_TOKEN, newAuthToken);
+          storage.setItem(STORAGE_KEYS.REFRESH_TOKEN, response.refreshToken);
+          dispatch(refreshTokenSuccess({
+            accessToken: newAuthToken,
+            refreshToken: response.refreshToken,
+          }));
+        } catch {
+          // Token refresh failed — user will need to re-login
+        }
+      }, refreshIn);
+
+      return () => clearTimeout(timer);
+    } catch {
+      // Invalid JWT format — ignore
+    }
+  }, [authState.accessToken, dispatch]);
+
   // Request OTP for login
   const requestOtp = useCallback(async (email: string) => {
     dispatch(setLoading(true));

@@ -67,11 +67,45 @@ export default function MediaPickerModal({ accessToken, onSelect, onClose, folde
         const formData = new FormData();
         formData.append('file', file);
 
-        const res = await fetch(`${API_BASE}/uploads/upload?folder=${folder}`, {
+        // Always use freshest token from localStorage (React prop may be stale)
+        let token = (typeof window !== 'undefined' && localStorage.getItem('auth_access_token')) || accessToken;
+        let res = await fetch(`${API_BASE}/uploads/upload?folder=${folder}`, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${accessToken}` },
+          headers: { Authorization: `Bearer ${token}` },
           body: formData,
         });
+
+        // On 401, attempt token refresh and retry once
+        if (res.status === 401 && typeof window !== 'undefined') {
+          const refreshToken = localStorage.getItem('auth_refresh_token');
+          if (refreshToken) {
+            try {
+              const refreshRes = await fetch(`${API_BASE}/auth/refresh`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refreshToken }),
+              });
+              if (refreshRes.ok) {
+                const data = await refreshRes.json();
+                const newToken = data.idToken || data.accessToken;
+                if (newToken) {
+                  localStorage.setItem('auth_access_token', newToken);
+                  localStorage.setItem('auth_refresh_token', data.refreshToken);
+                  token = newToken;
+                  const retryFormData = new FormData();
+                  retryFormData.append('file', file);
+                  res = await fetch(`${API_BASE}/uploads/upload?folder=${folder}`, {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${token}` },
+                    body: retryFormData,
+                  });
+                }
+              }
+            } catch {
+              // refresh failed, keep original 401 response
+            }
+          }
+        }
 
         if (!res.ok) throw new Error('Upload failed');
         const data = await res.json();
