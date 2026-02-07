@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { AppLocale } from "@/i18n/config";
 import { Container } from "@/components/ui/Container";
 import { getPageContent, PAGE_IDS, t } from "@/content/contentProvider";
+import CMSTextBlocks from "@/components/CMSTextBlocks";
 
 // Generate metadata for SEO
 export async function generateMetadata({ 
@@ -129,6 +130,9 @@ export default async function SwamijiPage({
               </p>
             </section>
           ))}
+
+          {/* CMS-managed text blocks (added via Content Editor) */}
+          <CMSTextBlocks pageSlug="swamiji" locale={locale} />
         </div>
       </Container>
     </div>

@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/useAuth';
 import Container from '@/components/ui/Container';
 import Button from '@/components/ui/Button';
 import MediaPickerModal from '@/components/admin/MediaPickerModal';
+import RichTextEditor from '@/components/admin/RichTextEditor';
 import {
   type CMSPage,
   type CMSComponent,
@@ -348,14 +349,25 @@ export default function CMSEditorPage() {
         });
       };
 
-      if (fieldDef.type === 'textarea' || fieldDef.type === 'richtext') {
+      if (fieldDef.type === 'richtext') {
+        return (
+          <RichTextEditor
+            value={currentText}
+            onChange={handleLocChange}
+            placeholder={fieldDef.placeholder || fieldDef.label}
+            label={`${fieldDef.label} (${activeLanguage.toUpperCase()})`}
+          />
+        );
+      }
+
+      if (fieldDef.type === 'textarea') {
         return (
           <textarea
             value={currentText}
             onChange={(e) => handleLocChange(e.target.value)}
             placeholder={fieldDef.placeholder || fieldDef.label}
             aria-label={`${fieldDef.label} (${activeLanguage.toUpperCase()})`}
-            rows={fieldDef.type === 'richtext' ? 6 : 3}
+            rows={3}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
           />
         );
@@ -389,15 +401,24 @@ export default function CMSEditorPage() {
           />
         );
 
-      case 'textarea':
       case 'richtext':
+        return (
+          <RichTextEditor
+            value={(simpleVal as string) || ''}
+            onChange={(val) => updateFieldValue(fieldDef.key, { value: val })}
+            placeholder={fieldDef.label}
+            label={fieldDef.label}
+          />
+        );
+
+      case 'textarea':
         return (
           <textarea
             value={(simpleVal as string) || ''}
             onChange={(e) => updateFieldValue(fieldDef.key, { value: e.target.value })}
             aria-label={fieldDef.label}
             placeholder={fieldDef.label}
-            rows={fieldDef.type === 'richtext' ? 6 : 3}
+            rows={3}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
           />
         );
