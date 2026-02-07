@@ -35,6 +35,7 @@ provider:
     DYNAMODB_TABLE_PREFIX: ${self:service}-${self:provider.stage}
     MAIN_TABLE: !Ref MainTable
     COGNITO_REGION: ${self:provider.region}
+    AWS_S3_BUCKET: !Ref ContentBucket
   
   # IAM Role for Lambda
   iam:
@@ -77,6 +78,16 @@ provider:
             - logs:CreateLogStream
             - logs:PutLogEvents
           Resource: '*'
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+            - s3:ListBucket
+            - s3:HeadObject
+          Resource:
+            - !GetAtt ContentBucket.Arn
+            - !Join ['/', [!GetAtt ContentBucket.Arn, '*']]
 
 plugins:
   - serverless-offline
@@ -315,6 +326,45 @@ resources:
         Action: lambda:InvokeFunction
         SourceArn: !GetAtt CognitoUserPool.Arn
 
+    # ─── S3: Content Bucket ──────────────────────────────────
+    ContentBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:service}-${self:provider.stage}-content
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - HEAD
+              AllowedOrigins:
+                - '*'
+              MaxAge: 3600
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+          - Key: Project
+            Value: ${self:service}
+
+    ContentBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref ContentBucket
+        PolicyDocument:
+          Statement:
+            - Effect: Allow
+              Principal: '*'
+              Action: s3:GetObject
+              Resource: !Join ['/', [!GetAtt ContentBucket.Arn, '*']]
+
   Outputs:
     ApiGatewayRestApiId:
       Value: !Ref ApiGatewayRestApi
@@ -328,3 +378,7 @@ resources:
       Value: !Ref CognitoUserPool
     CognitoUserPoolClientId:
       Value: !Ref CognitoUserPoolClient
+    ContentBucketName:
+      Value: !Ref ContentBucket
+    ContentBucketArn:
+      Value: !GetAtt ContentBucket.Arn

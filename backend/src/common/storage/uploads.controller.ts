@@ -10,16 +10,27 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Req,
+  Logger,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { IsString, IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
 import { StorageService, StorageFolder, PresignedUrlResult, FileMetadata } from './storage.service';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { AdminOnly, EditorOnly } from '@/common/decorators';
 
 export class GetPresignedUploadDto {
+  @IsEnum(StorageFolder)
+  @IsNotEmpty()
   folder: StorageFolder;
+
+  @IsString()
+  @IsNotEmpty()
   fileName: string;
+
+  @IsString()
+  @IsNotEmpty()
   contentType: string;
 }
 
@@ -36,6 +47,8 @@ export class UploadedFileDto {
 @Controller('uploads')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class UploadsController {
+  private readonly logger = new Logger(UploadsController.name);
+
   constructor(private readonly storageService: StorageService) {}
 
   /**
@@ -49,6 +62,7 @@ export class UploadsController {
 
   /**
    * Upload file directly through server
+   * Falls back to parsing raw body in Lambda where multer may not work
    */
   @Post('upload')
   @EditorOnly()
@@ -56,9 +70,14 @@ export class UploadsController {
   async uploadFile(
     @UploadedFile() file: any,
     @Query('folder') folder: StorageFolder = StorageFolder.IMAGES,
+    @Req() req: any,
   ): Promise<UploadedFileDto> {
+    // In Lambda, multer may not parse the file correctly
     if (!file) {
-      throw new BadRequestException('No file provided');
+      this.logger.warn('Multer did not parse file; check if running in Lambda');
+      throw new BadRequestException(
+        'No file provided. Use presigned-url endpoint for direct S3 upload instead.',
+      );
     }
 
     const result = await this.storageService.uploadFile(

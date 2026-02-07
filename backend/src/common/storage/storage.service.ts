@@ -96,7 +96,7 @@ export class StorageService {
   constructor(private readonly configService: ConfigService) {
     this.isLocal = this.configService.get<string>('IS_LOCAL') === 'true';
     this.bucketName =
-      this.configService.get<string>('AWS_S3_BUCKET') || 'swami-rupeshwaranand-content';
+      this.configService.get<string>('AWS_S3_BUCKET') || 'swami-rupeshwaranand-api-dev-content';
     this.cdnDomain = this.configService.get<string>('CDN_DOMAIN');
 
     if (this.isLocal) {
