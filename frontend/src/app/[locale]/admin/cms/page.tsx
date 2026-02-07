@@ -77,6 +77,12 @@ export default function CMSEditorPage() {
   const [hasChanges, setHasChanges] = useState(false);
   const originalFieldsRef = useRef<string>('[]');
 
+  // Detect real changes by comparing current fields to original snapshot
+  useEffect(() => {
+    const current = JSON.stringify(editedFields);
+    setHasChanges(current !== originalFieldsRef.current);
+  }, [editedFields]);
+
   // Modals
   const [showAddPageModal, setShowAddPageModal] = useState(false);
   const [showAddComponentModal, setShowAddComponentModal] = useState(false);
@@ -191,16 +197,12 @@ export default function CMSEditorPage() {
   const updateFieldValue = (key: string, update: Partial<ComponentFieldValue>) => {
     setEditedFields((prev) => {
       const idx = prev.findIndex((f) => f.key === key);
-      let next: ComponentFieldValue[];
       if (idx >= 0) {
-        next = [...prev];
-        next[idx] = { ...next[idx], ...update };
-      } else {
-        next = [...prev, { key, ...update }];
+        const copy = [...prev];
+        copy[idx] = { ...copy[idx], ...update };
+        return copy;
       }
-      // Compare against original to detect real changes
-      setHasChanges(JSON.stringify(next) !== originalFieldsRef.current);
-      return next;
+      return [...prev, { key, ...update }];
     });
   };
 
