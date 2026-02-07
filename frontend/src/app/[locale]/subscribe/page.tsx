@@ -297,7 +297,7 @@ function SubscribeContent() {
                   {/* Subscribe button */}
                   <button
                     onClick={() => handleSelectPlan(plan.id)}
-                    disabled={state === 'initiating' || state === 'checkout'}
+                    disabled={state === 'checkout'}
                     className={`w-full py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                       isPopular
                         ? 'bg-orange-600 text-white hover:bg-orange-700'
