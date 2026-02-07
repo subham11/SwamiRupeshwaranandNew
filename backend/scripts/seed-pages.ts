@@ -8,7 +8,7 @@ import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
 const isLocal = process.env.IS_LOCAL === 'true';
-const tableName = process.env.DYNAMODB_TABLE || 'swami-rupeshwaranand-dev';
+const tableName = process.env.DYNAMODB_TABLE || 'swami-rupeshwaranand-api-dev-main';
 
 const client = new DynamoDBClient(
   isLocal

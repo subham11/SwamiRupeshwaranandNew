@@ -22,7 +22,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 
 const isLocal = process.env.IS_LOCAL === 'true';
-const tableName = process.env.DYNAMODB_TABLE || 'swami-rupeshwaranand-dev';
+const tableName = process.env.DYNAMODB_TABLE || 'swami-rupeshwaranand-api-dev-main';
 
 const client = new DynamoDBClient(
   isLocal
@@ -31,7 +31,7 @@ const client = new DynamoDBClient(
         endpoint: 'http://localhost:8000',
         credentials: { accessKeyId: 'local', secretAccessKey: 'local' },
       }
-    : { region: process.env.AWS_REGION || 'ap-south-1' },
+    : { region: process.env.AWS_REGION || 'ap-south-1' }
 );
 
 const docClient = DynamoDBDocumentClient.from(client);
