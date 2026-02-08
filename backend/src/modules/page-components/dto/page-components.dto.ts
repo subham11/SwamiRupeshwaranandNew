@@ -22,6 +22,8 @@ export enum PageStatus {
 
 export enum ComponentType {
   ANNOUNCEMENT_BAR = 'announcement_bar',
+  HEADER = 'header',
+  FOOTER = 'footer',
   HERO_SECTION = 'hero_section',
   SACRED_TEACHINGS = 'sacred_teachings',
   UPCOMING_EVENTS = 'upcoming_events',

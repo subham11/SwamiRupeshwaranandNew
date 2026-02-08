@@ -36,13 +36,15 @@ const LANGUAGE_LABELS: Record<Language, string> = {
 // Component types that are always treated as global (site-wide).
 // This acts as a frontend fallback in case the backend template
 // hasn't been rebuilt yet with the isGlobal flag.
-const GLOBAL_COMPONENT_TYPES = new Set(['announcement_bar']);
+const GLOBAL_COMPONENT_TYPES = new Set(['announcement_bar', 'header', 'footer']);
 
 const isGlobalTemplate = (t: { componentType: string; isGlobal?: boolean }) =>
   t.isGlobal || GLOBAL_COMPONENT_TYPES.has(t.componentType);
 
 const COMPONENT_TYPE_ICONS: Record<string, string> = {
   announcement_bar: '📢',
+  header: '🔝',
+  footer: '🔻',
   hero_section: '🏠',
   sacred_teachings: '📿',
   upcoming_events: '📅',
