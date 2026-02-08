@@ -898,9 +898,8 @@ export class PageComponentsService {
   private readonly GLOBAL_PAGE_ID = '__GLOBAL__';
 
   async findGlobalComponents(): Promise<PageComponentListResponseDto> {
-    const globalTypes = COMPONENT_TEMPLATES
-      .filter((t) => t.isGlobal)
-      .map((t) => t.componentType);
+    const globalTemplates = COMPONENT_TEMPLATES.filter((t) => t.isGlobal);
+    const globalTypes = globalTemplates.map((t) => t.componentType);
 
     if (globalTypes.length === 0) {
       return { items: [], count: 0 };
@@ -943,24 +942,24 @@ export class PageComponentsService {
       }
     }
 
+    // 3. Auto-initialize any global templates that have no component yet
+    for (const template of globalTemplates) {
+      if (!foundTypes.has(template.componentType)) {
+        const created = await this.initializeGlobalComponent(template.componentType);
+        allGlobalComponents.push(created);
+        foundTypes.add(template.componentType);
+      }
+    }
+
     return {
       items: allGlobalComponents,
       count: allGlobalComponents.length,
     };
   }
 
-  async initializeGlobalComponent(
+  private async initializeGlobalComponent(
     componentType: ComponentType,
   ): Promise<PageComponentResponseDto> {
-    // Check if already exists
-    const existing = await this.findGlobalComponents();
-    const existingComp = existing.items.find(
-      (c) => c.componentType === componentType,
-    );
-    if (existingComp) {
-      return existingComp;
-    }
-
     // Validate template exists and is global
     const template = this.getComponentTemplate(componentType);
     if (!template) {

@@ -24,7 +24,6 @@ import {
   deleteCMSComponent,
   fetchComponentTemplates,
   fetchGlobalComponents,
-  initializeGlobalComponent,
 } from '@/lib/api';
 
 type Language = 'en' | 'hi';
@@ -262,21 +261,6 @@ export default function CMSEditorPage() {
     } else {
       setSelectedComponent(null);
       setEditedFields([]);
-    }
-  };
-
-  const handleInitializeGlobal = async () => {
-    if (!selectedGlobalType || !accessToken) return;
-    try {
-      setSaving(true);
-      const comp = await initializeGlobalComponent(selectedGlobalType, accessToken);
-      setGlobalComponents((prev) => [...prev, comp]);
-      setSelectedComponent(comp);
-      setSuccessMessage('Global component initialized successfully!');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to initialize global component');
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -1198,29 +1182,12 @@ export default function CMSEditorPage() {
             </div>
 
             {!selectedComponent ? (
-              selectedGlobalType ? (
-                <div className="p-8 text-center">
-                  <svg className="w-16 h-16 mx-auto mb-4 text-orange-400 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  <p className="text-gray-700 dark:text-gray-300 font-medium mb-2">
-                    {templates.find((t) => t.componentType === selectedGlobalType)?.name || selectedGlobalType} is not configured yet
-                  </p>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
-                    Initialize this global component with default values so you can start editing it.
-                  </p>
-                  <Button variant="primary" onClick={handleInitializeGlobal} disabled={saving}>
-                    {saving ? 'Initializing...' : 'Initialize Component'}
-                  </Button>
-                </div>
-              ) : (
                 <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                   <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                   <p>Select a component to edit its content</p>
                 </div>
-              )
             ) : (
               <div className="p-4">
                 {/* Active language indicator */}
