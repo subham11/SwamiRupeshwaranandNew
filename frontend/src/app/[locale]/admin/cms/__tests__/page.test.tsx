@@ -414,4 +414,57 @@ describe('CMSEditorPage - Global Components', () => {
     // fetchGlobalComponents should have been called once on load
     expect(fetchGlobalComponents).toHaveBeenCalledTimes(1);
   });
+
+  it('treats announcement_bar as global even without isGlobal flag from backend', async () => {
+    // Simulate backend that hasn't been updated yet (no isGlobal field)
+    const templatesWithoutFlag = mockTemplates.map((t) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { isGlobal, ...rest } = t as typeof t & { isGlobal?: boolean };
+      return rest;
+    });
+    (fetchComponentTemplates as jest.Mock).mockResolvedValue(templatesWithoutFlag);
+    setupAuthenticatedUser();
+    // Re-override templates after setupAuthenticatedUser sets its own mock
+    (fetchComponentTemplates as jest.Mock).mockResolvedValue(templatesWithoutFlag);
+
+    render(<CMSEditorPage />);
+
+    await waitFor(() => {
+      // Global section should still appear via fallback
+      expect(screen.getByText('Global')).toBeInTheDocument();
+      expect(screen.getByText('Announcement Bar')).toBeInTheDocument();
+    });
+  });
+
+  it('closes the Add Component modal via the close button', async () => {
+    setupAuthenticatedUser();
+    render(<CMSEditorPage />);
+
+    // Select a page first
+    await waitFor(() => {
+      expect(screen.getByText('Home')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('Home'));
+
+    await waitFor(() => {
+      expect(fetchCMSPageWithComponents).toHaveBeenCalled();
+    });
+
+    // Open the Add Component modal
+    const addButtons = screen.getAllByTitle('Add Component');
+    fireEvent.click(addButtons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByText('Add Component')).toBeInTheDocument();
+    });
+
+    // Click the close (X) button
+    const closeButton = screen.getByTitle('Close');
+    fireEvent.click(closeButton);
+
+    await waitFor(() => {
+      // The modal description should no longer be visible
+      expect(screen.queryByText('Rich text content block')).not.toBeInTheDocument();
+    });
+  });
 });

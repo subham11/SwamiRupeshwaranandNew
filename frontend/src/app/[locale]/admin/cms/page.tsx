@@ -33,6 +33,14 @@ const LANGUAGE_LABELS: Record<Language, string> = {
   hi: 'हिंदी',
 };
 
+// Component types that are always treated as global (site-wide).
+// This acts as a frontend fallback in case the backend template
+// hasn't been rebuilt yet with the isGlobal flag.
+const GLOBAL_COMPONENT_TYPES = new Set(['announcement_bar']);
+
+const isGlobalTemplate = (t: { componentType: string; isGlobal?: boolean }) =>
+  t.isGlobal || GLOBAL_COMPONENT_TYPES.has(t.componentType);
+
 const COMPONENT_TYPE_ICONS: Record<string, string> = {
   announcement_bar: '📢',
   hero_section: '🏠',
@@ -945,13 +953,13 @@ export default function CMSEditorPage() {
             </div>
             <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-[65vh] overflow-y-auto">
               {/* Global Components Section */}
-              {templates.filter((t) => t.isGlobal).length > 0 && (
+              {templates.filter(isGlobalTemplate).length > 0 && (
                 <>
                   <div className="px-3 py-2 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Global</span>
                   </div>
                   {templates
-                    .filter((t) => t.isGlobal)
+                    .filter(isGlobalTemplate)
                     .map((template) => {
                       const globalComp = globalComponents.find((c) => c.componentType === template.componentType);
                       return (
@@ -1040,7 +1048,7 @@ export default function CMSEditorPage() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
               <h2 className="font-semibold text-gray-900 dark:text-white">
-                Components {selectedPage ? `(${components.filter((c) => !templates.find((t) => t.componentType === c.componentType && t.isGlobal)).length})` : ''}
+                Components {selectedPage ? `(${components.filter((c) => !templates.find((t) => t.componentType === c.componentType && isGlobalTemplate(t))).length})` : ''}
               </h2>
               {selectedPage && (
                 <button
@@ -1077,7 +1085,7 @@ export default function CMSEditorPage() {
             ) : (
               <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-[65vh] overflow-y-auto">
                 {components
-                  .filter((c) => !templates.find((t) => t.componentType === c.componentType && t.isGlobal))
+                  .filter((c) => !templates.find((t) => t.componentType === c.componentType && isGlobalTemplate(t)))
                   .sort((a, b) => a.displayOrder - b.displayOrder)
                   .map((comp) => (
                     <div
@@ -1323,13 +1331,24 @@ export default function CMSEditorPage() {
       {/* ====== Add Component Modal ====== */}
       {showAddComponentModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-2xl mx-4 shadow-xl max-h-[80vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add Component</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-2xl mx-4 shadow-xl max-h-[80vh] overflow-y-auto relative">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Add Component</h3>
+              <button
+                onClick={() => setShowAddComponentModal(false)}
+                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded"
+                title="Close"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
               Choose a component type to add to &ldquo;{selectedPage?.title.en}&rdquo;
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {templates.filter((t) => !t.isGlobal).map((template) => (
+              {templates.filter((t) => !isGlobalTemplate(t)).map((template) => (
                 <button
                   key={template.componentType}
                   onClick={() => handleAddComponent(template)}
