@@ -176,6 +176,20 @@ export class PageComponentsController {
     return this.pageComponentsService.findComponentsByPage(pageId);
   }
 
+  @Get('components/global')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @EditorOnly()
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get all global components (Content Editor+)' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of global components',
+    type: PageComponentListResponseDto,
+  })
+  async findGlobalComponents(): Promise<PageComponentListResponseDto> {
+    return this.pageComponentsService.findGlobalComponents();
+  }
+
   @Get('components/:id')
   @Public()
   @ApiOperation({ summary: 'Get component by ID' })

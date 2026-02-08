@@ -74,6 +74,7 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     name: 'Announcement Bar',
     description: 'Top announcement banner with scrolling text',
     icon: '📢',
+    isGlobal: true,
     fields: [
       {
         key: 'text',
@@ -857,6 +858,33 @@ export class PageComponentsService {
 
   getComponentTemplate(componentType: ComponentType): ComponentTemplateDto | null {
     return COMPONENT_TEMPLATES.find((t) => t.componentType === componentType) || null;
+  }
+
+  async findGlobalComponents(): Promise<PageComponentListResponseDto> {
+    const globalTypes = COMPONENT_TEMPLATES
+      .filter((t) => t.isGlobal)
+      .map((t) => t.componentType);
+
+    if (globalTypes.length === 0) {
+      return { items: [], count: 0 };
+    }
+
+    // Get all pages, then fetch their components and filter by global types
+    const pages = await this.findAllPages();
+    const allGlobalComponents: PageComponentResponseDto[] = [];
+
+    for (const page of pages.items) {
+      const components = await this.findComponentsByPage(page.id);
+      const globals = components.items.filter((c) =>
+        globalTypes.includes(c.componentType as ComponentType),
+      );
+      allGlobalComponents.push(...globals);
+    }
+
+    return {
+      items: allGlobalComponents,
+      count: allGlobalComponents.length,
+    };
   }
 
   // ============================================

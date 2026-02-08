@@ -392,6 +392,9 @@ export class ComponentTemplateDto {
 
   @ApiProperty({ type: [ComponentFieldDefinition] })
   fields!: ComponentFieldDefinition[];
+
+  @ApiProperty({ required: false, description: 'Whether this component type is global (site-wide, not page-specific)' })
+  isGlobal?: boolean;
 }
 
 export class ComponentTemplateListResponseDto {

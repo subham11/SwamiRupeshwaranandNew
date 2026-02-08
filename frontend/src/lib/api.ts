@@ -558,6 +558,7 @@ export interface ComponentTemplate {
   description: string;
   icon: string;
   fields: ComponentFieldDefinition[];
+  isGlobal?: boolean;
 }
 
 /**
@@ -737,6 +738,16 @@ export async function reorderCMSComponents(
  */
 export async function fetchComponentTemplates(accessToken: string): Promise<ComponentTemplate[]> {
   const res: { items: ComponentTemplate[]; count: number } = await apiRequest("/cms/templates", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return res.items;
+}
+
+/**
+ * Fetch all global components (components whose type is marked as global)
+ */
+export async function fetchGlobalComponents(accessToken: string): Promise<CMSComponent[]> {
+  const res: { items: CMSComponent[]; count: number } = await apiRequest("/cms/components/global", {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   return res.items;

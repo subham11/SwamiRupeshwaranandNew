@@ -23,6 +23,7 @@ import {
   updateCMSComponent,
   deleteCMSComponent,
   fetchComponentTemplates,
+  fetchGlobalComponents,
 } from '@/lib/api';
 
 type Language = 'en' | 'hi';
@@ -62,6 +63,10 @@ export default function CMSEditorPage() {
   const [selectedComponent, setSelectedComponent] = useState<CMSComponent | null>(null);
   const [templates, setTemplates] = useState<ComponentTemplate[]>([]);
   const [activeLanguage, setActiveLanguage] = useState<Language>('en');
+
+  // Global components (site-wide, shown directly in page list)
+  const [globalComponents, setGlobalComponents] = useState<CMSComponent[]>([]);
+  const [selectedGlobalType, setSelectedGlobalType] = useState<string | null>(null);
 
   // Loading states
   const [loadingPages, setLoadingPages] = useState(true);
@@ -129,6 +134,16 @@ export default function CMSEditorPage() {
     }
   }, [accessToken]);
 
+  const loadGlobalComponents = useCallback(async () => {
+    if (!accessToken) return;
+    try {
+      const data = await fetchGlobalComponents(accessToken);
+      setGlobalComponents(data);
+    } catch (err) {
+      console.error('Failed to load global components:', err);
+    }
+  }, [accessToken]);
+
   // ============================================
   // Auth guard
   // ============================================
@@ -145,8 +160,9 @@ export default function CMSEditorPage() {
     if (isAuthenticated && isEditor && accessToken) {
       loadPages();
       loadTemplates();
+      loadGlobalComponents();
     }
-  }, [isAuthenticated, isEditor, accessToken, loadPages, loadTemplates]);
+  }, [isAuthenticated, isEditor, accessToken, loadPages, loadTemplates, loadGlobalComponents]);
 
   useEffect(() => {
     if (selectedPage) {
@@ -219,7 +235,23 @@ export default function CMSEditorPage() {
 
   const handleSelectPage = (page: CMSPage) => {
     if (hasChanges && !confirm('You have unsaved changes. Discard them?')) return;
+    setSelectedGlobalType(null);
     setSelectedPage(page);
+  };
+
+  const handleSelectGlobalComponent = (componentType: string) => {
+    if (hasChanges && !confirm('You have unsaved changes. Discard them?')) return;
+    setSelectedPage(null);
+    setComponents([]);
+    setSelectedGlobalType(componentType);
+    // Find the first global component of this type
+    const comp = globalComponents.find((c) => c.componentType === componentType);
+    if (comp) {
+      setSelectedComponent(comp);
+    } else {
+      setSelectedComponent(null);
+      setEditedFields([]);
+    }
   };
 
   const handleSelectComponent = (component: CMSComponent) => {
@@ -235,6 +267,7 @@ export default function CMSEditorPage() {
       setSuccessMessage('Component saved successfully!');
       setHasChanges(false);
       if (selectedPage) loadPageComponents(selectedPage.id);
+      if (selectedGlobalType) loadGlobalComponents();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save component');
     } finally {
@@ -911,6 +944,49 @@ export default function CMSEditorPage() {
               )}
             </div>
             <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-[65vh] overflow-y-auto">
+              {/* Global Components Section */}
+              {templates.filter((t) => t.isGlobal).length > 0 && (
+                <>
+                  <div className="px-3 py-2 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Global</span>
+                  </div>
+                  {templates
+                    .filter((t) => t.isGlobal)
+                    .map((template) => {
+                      const globalComp = globalComponents.find((c) => c.componentType === template.componentType);
+                      return (
+                        <div
+                          key={`global-${template.componentType}`}
+                          className={`p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
+                            selectedGlobalType === template.componentType ? 'bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-500' : ''
+                          }`}
+                          onClick={() => handleSelectGlobalComponent(template.componentType)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg flex-shrink-0">{template.icon || COMPONENT_TYPE_ICONS[template.componentType] || '📦'}</span>
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-medium text-gray-900 dark:text-white text-sm truncate">
+                                {template.name}
+                              </h3>
+                              {globalComp ? (
+                                <span className="inline-block mt-0.5 text-xs px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                                  global
+                                </span>
+                              ) : (
+                                <span className="inline-block mt-0.5 text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                                  not configured
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  <div className="px-3 py-2 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pages</span>
+                  </div>
+                </>
+              )}
               {pages.length === 0 ? (
                 <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
                   No pages yet. Create one to get started.
@@ -964,7 +1040,7 @@ export default function CMSEditorPage() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
               <h2 className="font-semibold text-gray-900 dark:text-white">
-                Components {selectedPage ? `(${components.length})` : ''}
+                Components {selectedPage ? `(${components.filter((c) => !templates.find((t) => t.componentType === c.componentType && t.isGlobal)).length})` : ''}
               </h2>
               {selectedPage && (
                 <button
@@ -982,6 +1058,14 @@ export default function CMSEditorPage() {
               <div className="p-8 flex justify-center">
                 <div className="animate-spin w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full" />
               </div>
+            ) : selectedGlobalType ? (
+              <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
+                <svg className="w-10 h-10 mx-auto mb-2 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                </svg>
+                <p className="font-medium text-gray-700 dark:text-gray-300">Global Component</p>
+                <p className="mt-1 text-xs">This component appears site-wide and is edited directly.</p>
+              </div>
             ) : !selectedPage ? (
               <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
                 Select a page to view its components
@@ -993,6 +1077,7 @@ export default function CMSEditorPage() {
             ) : (
               <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-[65vh] overflow-y-auto">
                 {components
+                  .filter((c) => !templates.find((t) => t.componentType === c.componentType && t.isGlobal))
                   .sort((a, b) => a.displayOrder - b.displayOrder)
                   .map((comp) => (
                     <div
@@ -1244,7 +1329,7 @@ export default function CMSEditorPage() {
               Choose a component type to add to &ldquo;{selectedPage?.title.en}&rdquo;
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {templates.map((template) => (
+              {templates.filter((t) => !t.isGlobal).map((template) => (
                 <button
                   key={template.componentType}
                   onClick={() => handleAddComponent(template)}
