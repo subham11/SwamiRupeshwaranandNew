@@ -52,8 +52,13 @@ describe('PageComponentsService', () => {
 
     it('does not mark non-global templates as global', () => {
       const result = service.getComponentTemplates();
+      const GLOBAL_TYPES = new Set([
+        ComponentType.ANNOUNCEMENT_BAR,
+        ComponentType.HEADER,
+        ComponentType.FOOTER,
+      ]);
       const nonGlobalTemplates = result.items.filter(
-        (t) => t.componentType !== ComponentType.ANNOUNCEMENT_BAR,
+        (t) => !GLOBAL_TYPES.has(t.componentType as ComponentType),
       );
 
       for (const template of nonGlobalTemplates) {
