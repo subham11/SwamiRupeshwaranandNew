@@ -895,6 +895,8 @@ export class PageComponentsService {
     return COMPONENT_TEMPLATES.find((t) => t.componentType === componentType) || null;
   }
 
+  private readonly GLOBAL_PAGE_ID = '__GLOBAL__';
+
   async findGlobalComponents(): Promise<PageComponentListResponseDto> {
     const globalTypes = COMPONENT_TEMPLATES
       .filter((t) => t.isGlobal)
@@ -904,22 +906,108 @@ export class PageComponentsService {
       return { items: [], count: 0 };
     }
 
-    // Get all pages, then fetch their components and filter by global types
-    const pages = await this.findAllPages();
-    const allGlobalComponents: PageComponentResponseDto[] = [];
+    // 1. Query dedicated global components store
+    const globalResult = await this.databaseService.query<PageComponentEntity>(
+      this.componentEntityType,
+      {
+        indexName: 'GSI1',
+        keyConditionExpression: 'GSI1PK = :pk',
+        expressionAttributeValues: {
+          ':pk': `PAGE#${this.GLOBAL_PAGE_ID}`,
+        },
+        scanIndexForward: true,
+      },
+    );
 
-    for (const page of pages.items) {
-      const components = await this.findComponentsByPage(page.id);
-      const globals = components.items.filter((c) =>
-        globalTypes.includes(c.componentType as ComponentType),
-      );
-      allGlobalComponents.push(...globals);
+    const allGlobalComponents: PageComponentResponseDto[] = globalResult.items.map(
+      this.mapComponentToResponse,
+    );
+    const foundTypes = new Set(allGlobalComponents.map((c) => c.componentType));
+
+    // 2. Backward compatibility: also scan regular pages for global types not yet migrated
+    if (foundTypes.size < globalTypes.length) {
+      const pages = await this.findAllPages();
+      for (const page of pages.items) {
+        const components = await this.findComponentsByPage(page.id);
+        const globals = components.items.filter(
+          (c) =>
+            globalTypes.includes(c.componentType as ComponentType) &&
+            !foundTypes.has(c.componentType),
+        );
+        for (const g of globals) {
+          if (!foundTypes.has(g.componentType)) {
+            allGlobalComponents.push(g);
+            foundTypes.add(g.componentType);
+          }
+        }
+      }
     }
 
     return {
       items: allGlobalComponents,
       count: allGlobalComponents.length,
     };
+  }
+
+  async initializeGlobalComponent(
+    componentType: ComponentType,
+  ): Promise<PageComponentResponseDto> {
+    // Check if already exists
+    const existing = await this.findGlobalComponents();
+    const existingComp = existing.items.find(
+      (c) => c.componentType === componentType,
+    );
+    if (existingComp) {
+      return existingComp;
+    }
+
+    // Validate template exists and is global
+    const template = this.getComponentTemplate(componentType);
+    if (!template) {
+      throw new NotFoundException(
+        `Template not found for type: ${componentType}`,
+      );
+    }
+    if (!template.isGlobal) {
+      throw new BadRequestException(
+        `Component type ${componentType} is not a global component`,
+      );
+    }
+
+    // Build default fields from template
+    const defaultFields: ComponentFieldValue[] = template.fields.map((fd) => {
+      if (fd.localized) {
+        return {
+          key: fd.key,
+          localizedValue: {
+            en: (fd.defaultValue as string) || '',
+            hi: '',
+          },
+        };
+      }
+      return { key: fd.key, value: fd.defaultValue ?? '' };
+    });
+
+    const id = uuidv4();
+    const component: PageComponentEntity = {
+      PK: `${this.componentEntityType}#${id}`,
+      SK: `${this.componentEntityType}#${id}`,
+      GSI1PK: `PAGE#${this.GLOBAL_PAGE_ID}`,
+      GSI1SK: `ORDER#000#${componentType}`,
+      id,
+      pageId: this.GLOBAL_PAGE_ID,
+      componentType,
+      name: { en: template.name, hi: template.name },
+      description: { en: template.description },
+      fields: defaultFields,
+      displayOrder: 0,
+      isVisible: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    await this.databaseService.put(component);
+    return this.mapComponentToResponse(component);
   }
 
   // ============================================

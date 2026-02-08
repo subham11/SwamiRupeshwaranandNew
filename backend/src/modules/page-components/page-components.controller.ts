@@ -190,6 +190,22 @@ export class PageComponentsController {
     return this.pageComponentsService.findGlobalComponents();
   }
 
+  @Post('components/global/initialize')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @EditorOnly()
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Initialize a global component with default fields (Content Editor+)' })
+  @ApiResponse({
+    status: 201,
+    description: 'Global component initialized successfully',
+    type: PageComponentResponseDto,
+  })
+  async initializeGlobalComponent(
+    @Body('componentType') componentType: ComponentType,
+  ): Promise<PageComponentResponseDto> {
+    return this.pageComponentsService.initializeGlobalComponent(componentType);
+  }
+
   @Get('components/:id')
   @Public()
   @ApiOperation({ summary: 'Get component by ID' })

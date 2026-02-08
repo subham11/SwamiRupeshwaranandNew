@@ -753,6 +753,21 @@ export async function fetchGlobalComponents(accessToken: string): Promise<CMSCom
   return res.items;
 }
 
+/**
+ * Initialize a global component with default fields from its template.
+ * If the component already exists, returns the existing one.
+ */
+export async function initializeGlobalComponent(
+  componentType: string,
+  accessToken: string
+): Promise<CMSComponent> {
+  return apiRequest("/cms/components/global/initialize", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ componentType }),
+  });
+}
+
 // ============================================
 // Newsletter API
 // ============================================

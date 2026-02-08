@@ -116,19 +116,21 @@ describe('PageComponentsService', () => {
     });
 
     it('returns only components of global types', async () => {
-      // First query: findAllPages
       mockDb.query
+        // 1st query: PAGE#__GLOBAL__
+        .mockResolvedValueOnce({ items: [] })
+        // 2nd query: findAllPages
         .mockResolvedValueOnce({
           items: [makePage('p1'), makePage('p2')],
         })
-        // Second query: findComponentsByPage('p1')
+        // 3rd query: findComponentsByPage('p1')
         .mockResolvedValueOnce({
           items: [
             makeComponent('c1', 'p1', ComponentType.ANNOUNCEMENT_BAR),
             makeComponent('c2', 'p1', ComponentType.HERO_SECTION),
           ],
         })
-        // Third query: findComponentsByPage('p2')
+        // 4th query: findComponentsByPage('p2')
         .mockResolvedValueOnce({
           items: [
             makeComponent('c3', 'p2', ComponentType.TEXT_BLOCK),
@@ -145,9 +147,13 @@ describe('PageComponentsService', () => {
 
     it('returns empty list when no global components exist', async () => {
       mockDb.query
+        // 1st query: PAGE#__GLOBAL__
+        .mockResolvedValueOnce({ items: [] })
+        // 2nd query: findAllPages
         .mockResolvedValueOnce({
           items: [makePage('p1')],
         })
+        // 3rd query: findComponentsByPage('p1')
         .mockResolvedValueOnce({
           items: [
             makeComponent('c1', 'p1', ComponentType.HERO_SECTION),
@@ -161,7 +167,11 @@ describe('PageComponentsService', () => {
     });
 
     it('returns empty list when no pages exist', async () => {
-      mockDb.query.mockResolvedValueOnce({ items: [] });
+      mockDb.query
+        // 1st query: PAGE#__GLOBAL__
+        .mockResolvedValueOnce({ items: [] })
+        // 2nd query: findAllPages
+        .mockResolvedValueOnce({ items: [] });
 
       const result = await service.findGlobalComponents();
 
@@ -169,16 +179,21 @@ describe('PageComponentsService', () => {
       expect(result.items).toHaveLength(0);
     });
 
-    it('collects global components from multiple pages', async () => {
+    it('collects global components from multiple pages (deduplicated by type)', async () => {
       mockDb.query
+        // 1st query: PAGE#__GLOBAL__
+        .mockResolvedValueOnce({ items: [] })
+        // 2nd query: findAllPages
         .mockResolvedValueOnce({
           items: [makePage('p1'), makePage('p2')],
         })
+        // 3rd query: findComponentsByPage('p1')
         .mockResolvedValueOnce({
           items: [makeComponent('c1', 'p1', ComponentType.ANNOUNCEMENT_BAR)],
         })
+        // 4th query: findComponentsByPage('p2')
         .mockResolvedValueOnce({
-          items: [makeComponent('c2', 'p2', ComponentType.ANNOUNCEMENT_BAR)],
+          items: [makeComponent('c2', 'p2', ComponentType.HEADER)],
         });
 
       const result = await service.findGlobalComponents();
@@ -187,6 +202,89 @@ describe('PageComponentsService', () => {
       expect(result.items).toHaveLength(2);
       expect(result.items[0].id).toBe('c1');
       expect(result.items[1].id).toBe('c2');
+    });
+
+    it('prefers __GLOBAL__ components over page-level ones', async () => {
+      mockDb.query
+        // 1st query: PAGE#__GLOBAL__ — has an announcement_bar
+        .mockResolvedValueOnce({
+          items: [makeComponent('g1', '__GLOBAL__', ComponentType.ANNOUNCEMENT_BAR)],
+        })
+        // 2nd query: findAllPages (still scanned for missing types)
+        .mockResolvedValueOnce({
+          items: [makePage('p1')],
+        })
+        // 3rd query: findComponentsByPage('p1')
+        .mockResolvedValueOnce({
+          items: [
+            makeComponent('c1', 'p1', ComponentType.ANNOUNCEMENT_BAR), // duplicate — should be skipped
+            makeComponent('c2', 'p1', ComponentType.HEADER),
+          ],
+        });
+
+      const result = await service.findGlobalComponents();
+
+      // g1 (from __GLOBAL__) + c2 (header from p1) — c1 skipped as duplicate type
+      expect(result.count).toBe(2);
+      expect(result.items).toHaveLength(2);
+      expect(result.items[0].id).toBe('g1');
+      expect(result.items[1].id).toBe('c2');
+    });
+  });
+
+  describe('initializeGlobalComponent', () => {
+    it('creates a global component with default fields', async () => {
+      // findGlobalComponents initial queries: __GLOBAL__ query + pages query
+      mockDb.query
+        .mockResolvedValueOnce({ items: [] }) // PAGE#__GLOBAL__
+        .mockResolvedValueOnce({ items: [] }); // findAllPages
+      mockDb.put.mockResolvedValueOnce({});
+
+      const result = await service.initializeGlobalComponent(ComponentType.ANNOUNCEMENT_BAR);
+
+      expect(result).toBeDefined();
+      expect(result.componentType).toBe(ComponentType.ANNOUNCEMENT_BAR);
+      expect(result.pageId).toBe('__GLOBAL__');
+      expect(result.fields.length).toBeGreaterThan(0);
+      expect(mockDb.put).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns existing component if already initialized', async () => {
+      const existing = {
+        PK: 'CMS_COMPONENT#existing',
+        SK: 'CMS_COMPONENT#existing',
+        GSI1PK: 'PAGE#__GLOBAL__',
+        GSI1SK: 'ORDER#000#announcement_bar',
+        id: 'existing',
+        pageId: '__GLOBAL__',
+        componentType: ComponentType.ANNOUNCEMENT_BAR,
+        name: { en: 'Announcement Bar' },
+        fields: [{ key: 'text', localizedValue: { en: 'Hello', hi: '' } }],
+        displayOrder: 0,
+        isVisible: true,
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      };
+
+      mockDb.query
+        .mockResolvedValueOnce({ items: [existing] }) // PAGE#__GLOBAL__
+        .mockResolvedValueOnce({ items: [] }); // findAllPages (still scanned for other global types)
+
+      const result = await service.initializeGlobalComponent(ComponentType.ANNOUNCEMENT_BAR);
+
+      expect(result.id).toBe('existing');
+      expect(mockDb.put).not.toHaveBeenCalled();
+    });
+
+    it('rejects non-global component types', async () => {
+      // findGlobalComponents queries
+      mockDb.query
+        .mockResolvedValueOnce({ items: [] }) // PAGE#__GLOBAL__
+        .mockResolvedValueOnce({ items: [] }); // findAllPages
+
+      await expect(
+        service.initializeGlobalComponent(ComponentType.HERO_SECTION),
+      ).rejects.toThrow('not a global component');
     });
   });
 });
