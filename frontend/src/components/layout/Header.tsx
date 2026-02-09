@@ -38,7 +38,7 @@ const TelegramIcon = () => (
 );
 
 // Default social links (used when CMS has no socialLinks configured)
-const DEFAULT_SOCIAL_LINKS = [
+const DEFAULT_SOCIAL_LINKS: { name: string; href: string; icon: React.ReactNode }[] = [
   { name: "YouTube", href: "https://youtube.com", icon: <YouTubeIcon /> },
   { name: "Instagram", href: "https://instagram.com", icon: <InstagramIcon /> },
   { name: "Facebook", href: "https://facebook.com", icon: <FacebookIcon /> },

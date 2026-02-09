@@ -50,7 +50,7 @@ const TelegramIcon = () => (
   </svg>
 );
 
-const DEFAULT_SOCIAL_LINKS = [
+const DEFAULT_SOCIAL_LINKS: { name: string; href: string; icon: React.ReactNode }[] = [
   { name: "YouTube", href: "https://youtube.com", icon: <YouTubeIcon /> },
   { name: "Instagram", href: "https://instagram.com", icon: <InstagramIcon /> },
   { name: "Facebook", href: "https://facebook.com", icon: <FacebookIcon /> },
