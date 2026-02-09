@@ -249,18 +249,33 @@ export default function CMSEditorPage() {
     setSelectedPage(page);
   };
 
-  const handleSelectGlobalComponent = (componentType: string) => {
+  const handleSelectGlobalComponent = async (componentType: string) => {
     if (hasChanges && !confirm('You have unsaved changes. Discard them?')) return;
     setSelectedPage(null);
     setComponents([]);
     setSelectedGlobalType(componentType);
     // Find the first global component of this type
-    const comp = globalComponents.find((c) => c.componentType === componentType);
+    let comp = globalComponents.find((c) => c.componentType === componentType);
     if (comp) {
       setSelectedComponent(comp);
     } else {
+      // Component not yet initialized — reload from backend (which auto-creates missing ones)
       setSelectedComponent(null);
       setEditedFields([]);
+      if (!accessToken) return;
+      try {
+        setLoadingComponents(true);
+        const data = await fetchGlobalComponents(accessToken);
+        setGlobalComponents(data);
+        comp = data.find((c) => c.componentType === componentType);
+        if (comp) {
+          setSelectedComponent(comp);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to initialize global component');
+      } finally {
+        setLoadingComponents(false);
+      }
     }
   };
 

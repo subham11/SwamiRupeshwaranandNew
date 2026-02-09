@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { type AnnouncementItem, type LocalizedText } from "@/content/pageContent";
+import { type AnnouncementItem } from "@/content/pageContent";
 
 // Static fallback announcements (used while loading or if API fails)
 const FALLBACK_ANNOUNCEMENTS: AnnouncementItem[] = [
@@ -42,64 +42,59 @@ interface CMSComponent {
   fields: { key: string; value?: unknown; localizedValue?: Record<string, string> }[];
 }
 
-interface CMSPageWithComponents {
-  slug: string;
-  components?: CMSComponent[];
+interface AnnouncementCMSData {
+  textHtml: Record<string, string>;
+  bgColor: string;
+  textColor: string;
+  link: string;
+  isScrolling: boolean;
+  ariaLabel: string;
+}
+
+function getFieldValue(fields: CMSComponent["fields"], key: string): unknown {
+  const field = fields.find((f) => f.key === key);
+  if (!field) return undefined;
+  return field.value;
+}
+
+function getFieldLocalizedValue(fields: CMSComponent["fields"], key: string): Record<string, string> | undefined {
+  const field = fields.find((f) => f.key === key);
+  if (!field) return undefined;
+  return field.localizedValue;
 }
 
 /**
- * Fetch all announcements from CMS (client-side).
- * Scans all published pages for announcement_bar components.
+ * Fetch announcement bar data from the global CMS components endpoint.
  */
-async function fetchAnnouncementsFromCMS(): Promise<AnnouncementItem[]> {
+async function fetchAnnouncementFromCMS(): Promise<AnnouncementCMSData | null> {
   try {
-    // 1. Get all published pages
-    const pagesRes = await fetch(`${API_BASE}/cms/pages?publishedOnly=true`);
-    if (!pagesRes.ok) return [];
-    const pagesData: { items: { slug: string }[] } = await pagesRes.json();
-    if (!pagesData.items?.length) return [];
+    const res = await fetch(`${API_BASE}/cms/components/global/public`);
+    if (!res.ok) return null;
+    const data: { items: CMSComponent[]; count: number } = await res.json();
+    const comp = data.items.find((c) => c.componentType === "announcement_bar" && c.isVisible);
+    if (!comp) return null;
 
-    // 2. Fetch each page's components and collect announcement bars
-    const allAnnouncements: AnnouncementItem[] = [];
+    const textLocalized = getFieldLocalizedValue(comp.fields, "text");
+    if (!textLocalized) return null;
 
-    await Promise.all(
-      pagesData.items.map(async (page) => {
-        try {
-          const pageRes = await fetch(`${API_BASE}/cms/pages/by-slug/${page.slug}`);
-          if (!pageRes.ok) return;
-          const cmsPage: CMSPageWithComponents = await pageRes.json();
-          if (!cmsPage.components) return;
-
-          const announcementComps = cmsPage.components.filter(
-            (c) => c.componentType === "announcement_bar" && c.isVisible
-          );
-
-          for (const comp of announcementComps) {
-            const textField = comp.fields.find((f) => f.key === "text");
-            const linkField = comp.fields.find((f) => f.key === "link");
-
-            if (textField) {
-              allAnnouncements.push({
-                id: comp.id,
-                text: (textField.localizedValue as unknown as LocalizedText) || {
-                  en: String(textField.value || ""),
-                  hi: "",
-                },
-                link: (linkField?.value as string) || `/${page.slug}`,
-                icon: "🔔",
-              });
-            }
-          }
-        } catch {
-          // skip individual page failures
-        }
-      })
-    );
-
-    return allAnnouncements;
+    return {
+      textHtml: textLocalized,
+      bgColor: (getFieldValue(comp.fields, "bgColor") as string) || "#f97316",
+      textColor: (getFieldValue(comp.fields, "textColor") as string) || "#ffffff",
+      link: (getFieldValue(comp.fields, "link") as string) || "",
+      isScrolling: getFieldValue(comp.fields, "isScrolling") !== false,
+      ariaLabel: (getFieldValue(comp.fields, "ariaLabel") as string) || "Announcements",
+    };
   } catch {
-    return [];
+    return null;
   }
+}
+
+/**
+ * Strip HTML tags to get plain text (for checking emptiness).
+ */
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, "").trim();
 }
 
 interface AnnouncementBarProps {
@@ -111,20 +106,86 @@ export default function AnnouncementBar({ locale, announcements: initialAnnounce
   const [announcements, setAnnouncements] = useState<AnnouncementItem[]>(
     initialAnnouncements ?? FALLBACK_ANNOUNCEMENTS
   );
+  const [cmsData, setCmsData] = useState<AnnouncementCMSData | null>(null);
 
   useEffect(() => {
-    // Fetch fresh announcements from CMS on client side
-    fetchAnnouncementsFromCMS().then((cmsAnnouncements) => {
-      if (cmsAnnouncements.length > 0) {
-        setAnnouncements(cmsAnnouncements);
+    fetchAnnouncementFromCMS().then((data) => {
+      if (data && stripHtml(data.textHtml[locale] || "")) {
+        setCmsData(data);
       }
-      // If CMS returns nothing, keep the initial/fallback announcements
     });
-  }, []);
+  }, [locale]);
 
+  // CMS-driven rich text announcement bar
+  if (cmsData) {
+    const htmlContent = cmsData.textHtml[locale] || cmsData.textHtml.en || "";
+    if (!stripHtml(htmlContent)) return null;
+
+    const content = (
+      <div
+        className="announcement-rich-text"
+        dangerouslySetInnerHTML={{ __html: htmlContent }}
+      />
+    );
+
+    const wrappedContent = cmsData.link ? (
+      <Link href={`/${locale}${cmsData.link.startsWith("/") ? cmsData.link : `/${cmsData.link}`}`} className="hover:underline">
+        {content}
+      </Link>
+    ) : content;
+
+    return (
+      <div
+        className="w-full overflow-hidden relative"
+        style={{ backgroundColor: cmsData.bgColor, color: cmsData.textColor }}
+        role="marquee"
+        aria-label={cmsData.ariaLabel}
+      >
+        <div className="overflow-hidden py-2.5">
+          {cmsData.isScrolling ? (
+            <div className="marquee-container">
+              <div className="marquee-content">
+                <span className="inline-flex items-center whitespace-nowrap mx-8">{wrappedContent}</span>
+                <span className="inline-flex items-center whitespace-nowrap mx-8">{wrappedContent}</span>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center text-sm md:text-base font-medium px-4">
+              {wrappedContent}
+            </div>
+          )}
+        </div>
+
+        <style jsx>{`
+          .marquee-container {
+            display: flex;
+            overflow: hidden;
+            width: 100%;
+          }
+          .marquee-content {
+            display: flex;
+            animation: marquee 40s linear infinite;
+            will-change: transform;
+          }
+          .marquee-content:hover {
+            animation-play-state: paused;
+          }
+          @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+        `}</style>
+        <style jsx global>{`
+          .announcement-rich-text p { display: inline; margin: 0; }
+          .announcement-rich-text a { text-decoration: underline; }
+        `}</style>
+      </div>
+    );
+  }
+
+  // Fallback: individual announcement items
   if (!announcements || announcements.length === 0) return null;
 
-  // Filter out announcements with empty text for the current locale
   const validAnnouncements = announcements.filter(
     (item) => item.text[locale]?.trim()
   );
@@ -132,9 +193,9 @@ export default function AnnouncementBar({ locale, announcements: initialAnnounce
   if (validAnnouncements.length === 0) return null;
 
   return (
-    <div 
+    <div
       className="w-full overflow-hidden relative"
-      style={{ 
+      style={{
         background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))'
       }}
     >
