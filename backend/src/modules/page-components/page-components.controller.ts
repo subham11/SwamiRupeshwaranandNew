@@ -176,6 +176,18 @@ export class PageComponentsController {
     return this.pageComponentsService.findComponentsByPage(pageId);
   }
 
+  @Get('components/global/public')
+  @Public()
+  @ApiOperation({ summary: 'Get all global components (public, read-only)' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of global components',
+    type: PageComponentListResponseDto,
+  })
+  async findPublicGlobalComponents(): Promise<PageComponentListResponseDto> {
+    return this.pageComponentsService.findGlobalComponents();
+  }
+
   @Get('components/global')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @EditorOnly()

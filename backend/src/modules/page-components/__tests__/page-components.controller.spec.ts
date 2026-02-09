@@ -54,6 +54,34 @@ describe('PageComponentsController', () => {
     jest.clearAllMocks();
   });
 
+  describe('findPublicGlobalComponents', () => {
+    it('returns global components via public endpoint', async () => {
+      const mockResponse = {
+        items: [
+          {
+            id: 'c1',
+            pageId: '__GLOBAL__',
+            componentType: ComponentType.HEADER,
+            name: { en: 'Header' },
+            fields: [],
+            displayOrder: 0,
+            isVisible: true,
+            createdAt: '2026-01-01T00:00:00.000Z',
+            updatedAt: '2026-01-01T00:00:00.000Z',
+          },
+        ],
+        count: 1,
+      };
+
+      mockPageComponentsService.findGlobalComponents.mockResolvedValue(mockResponse);
+
+      const result = await controller.findPublicGlobalComponents();
+
+      expect(result).toEqual(mockResponse);
+      expect(mockPageComponentsService.findGlobalComponents).toHaveBeenCalled();
+    });
+  });
+
   describe('findGlobalComponents', () => {
     it('returns global components from service', async () => {
       const mockResponse = {

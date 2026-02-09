@@ -6,6 +6,7 @@ import MegaMenu from "@/components/layout/MegaMenu";
 import AuthButton from "@/components/layout/AuthButton";
 import { resolveNavGroups } from "@/config/nav";
 import { getDict } from "@/i18n/dict";
+import { getGlobalComponent, getLocalizedField, getField } from "@/lib/cmsGlobals";
 
 async function getNavGroups(locale: AppLocale) {
   return resolveNavGroups(locale);
@@ -36,17 +37,70 @@ const TelegramIcon = () => (
   </svg>
 );
 
-// Social links inspired by reference sites
-const socialLinks = [
+// Default social links (used when CMS has no socialLinks configured)
+const DEFAULT_SOCIAL_LINKS = [
   { name: "YouTube", href: "https://youtube.com", icon: <YouTubeIcon /> },
   { name: "Instagram", href: "https://instagram.com", icon: <InstagramIcon /> },
   { name: "Facebook", href: "https://facebook.com", icon: <FacebookIcon /> },
   { name: "Telegram", href: "https://telegram.org", icon: <TelegramIcon /> },
 ];
 
+const SOCIAL_ICON_MAP: Record<string, React.ReactNode> = {
+  youtube: <YouTubeIcon />,
+  instagram: <InstagramIcon />,
+  facebook: <FacebookIcon />,
+  telegram: <TelegramIcon />,
+};
+
 export default async function Header({ locale }: { locale: AppLocale }) {
   const groups = await getNavGroups(locale);
   const dict = getDict(locale);
+
+  // Fetch CMS header data
+  const headerComp = await getGlobalComponent("header");
+
+  // CMS values with fallbacks
+  const brandName = headerComp
+    ? getLocalizedField(headerComp.fields, "brandName", locale, dict.brand)
+    : dict.brand;
+  const brandTagline = headerComp
+    ? getLocalizedField(headerComp.fields, "brandTagline", locale, locale === "en" ? "Path to Inner Peace" : "आंतरिक शांति का मार्ग")
+    : (locale === "en" ? "Path to Inner Peace" : "आंतरिक शांति का मार्ग");
+  const contactPhone = headerComp
+    ? getField(headerComp.fields, "contactPhone", "+91 1234567890")
+    : "+91 1234567890";
+  const contactEmail = headerComp
+    ? getField(headerComp.fields, "contactEmail", "info@example.org")
+    : "info@example.org";
+  const ctaLabel = headerComp
+    ? getLocalizedField(headerComp.fields, "ctaButtonLabel", locale, locale === "en" ? "Donate" : "दान करें")
+    : (locale === "en" ? "Donate" : "दान करें");
+  const ctaLink = headerComp
+    ? getField(headerComp.fields, "ctaButtonLink", "/donation")
+    : "/donation";
+  const logoImage = headerComp
+    ? getField(headerComp.fields, "logoImage", "")
+    : "";
+
+  // Parse social links from CMS JSON or use defaults
+  let socialLinks = DEFAULT_SOCIAL_LINKS;
+  if (headerComp) {
+    const rawSocial = getField<string>(headerComp.fields, "socialLinks", "");
+    if (rawSocial) {
+      try {
+        const parsed = typeof rawSocial === "string" ? JSON.parse(rawSocial) : rawSocial;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          socialLinks = parsed.map((s: { platform: string; url: string; icon?: string }) => ({
+            name: s.platform,
+            href: s.url,
+            icon: SOCIAL_ICON_MAP[s.icon?.toLowerCase() || s.platform.toLowerCase()] || <span>{s.platform[0]}</span>,
+          }));
+        }
+      } catch {
+        // keep defaults
+      }
+    }
+  }
 
   // Flatten keys we need for menu labels in a simple string map
   const labels: Record<string, string> = {
@@ -69,14 +123,14 @@ export default async function Header({ locale }: { locale: AppLocale }) {
   }
 
   return (
-    <header 
+    <header
       className="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm transition-all duration-300"
       style={{ borderBottom: '1px solid var(--color-border)' }}
     >
       {/* Top Bar with Social Links (hidden on mobile) */}
-      <div 
+      <div
         className="hidden lg:block border-b py-2 text-sm"
-        style={{ 
+        style={{
           backgroundColor: 'var(--color-secondary)',
           borderColor: 'var(--color-border)'
         }}
@@ -84,10 +138,10 @@ export default async function Header({ locale }: { locale: AppLocale }) {
         <Container className="flex items-center justify-between">
           <div className="flex items-center gap-4" style={{ color: 'var(--color-muted)' }}>
             <span className="flex items-center gap-1">
-              📞 {locale === "en" ? "Contact: +91 1234567890" : "संपर्क: +91 1234567890"}
+              📞 {locale === "en" ? `Contact: ${contactPhone}` : `संपर्क: ${contactPhone}`}
             </span>
             <span className="flex items-center gap-1">
-              ✉️ info@example.org
+              ✉️ {contactEmail}
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -111,32 +165,40 @@ export default async function Header({ locale }: { locale: AppLocale }) {
       {/* Main Header */}
       <Container className="flex h-20 items-center justify-between">
         {/* Logo / Brand */}
-        <Link 
-          href={`/${locale}`} 
+        <Link
+          href={`/${locale}`}
           className="flex items-center gap-3 group"
         >
-          {/* Logo Symbol - Om symbol or decorative element */}
-          <div 
-            className="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-heading transition-all duration-300 group-hover:scale-105"
-            style={{ 
-              backgroundColor: 'var(--color-primary)',
-              color: 'white'
-            }}
-          >
-            ॐ
-          </div>
+          {/* Logo Symbol - Om symbol or uploaded image */}
+          {logoImage ? (
+            <img
+              src={logoImage}
+              alt={brandName}
+              className="w-12 h-12 rounded-full object-cover transition-all duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-heading transition-all duration-300 group-hover:scale-105"
+              style={{
+                backgroundColor: 'var(--color-primary)',
+                color: 'white'
+              }}
+            >
+              ॐ
+            </div>
+          )}
           <div className="flex flex-col">
-            <span 
+            <span
               className="font-heading text-xl font-semibold tracking-tight transition-colors"
               style={{ color: 'var(--color-primary)' }}
             >
-              {dict.brand}
+              {brandName}
             </span>
-            <span 
+            <span
               className="text-xs font-body hidden sm:block"
               style={{ color: 'var(--color-muted)' }}
             >
-              {locale === "en" ? "Path to Inner Peace" : "आंतरिक शांति का मार्ग"}
+              {brandTagline}
             </span>
           </div>
         </Link>
@@ -151,12 +213,12 @@ export default async function Header({ locale }: { locale: AppLocale }) {
           {/* Auth Button - Login or User Menu */}
           <AuthButton locale={locale} />
 
-          {/* Donate/CTA Button - Inspired by Isha */}
+          {/* Donate/CTA Button */}
           <Link
-            href={`/${locale}/donation`}
+            href={`/${locale}${ctaLink.startsWith("/") ? ctaLink : `/${ctaLink}`}`}
             className="hidden md:inline-flex btn-primary text-sm"
           >
-            {locale === "en" ? "Donate" : "दान करें"}
+            {ctaLabel}
           </Link>
 
           {/* Mobile Menu Toggle */}

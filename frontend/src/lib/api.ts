@@ -753,6 +753,14 @@ export async function fetchGlobalComponents(accessToken: string): Promise<CMSCom
   return res.items;
 }
 
+/**
+ * Fetch all global components (public, no auth required)
+ */
+export async function fetchPublicGlobalComponents(): Promise<CMSComponent[]> {
+  const res: { items: CMSComponent[]; count: number } = await apiRequest("/cms/components/global/public");
+  return res.items;
+}
+
 // ============================================
 // Newsletter API
 // ============================================

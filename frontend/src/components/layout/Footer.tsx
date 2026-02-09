@@ -4,15 +4,25 @@ import { Container } from "@/components/ui/Container";
 import { FOOTER_LINKS, localeHome } from "@/config/footer";
 import { SacredDivider } from "@/components/ui/Decorative";
 import { getDict } from "@/i18n/dict";
+import { getGlobalComponent, getLocalizedField, getField } from "@/lib/cmsGlobals";
 
-// Quick Links for footer
-const getQuickLinks = (locale: AppLocale) => [
+// Default quick links
+const getDefaultQuickLinks = (locale: AppLocale) => [
   { label: locale === "en" ? "Home" : "होम", href: `/${locale}` },
   { label: locale === "en" ? "About Swamiji" : "स्वामीजी के बारे में", href: `/${locale}/swamiji` },
   { label: locale === "en" ? "Ashram" : "आश्रम", href: `/${locale}/ashram` },
   { label: locale === "en" ? "Services" : "सेवाएं", href: `/${locale}/services` },
   { label: locale === "en" ? "Events" : "कार्यक्रम", href: `/${locale}/events` },
   { label: locale === "en" ? "Contact" : "संपर्क", href: `/${locale}/contact` },
+];
+
+// Default offerings
+const DEFAULT_OFFERINGS = [
+  { en: "Poojan Services", hi: "पूजन सेवाएँ" },
+  { en: "Daily Aarti", hi: "दैनिक आरती" },
+  { en: "Sahasranama Path", hi: "सहस्रनाम पाठ" },
+  { en: "Spiritual Retreats", hi: "आध्यात्मिक शिविर" },
+  { en: "Donate", hi: "दान करें" },
 ];
 
 // SVG Icon Components
@@ -40,21 +50,113 @@ const TelegramIcon = () => (
   </svg>
 );
 
-// Social links with icons
-const socialLinks = [
+const DEFAULT_SOCIAL_LINKS = [
   { name: "YouTube", href: "https://youtube.com", icon: <YouTubeIcon /> },
   { name: "Instagram", href: "https://instagram.com", icon: <InstagramIcon /> },
   { name: "Facebook", href: "https://facebook.com", icon: <FacebookIcon /> },
   { name: "Telegram", href: "https://telegram.org", icon: <TelegramIcon /> },
 ];
 
+const SOCIAL_ICON_MAP: Record<string, React.ReactNode> = {
+  youtube: <YouTubeIcon />,
+  instagram: <InstagramIcon />,
+  facebook: <FacebookIcon />,
+  telegram: <TelegramIcon />,
+};
+
+function parseJsonField<T>(raw: unknown, fallback: T): T {
+  if (!raw) return fallback;
+  try {
+    const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+    return Array.isArray(parsed) ? (parsed as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export default async function Footer({ locale }: { locale: AppLocale }) {
   const dict = getDict(locale);
-  const quickLinks = getQuickLinks(locale);
+
+  // Fetch CMS footer data
+  const footerComp = await getGlobalComponent("footer");
+
+  // CMS values with fallbacks
+  const aboutDescription = footerComp
+    ? getLocalizedField(footerComp.fields, "aboutDescription", locale,
+        locale === "en"
+          ? "Dedicated to spiritual upliftment and the timeless teachings of the ancient wisdom traditions."
+          : "प्राचीन ज्ञान परंपराओं की शाश्वत शिक्षाओं और आध्यात्मिक उत्थान के लिए समर्पित।"
+      )
+    : (locale === "en"
+        ? "Dedicated to spiritual upliftment and the timeless teachings of the ancient wisdom traditions."
+        : "प्राचीन ज्ञान परंपराओं की शाश्वत शिक्षाओं और आध्यात्मिक उत्थान के लिए समर्पित।");
+
+  const contactAddress = footerComp
+    ? getLocalizedField(footerComp.fields, "contactAddress", locale, locale === "en" ? "Sri Pitambara Peeth" : "श्री पीताम्बरा पीठ")
+    : (locale === "en" ? "Sri Pitambara Peeth" : "श्री पीताम्बरा पीठ");
+  const contactPhone = footerComp
+    ? getField(footerComp.fields, "contactPhone", "+91 1234567890")
+    : "+91 1234567890";
+  const contactEmail = footerComp
+    ? getField(footerComp.fields, "contactEmail", "info@example.org")
+    : "info@example.org";
+  const copyrightText = footerComp
+    ? getLocalizedField(footerComp.fields, "copyrightText", locale, locale === "en" ? "All rights reserved." : "सर्वाधिकार सुरक्षित।")
+    : (locale === "en" ? "All rights reserved." : "सर्वाधिकार सुरक्षित।");
+  const newsletterLabel = footerComp
+    ? getLocalizedField(footerComp.fields, "newsletterLabel", locale, locale === "en" ? "Subscribe to Newsletter" : "न्यूज़लेटर की सदस्यता लें")
+    : (locale === "en" ? "Subscribe to Newsletter" : "न्यूज़लेटर की सदस्यता लें");
+
+  // Parse quick links from CMS or use defaults
+  const defaultQuickLinks = getDefaultQuickLinks(locale);
+  let quickLinks = defaultQuickLinks;
+  if (footerComp) {
+    const rawLinks = getField(footerComp.fields, "quickLinks", "");
+    const parsed = parseJsonField<{ label: { en: string; hi: string }; href: string }[]>(rawLinks, []);
+    if (parsed.length > 0) {
+      quickLinks = parsed.map((l) => ({
+        label: l.label?.[locale] || l.label?.en || "",
+        href: l.href,
+      }));
+    }
+  }
+
+  // Parse offering links from CMS or use defaults
+  let offeringItems: { label: string; href: string }[] = DEFAULT_OFFERINGS.map((item) => ({
+    label: locale === "en" ? item.en : item.hi,
+    href: `/${locale}/services`,
+  }));
+  if (footerComp) {
+    const rawOfferings = getField(footerComp.fields, "offeringLinks", "");
+    const parsed = parseJsonField<{ label: { en: string; hi: string }; href: string }[]>(rawOfferings, []);
+    if (parsed.length > 0) {
+      offeringItems = parsed.map((l) => ({
+        label: l.label?.[locale] || l.label?.en || "",
+        href: l.href,
+      }));
+    }
+  }
+
+  // Parse social links from CMS or use defaults
+  let socialLinks = DEFAULT_SOCIAL_LINKS;
+  if (footerComp) {
+    const rawSocial = getField(footerComp.fields, "socialLinks", "");
+    const parsed = parseJsonField<{ platform: string; url: string; icon?: string }[]>(rawSocial, []);
+    if (parsed.length > 0) {
+      socialLinks = parsed.map((s) => ({
+        name: s.platform,
+        href: s.url,
+        icon: SOCIAL_ICON_MAP[s.icon?.toLowerCase() || s.platform.toLowerCase()] || <span>{s.platform[0]}</span>,
+      }));
+    }
+  }
+
+  // Check if aboutDescription is HTML (richtext)
+  const isHtml = aboutDescription.includes("<");
 
   return (
-    <footer 
-      style={{ 
+    <footer
+      style={{
         backgroundColor: 'var(--color-secondary)',
         borderTop: '1px solid var(--color-border)'
       }}
@@ -65,38 +167,43 @@ export default async function Footer({ locale }: { locale: AppLocale }) {
       <Container className="pb-8">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-          
+
           {/* Brand / About Section */}
           <div className="lg:col-span-1">
-            <Link 
-              href={localeHome(locale)} 
+            <Link
+              href={localeHome(locale)}
               className="flex items-center gap-3 mb-4"
             >
-              <div 
+              <div
                 className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-heading"
-                style={{ 
+                style={{
                   backgroundColor: 'var(--color-primary)',
                   color: 'white'
                 }}
               >
                 ॐ
               </div>
-              <span 
+              <span
                 className="font-heading text-xl font-semibold"
                 style={{ color: 'var(--color-primary)' }}
               >
                 {dict.brand}
               </span>
             </Link>
-            <p 
-              className="text-sm leading-relaxed mb-4"
-              style={{ color: 'var(--color-muted)' }}
-            >
-              {locale === "en" 
-                ? "Dedicated to spiritual upliftment and the timeless teachings of the ancient wisdom traditions."
-                : "प्राचीन ज्ञान परंपराओं की शाश्वत शिक्षाओं और आध्यात्मिक उत्थान के लिए समर्पित।"
-              }
-            </p>
+            {isHtml ? (
+              <div
+                className="text-sm leading-relaxed mb-4"
+                style={{ color: 'var(--color-muted)' }}
+                dangerouslySetInnerHTML={{ __html: aboutDescription }}
+              />
+            ) : (
+              <p
+                className="text-sm leading-relaxed mb-4"
+                style={{ color: 'var(--color-muted)' }}
+              >
+                {aboutDescription}
+              </p>
+            )}
             {/* Social Links */}
             <div className="flex gap-3">
               {socialLinks.map((link) => (
@@ -106,7 +213,7 @@ export default async function Footer({ locale }: { locale: AppLocale }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full flex items-center justify-center text-lg transition-all duration-300 hover:scale-110"
-                  style={{ 
+                  style={{
                     backgroundColor: 'var(--color-background)',
                     border: '1px solid var(--color-border)'
                   }}
@@ -121,7 +228,7 @@ export default async function Footer({ locale }: { locale: AppLocale }) {
 
           {/* Quick Links */}
           <div>
-            <h3 
+            <h3
               className="font-heading text-lg font-semibold mb-4"
               style={{ color: 'var(--color-primary)' }}
             >
@@ -130,7 +237,7 @@ export default async function Footer({ locale }: { locale: AppLocale }) {
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.href}>
-                  <Link 
+                  <Link
                     href={link.href}
                     className="text-sm transition-colors hover:underline"
                     style={{ color: 'var(--color-foreground)' }}
@@ -144,27 +251,21 @@ export default async function Footer({ locale }: { locale: AppLocale }) {
 
           {/* Offerings */}
           <div>
-            <h3 
+            <h3
               className="font-heading text-lg font-semibold mb-4"
               style={{ color: 'var(--color-primary)' }}
             >
               {locale === "en" ? "Offerings" : "सेवाएँ"}
             </h3>
             <ul className="space-y-2">
-              {[
-                { en: "Poojan Services", hi: "पूजन सेवाएँ" },
-                { en: "Daily Aarti", hi: "दैनिक आरती" },
-                { en: "Sahasranama Path", hi: "सहस्रनाम पाठ" },
-                { en: "Spiritual Retreats", hi: "आध्यात्मिक शिविर" },
-                { en: "Donate", hi: "दान करें" },
-              ].map((item, idx) => (
+              {offeringItems.map((item, idx) => (
                 <li key={idx}>
-                  <Link 
-                    href={`/${locale}/services`}
+                  <Link
+                    href={item.href}
                     className="text-sm transition-colors hover:underline"
                     style={{ color: 'var(--color-foreground)' }}
                   >
-                    {locale === "en" ? item.en : item.hi}
+                    {item.label}
                   </Link>
                 </li>
               ))}
@@ -173,43 +274,43 @@ export default async function Footer({ locale }: { locale: AppLocale }) {
 
           {/* Contact & Newsletter */}
           <div>
-            <h3 
+            <h3
               className="font-heading text-lg font-semibold mb-4"
               style={{ color: 'var(--color-primary)' }}
             >
               {locale === "en" ? "Contact Us" : "संपर्क करें"}
             </h3>
-            <address 
+            <address
               className="not-italic text-sm space-y-2 mb-4"
               style={{ color: 'var(--color-muted)' }}
             >
-              <p>📍 {locale === "en" ? "Sri Pitambara Peeth" : "श्री पीताम्बरा पीठ"}</p>
-              <p>📞 +91 1234567890</p>
-              <p>✉️ info@example.org</p>
+              <p>📍 {contactAddress}</p>
+              <p>📞 {contactPhone}</p>
+              <p>✉️ {contactEmail}</p>
             </address>
-            
+
             {/* Newsletter Signup */}
             <div className="mt-4">
-              <p 
+              <p
                 className="text-sm mb-2 font-medium"
                 style={{ color: 'var(--color-foreground)' }}
               >
-                {locale === "en" ? "Subscribe to Newsletter" : "न्यूज़लेटर की सदस्यता लें"}
+                {newsletterLabel}
               </p>
               <form className="flex gap-2">
                 <input
                   type="email"
                   placeholder={locale === "en" ? "Your email" : "आपका ईमेल"}
                   className="flex-1 px-3 py-2 text-sm rounded-md border focus:outline-none focus:ring-2"
-                  style={{ 
+                  style={{
                     borderColor: 'var(--color-border)',
                     backgroundColor: 'var(--color-background)'
                   }}
                 />
-                <button 
+                <button
                   type="submit"
                   className="px-4 py-2 text-sm font-medium rounded-md transition-colors"
-                  style={{ 
+                  style={{
                     backgroundColor: 'var(--color-primary)',
                     color: 'white'
                   }}
@@ -222,15 +323,15 @@ export default async function Footer({ locale }: { locale: AppLocale }) {
         </div>
 
         {/* Bottom Bar */}
-        <div 
+        <div
           className="mt-12 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm"
-          style={{ 
+          style={{
             borderTop: '1px solid var(--color-border)',
             color: 'var(--color-muted)'
           }}
         >
-          <p>© {new Date().getFullYear()} {dict.brand}. {locale === "en" ? "All rights reserved." : "सर्वाधिकार सुरक्षित।"}</p>
-          
+          <p>© {new Date().getFullYear()} {dict.brand}. {copyrightText}</p>
+
           <div className="flex flex-wrap gap-4">
             <Link href={`/${locale}`} className="hover:underline">
               {locale === "en" ? "Privacy Policy" : "गोपनीयता नीति"}
@@ -239,11 +340,11 @@ export default async function Footer({ locale }: { locale: AppLocale }) {
               {locale === "en" ? "Terms of Service" : "सेवा की शर्तें"}
             </Link>
             {FOOTER_LINKS.map((l) => (
-              <a 
-                key={l.href} 
-                href={l.href} 
-                target="_blank" 
-                rel="noreferrer" 
+              <a
+                key={l.href}
+                href={l.href}
+                target="_blank"
+                rel="noreferrer"
                 className="hover:underline"
               >
                 {l.label}
