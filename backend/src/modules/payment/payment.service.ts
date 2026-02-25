@@ -8,7 +8,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
-import Razorpay from 'razorpay';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Razorpay = require('razorpay');
 import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
 import { SubscriptionsService } from '@/modules/subscriptions/subscriptions.service';
 import { EmailService } from '@/common/email/email.service';
@@ -61,7 +62,7 @@ interface PaymentRecordEntity {
 export class PaymentService {
   private readonly logger = new Logger(PaymentService.name);
   private readonly paymentEntityType = 'PAYMENT';
-  private razorpay: Razorpay;
+  private razorpay: any = null;
   private readonly keyId: string;
   private readonly keySecret: string;
   private readonly webhookSecret: string;
@@ -77,15 +78,32 @@ export class PaymentService {
     this.keySecret = this.configService.get<string>('RAZORPAY_KEY_SECRET', '');
     this.webhookSecret = this.configService.get<string>('RAZORPAY_WEBHOOK_SECRET', '');
 
-    // Initialize Razorpay instance
-    this.razorpay = new Razorpay({
-      key_id: this.keyId,
-      key_secret: this.keySecret,
-    });
-
-    if (!this.keyId || !this.keySecret) {
+    // Initialize Razorpay instance only when credentials are configured
+    if (this.keyId && this.keySecret) {
+      try {
+        this.razorpay = new Razorpay({
+          key_id: this.keyId,
+          key_secret: this.keySecret,
+        });
+        this.logger.log('Razorpay initialized successfully');
+      } catch (error) {
+        this.logger.warn('Failed to initialize Razorpay:', error.message);
+      }
+    } else {
       this.logger.warn(
         'Razorpay keys not configured. Payment features will not work. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.',
+      );
+    }
+  }
+
+  /**
+   * Ensures Razorpay is initialized before any payment operation.
+   * Throws a clear error if Razorpay keys are not configured.
+   */
+  private ensureRazorpayInitialized(): void {
+    if (!this.razorpay) {
+      throw new BadRequestException(
+        'Payment service is not configured. Please contact administrator.',
       );
     }
   }
@@ -190,6 +208,8 @@ export class PaymentService {
 
     const billing = periodMap[plan.billingCycle] || { period: 'monthly' as RazorpayPeriod, interval: 1 };
 
+    this.ensureRazorpayInitialized();
+
     // Create a Razorpay Plan
     const razorpayPlan = (await this.razorpay.plans.create({
       period: billing.period,
@@ -263,6 +283,8 @@ export class PaymentService {
     userId: string,
     userEmail: string,
   ): Promise<SubscriptionPaymentResponseDto> {
+    this.ensureRazorpayInitialized();
+
     const order = await this.razorpay.orders.create({
       amount: plan.price * 100, // Convert to paise
       currency: 'INR',
@@ -400,6 +422,8 @@ export class PaymentService {
     dto: InitiateDonationPaymentDto,
     userId?: string,
   ): Promise<DonationPaymentResponseDto> {
+    this.ensureRazorpayInitialized();
+
     const order = await this.razorpay.orders.create({
       amount: dto.amount * 100,
       currency: 'INR',
