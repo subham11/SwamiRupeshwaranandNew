@@ -224,8 +224,10 @@ npm run test
 ## 🌐 Production Deployments
 
 ### Backend (AWS Lambda)
-- **URL:** `https://x3cgcqhhub.execute-api.ap-south-1.amazonaws.com/dev/api/v1`
-- **Swagger:** `https://x3cgcqhhub.execute-api.ap-south-1.amazonaws.com/dev/docs`
+- **AWS Account:** `525945693241` (SwamiJi profile)
+- **Region:** `ap-south-1` (Mumbai)
+- **URL:** `https://n4vi400a5e.execute-api.ap-south-1.amazonaws.com/prod/api/v1`
+- **Swagger:** `https://n4vi400a5e.execute-api.ap-south-1.amazonaws.com/prod/docs`
 
 ```bash
 # Deploy backend
@@ -235,9 +237,21 @@ npx serverless deploy --stage prod --aws-profile SwamiJi
 ```
 
 ### Frontend (AWS Amplify)
-- **URL:** `https://main.d1ojg9qcpef6jk.amplifyapp.com`
+- **URL:** _(Set after Amplify app is created in SwamiJi account)_
+- **App Root:** `frontend`
+- **Branch:** `main`
 
 Amplify auto-deploys from the `main` branch using `amplify.yml` configuration.
+
+### Key Resources
+| Resource | Identifier |
+|----------|------------|
+| Cognito User Pool | `ap-south-1_bpTAiYPEl` |
+| Cognito Client ID | `3mor1uulompisag9rhjlpi1d6s` |
+| S3 Content Bucket | `swami-rupeshwaranand-api-prod-content` |
+| DynamoDB Main Table | `swami-rupeshwaranand-api-prod-main` |
+| DynamoDB OTP Table | `swami-rupeshwaranand-api-prod-otp` |
+| SES From Email | `ashramseva2727@gmail.com` |
 
 ---
 

@@ -37,7 +37,7 @@ async function bootstrap(): Promise<Handler> {
   // Swagger Documentation (enabled in all environments for testing)
   const stage = process.env.STAGE || 'dev';
   const apiGatewayUrl =
-    process.env.API_GATEWAY_URL || 'https://x3cgcqhhub.execute-api.ap-south-1.amazonaws.com';
+    process.env.API_GATEWAY_URL || 'https://n4vi400a5e.execute-api.ap-south-1.amazonaws.com';
 
   const config = new DocumentBuilder()
     .setTitle('Swami Rupeshwaranand API')
