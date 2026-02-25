@@ -79,7 +79,7 @@ jobs:
 # ============================================================
 # DEPLOYMENT NOTE:
 # Backend deployment to AWS Lambda is done manually using:
-#   cd backend && npx serverless deploy --aws-profile <profile>
+#   cd backend && npx serverless deploy --stage prod --aws-profile SwamiJi
 #
 # For automated deployment, you can:
 # 1. Use AWS CodePipeline with CodeBuild (no GitHub secrets needed)

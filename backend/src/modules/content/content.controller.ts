@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Header } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -38,6 +38,7 @@ export class ContentController {
 
   @Get()
   @Public()
+  @Header('Cache-Control', 'public, max-age=300, s-maxage=600, stale-while-revalidate=60')
   @ApiOperation({ summary: 'Get all content' })
   @ApiQuery({ name: 'type', required: false, description: 'Filter by content type' })
   @ApiQuery({ name: 'locale', required: false, description: 'Filter by locale' })
@@ -70,6 +71,7 @@ export class ContentController {
 
   @Get('slug/:slug')
   @Public()
+  @Header('Cache-Control', 'public, max-age=300, s-maxage=600, stale-while-revalidate=60')
   @ApiOperation({ summary: 'Get content by slug' })
   @ApiParam({ name: 'slug', description: 'Content slug' })
   @ApiQuery({ name: 'locale', required: false, description: 'Locale' })

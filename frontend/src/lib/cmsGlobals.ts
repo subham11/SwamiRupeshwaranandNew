@@ -20,10 +20,15 @@ interface CMSComponent {
 
 let cachedComponents: CMSComponent[] | null = null;
 let cacheTimestamp = 0;
-const CACHE_TTL = 60_000; // 1 minute
+
+// CMS revalidation TTL — configurable via env var
+// Launch phase: 300s (5 min) for frequent CMS edits
+// Steady state: 3600s (1 hr) once content stabilizes to weekly edits
+const CMS_REVALIDATE_SECONDS = Number(process.env.NEXT_PUBLIC_CMS_REVALIDATE_SECONDS) || 300;
+const CACHE_TTL = CMS_REVALIDATE_SECONDS * 1000;
 
 /**
- * Fetch all global CMS components (server-side, cached for 1 minute).
+ * Fetch all global CMS components (server-side, cached per CMS_REVALIDATE_SECONDS).
  */
 export async function getGlobalComponents(): Promise<CMSComponent[]> {
   const now = Date.now();
@@ -33,7 +38,7 @@ export async function getGlobalComponents(): Promise<CMSComponent[]> {
 
   try {
     const res = await fetch(`${API_BASE}/cms/components/global/public`, {
-      next: { revalidate: 60 },
+      next: { revalidate: CMS_REVALIDATE_SECONDS },
     });
     if (!res.ok) return cachedComponents || [];
     const data: { items: CMSComponent[]; count: number } = await res.json();

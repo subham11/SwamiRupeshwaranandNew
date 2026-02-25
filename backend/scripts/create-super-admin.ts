@@ -6,8 +6,8 @@
 import { DynamoDBClient, PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
 import { CognitoIdentityProviderClient, AdminCreateUserCommand, AdminSetUserPasswordCommand, AdminGetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 
-const SUPER_ADMIN_EMAIL = 'subham11@gmail.com';
-const SUPER_ADMIN_NAME = 'Subham (Super Admin)';
+const SUPER_ADMIN_EMAIL = 'ashramseva2727@gmail.com';
+const SUPER_ADMIN_NAME = 'Ashram Seva (Super Admin)';
 const SUPER_ADMIN_ID = 'super-admin-001';
 
 // Configuration
@@ -108,7 +108,6 @@ async function createUserInCognito(): Promise<void> {
         { Name: 'email', Value: SUPER_ADMIN_EMAIL },
         { Name: 'email_verified', Value: 'true' },
         { Name: 'name', Value: SUPER_ADMIN_NAME },
-        { Name: 'custom:role', Value: 'super_admin' },
       ],
       MessageAction: 'SUPPRESS', // Don't send welcome email
     });

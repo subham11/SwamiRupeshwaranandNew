@@ -10,6 +10,7 @@ provider:
   runtime: nodejs20.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'ap-south-1'}
+  profile: ${opt:aws-profile, 'SwamiJi'}
   
   # Cost Optimization: Use ARM64 for better price-performance
   architecture: arm64
@@ -110,7 +111,7 @@ custom:
       enabled: ${self:provider.stage, 'prod'}
       prewarm: true
       events:
-        - schedule: rate(5 minutes)
+        - schedule: rate(15 minutes)
       concurrency: 1
       memorySize: 128
       timeout: 10
@@ -145,7 +146,7 @@ functions:
     timeout: 10
     environment:
       OTP_TABLE: !Ref OtpTable
-      SES_FROM_EMAIL: ${env:SES_FROM_EMAIL, 'satyam@elevatephysique.com'}
+      SES_FROM_EMAIL: ${env:SES_FROM_EMAIL, 'ashramseva2727@gmail.com'}
       SES_REGION: ${self:provider.region}
 
   verifyAuthChallenge:
@@ -170,11 +171,17 @@ functions:
 resources:
   Resources:
     # ─── DynamoDB: Main Table ────────────────────────────────
+    # Cost Optimization: Provisioned capacity with Auto-Scaling
+    # Base: 5 RCU / 5 WCU (within AWS always-free tier)
+    # Auto-scales up to 50 RCU / 25 WCU for traffic spikes
     MainTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:service}-${self:provider.stage}-main
-        BillingMode: PAY_PER_REQUEST
+        BillingMode: PROVISIONED
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
         AttributeDefinitions:
           - AttributeName: PK
             AttributeType: S
@@ -198,6 +205,9 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
         TimeToLiveSpecification:
           AttributeName: ttl
           Enabled: true
@@ -208,6 +218,77 @@ resources:
             Value: ${self:provider.stage}
           - Key: Project
             Value: ${self:service}
+
+    # ─── DynamoDB Auto-Scaling: Main Table ───────────────────
+    MainTableReadScalableTarget:
+      Type: AWS::ApplicationAutoScaling::ScalableTarget
+      Properties:
+        MaxCapacity: 50
+        MinCapacity: 5
+        ResourceId: !Sub table/${self:service}-${self:provider.stage}-main
+        ScalableDimension: dynamodb:table:ReadCapacityUnits
+        ServiceNamespace: dynamodb
+      DependsOn: MainTable
+
+    MainTableWriteScalableTarget:
+      Type: AWS::ApplicationAutoScaling::ScalableTarget
+      Properties:
+        MaxCapacity: 25
+        MinCapacity: 5
+        ResourceId: !Sub table/${self:service}-${self:provider.stage}-main
+        ScalableDimension: dynamodb:table:WriteCapacityUnits
+        ServiceNamespace: dynamodb
+      DependsOn: MainTable
+
+    MainTableReadScalingPolicy:
+      Type: AWS::ApplicationAutoScaling::ScalingPolicy
+      Properties:
+        PolicyName: MainTableReadAutoScaling
+        PolicyType: TargetTrackingScaling
+        ScalingTargetId: !Ref MainTableReadScalableTarget
+        TargetTrackingScalingPolicyConfiguration:
+          PredefinedMetricSpecification:
+            PredefinedMetricType: DynamoDBReadCapacityUtilization
+          TargetValue: 70
+          ScaleInCooldown: 60
+          ScaleOutCooldown: 60
+
+    MainTableWriteScalingPolicy:
+      Type: AWS::ApplicationAutoScaling::ScalingPolicy
+      Properties:
+        PolicyName: MainTableWriteAutoScaling
+        PolicyType: TargetTrackingScaling
+        ScalingTargetId: !Ref MainTableWriteScalableTarget
+        TargetTrackingScalingPolicyConfiguration:
+          PredefinedMetricSpecification:
+            PredefinedMetricType: DynamoDBWriteCapacityUtilization
+          TargetValue: 70
+          ScaleInCooldown: 60
+          ScaleOutCooldown: 60
+
+    # GSI1 Auto-Scaling
+    MainTableGSI1ReadScalableTarget:
+      Type: AWS::ApplicationAutoScaling::ScalableTarget
+      Properties:
+        MaxCapacity: 50
+        MinCapacity: 5
+        ResourceId: !Sub table/${self:service}-${self:provider.stage}-main/index/GSI1
+        ScalableDimension: dynamodb:index:ReadCapacityUnits
+        ServiceNamespace: dynamodb
+      DependsOn: MainTable
+
+    MainTableGSI1ReadScalingPolicy:
+      Type: AWS::ApplicationAutoScaling::ScalingPolicy
+      Properties:
+        PolicyName: MainTableGSI1ReadAutoScaling
+        PolicyType: TargetTrackingScaling
+        ScalingTargetId: !Ref MainTableGSI1ReadScalableTarget
+        TargetTrackingScalingPolicyConfiguration:
+          PredefinedMetricSpecification:
+            PredefinedMetricType: DynamoDBReadCapacityUtilization
+          TargetValue: 70
+          ScaleInCooldown: 60
+          ScaleOutCooldown: 60
 
     # ─── DynamoDB: OTP Tracking Table ────────────────────────
     OtpTable:

@@ -575,10 +575,15 @@ export async function fetchCMSPages(accessToken: string): Promise<CMSPage[]> {
  * Fetch CMS page with components by slug (public, no auth needed)
  * Uses short revalidation to serve fresh CMS content on the public site
  */
+// CMS revalidation TTL — configurable via env var
+// Launch phase: 300s (5 min) for frequent CMS edits
+// Steady state: 3600s (1 hr) once content stabilizes to weekly edits
+const CMS_REVALIDATE_SECONDS = Number(process.env.NEXT_PUBLIC_CMS_REVALIDATE_SECONDS) || 300;
+
 export async function fetchCMSPageBySlug(slug: string): Promise<CMSPageWithComponents | null> {
   try {
     return await apiRequest<CMSPageWithComponents>(`/cms/pages/by-slug/${slug}`, {
-      next: { revalidate: 60 }, // revalidate every 60 seconds
+      next: { revalidate: CMS_REVALIDATE_SECONDS },
     } as RequestInit);
   } catch {
     return null;
@@ -592,7 +597,7 @@ export async function fetchCMSPageBySlug(slug: string): Promise<CMSPageWithCompo
 export async function fetchAllPublishedCMSPages(): Promise<CMSPage[]> {
   try {
     const res: { items: CMSPage[]; count: number } = await apiRequest('/cms/pages?publishedOnly=true', {
-      next: { revalidate: 60 },
+      next: { revalidate: CMS_REVALIDATE_SECONDS },
     } as RequestInit);
     return res.items || [];
   } catch {

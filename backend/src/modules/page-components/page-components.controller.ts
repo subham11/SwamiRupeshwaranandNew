@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Header } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -51,6 +51,7 @@ export class PageComponentsController {
 
   @Get('pages')
   @Public()
+  @Header('Cache-Control', 'public, max-age=300, s-maxage=600, stale-while-revalidate=60')
   @ApiOperation({ summary: 'Get all pages' })
   @ApiQuery({
     name: 'publishedOnly',
@@ -73,6 +74,7 @@ export class PageComponentsController {
 
   @Get('pages/by-slug/:slug')
   @Public()
+  @Header('Cache-Control', 'public, max-age=300, s-maxage=600, stale-while-revalidate=60')
   @ApiOperation({ summary: 'Get page by slug with all components' })
   @ApiParam({ name: 'slug', description: 'Page slug' })
   @ApiResponse({
@@ -178,6 +180,7 @@ export class PageComponentsController {
 
   @Get('components/global/public')
   @Public()
+  @Header('Cache-Control', 'public, max-age=300, s-maxage=600, stale-while-revalidate=60')
   @ApiOperation({ summary: 'Get all global components (public, read-only)' })
   @ApiResponse({
     status: 200,

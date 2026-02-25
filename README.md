@@ -231,7 +231,7 @@ npm run test
 # Deploy backend
 cd backend
 npm run build
-npx serverless deploy --aws-profile VS-User
+npx serverless deploy --stage prod --aws-profile SwamiJi
 ```
 
 ### Frontend (AWS Amplify)

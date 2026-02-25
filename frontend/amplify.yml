@@ -11,9 +11,11 @@ applications:
         build:
           commands:
             # Set environment variables for production build
-            - export NEXT_PUBLIC_API_URL=https://x3cgcqhhub.execute-api.ap-south-1.amazonaws.com/dev
+            - export NEXT_PUBLIC_API_URL=https://n4vi400a5e.execute-api.ap-south-1.amazonaws.com/prod
             - export NEXT_PUBLIC_USE_API=true
             - export AMPLIFY_BUILD=true
+            # CMS ISR revalidation: 300s (launch phase), bump to 3600 once content is stable
+            - export NEXT_PUBLIC_CMS_REVALIDATE_SECONDS=300
             # Build the Next.js application
             - npm run build
       artifacts:
