@@ -2,7 +2,10 @@
  * CreateAuthChallenge Lambda Trigger
  *
  * Generates a 6-digit OTP, stores it hashed in DynamoDB with TTL,
- * and sends the OTP via SES email.
+ * and fires off an async Lambda to send the OTP via SMTP.
+ *
+ * The email is sent asynchronously (InvocationType: 'Event') so this
+ * trigger returns within Cognito's 5-second deadline.
  *
  * Security:
  *   - Secure random OTP generation (crypto.randomInt)
@@ -14,16 +17,16 @@
 import type { CreateAuthChallengeTriggerEvent, CreateAuthChallengeTriggerHandler } from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
-import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import * as crypto from 'crypto';
 
 const ddbClient = DynamoDBDocumentClient.from(
   new DynamoDBClient({ region: process.env.AWS_REGION || 'ap-south-1' }),
 );
-const sesClient = new SESClient({ region: process.env.SES_REGION || process.env.AWS_REGION || 'ap-south-1' });
+const lambdaClient = new LambdaClient({ region: process.env.AWS_REGION || 'ap-south-1' });
 
 const OTP_TABLE = process.env.OTP_TABLE || '';
-const SES_FROM_EMAIL = process.env.SES_FROM_EMAIL || 'satyam@elevatephysique.com';
+const SEND_OTP_EMAIL_FUNCTION = process.env.SEND_OTP_EMAIL_FUNCTION || '';
 const OTP_EXPIRY_SECONDS = 300; // 5 minutes
 
 function generateOtp(): string {
@@ -34,57 +37,29 @@ function hashOtp(otp: string): string {
   return crypto.createHash('sha256').update(otp).digest('hex');
 }
 
-async function sendOtpEmail(email: string, otp: string): Promise<void> {
-  // Try SES first, fall back to logging in dev
-  try {
-    const command = new SendEmailCommand({
-      Source: SES_FROM_EMAIL,
-      Destination: { ToAddresses: [email] },
-      Message: {
-        Subject: { Data: `Your Login OTP - Swami Rupeshwaranand` },
-        Body: {
-          Html: {
-            Data: `
-<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"></head>
-<body style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #f97316, #ea580c); border-radius: 12px 12px 0 0;">
-    <h1 style="color: white; margin: 0;">🙏 Swami Rupeshwaranand</h1>
-    <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0;">Path to Inner Peace</p>
-  </div>
-  <div style="padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-    <p>Dear Seeker,</p>
-    <p>Your One-Time Password for login is:</p>
-    <div style="text-align: center; margin: 25px 0;">
-      <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #ea580c; background: #fff7ed; padding: 15px 30px; border-radius: 8px; border: 2px dashed #fb923c;">${otp}</span>
-    </div>
-    <p style="color: #6b7280;">This OTP is valid for <strong>5 minutes</strong>. Do not share it with anyone.</p>
-    <p style="color: #6b7280;">If you did not request this, please ignore this email.</p>
-    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
-    <p style="text-align: center; color: #9ca3af; font-size: 12px;">With divine blessings, Swami Rupeshwaranand Ashram</p>
-  </div>
-</body>
-</html>`,
-          },
-          Text: {
-            Data: `Your OTP for Swami Rupeshwaranand login is: ${otp}\n\nThis OTP is valid for 5 minutes. Do not share it.\n\nWith blessings, Swami Rupeshwaranand Ashram`,
-          },
-        },
-      },
-    });
-
-    await sesClient.send(command);
-    console.log(`OTP email sent to ${email}`);
-  } catch (error) {
-    console.error('SES send failed:', error);
-    // In dev/local, log the OTP and continue (don't block auth flow)
+/**
+ * Invoke the sendOtpEmail Lambda asynchronously (fire-and-forget).
+ * This returns immediately so the Cognito trigger stays within its deadline.
+ */
+async function triggerOtpEmail(email: string, otp: string): Promise<void> {
+  if (!SEND_OTP_EMAIL_FUNCTION) {
+    console.warn('SEND_OTP_EMAIL_FUNCTION not set — cannot send OTP email');
     if (process.env.STAGE === 'dev' || process.env.STAGE === 'local') {
       console.log(`[DEV FALLBACK] OTP for ${email}: ${otp}`);
-      return; // Don't throw — allow the auth flow to continue
     }
-    // In production, SES must be configured — fail the flow
-    throw error;
+    return;
+  }
+
+  try {
+    await lambdaClient.send(new InvokeCommand({
+      FunctionName: SEND_OTP_EMAIL_FUNCTION,
+      InvocationType: 'Event', // Async — returns 202 immediately
+      Payload: Buffer.from(JSON.stringify({ email, otp })),
+    }));
+    console.log(`Async OTP email triggered for ${email}`);
+  } catch (error) {
+    console.error('Failed to invoke sendOtpEmail Lambda:', error);
+    // Don't throw — OTP is stored in DynamoDB, user can request resend
   }
 }
 
@@ -147,8 +122,8 @@ export const handler: CreateAuthChallengeTriggerHandler = async (
     }));
   }
 
-  // Send OTP email
-  await sendOtpEmail(email, otp);
+  // Send OTP email asynchronously (fire-and-forget via separate Lambda)
+  await triggerOtpEmail(email, otp);
 
   // Set challenge parameters
   event.response.publicChallengeParameters = {

@@ -40,6 +40,13 @@ provider:
     RAZORPAY_KEY_ID: ${env:RAZORPAY_KEY_ID, ''}
     RAZORPAY_KEY_SECRET: ${env:RAZORPAY_KEY_SECRET, ''}
     RAZORPAY_WEBHOOK_SECRET: ${env:RAZORPAY_WEBHOOK_SECRET, ''}
+    # SMTP Email Configuration
+    SMTP_HOST: ${env:SMTP_HOST, 'mail.swamirupeshwaranand.in'}
+    SMTP_PORT: ${env:SMTP_PORT, '587'}
+    SMTP_USERNAME: ${env:SMTP_USERNAME, 'noreply@swamirupeshwaranand.in'}
+    SMTP_PASSWORD: ${env:SMTP_PASSWORD, ''}
+    SMTP_FROM_EMAIL: ${env:SMTP_FROM_EMAIL, 'noreply@swamirupeshwaranand.in'}
+    SMTP_FROM_NAME: ${env:SMTP_FROM_NAME, 'Swami Rupeshwaranand ji'}
   
   # IAM Role for Lambda
   iam:
@@ -76,6 +83,17 @@ provider:
             - ses:SendEmail
             - ses:SendRawEmail
           Resource: '*'
+        - Effect: Allow
+          Action:
+            - lambda:InvokeFunction
+          Resource:
+            - !Join
+              - ''
+              - - 'arn:aws:lambda:'
+                - !Ref 'AWS::Region'
+                - ':'
+                - !Ref 'AWS::AccountId'
+                - ':function:${self:service}-${self:provider.stage}-sendOtpEmail'
         - Effect: Allow
           Action:
             - logs:CreateLogGroup
@@ -143,11 +161,22 @@ functions:
   createAuthChallenge:
     handler: dist/cognito-triggers/create-auth-challenge.handler
     memorySize: 128
-    timeout: 10
+    timeout: 5
     environment:
       OTP_TABLE: !Ref OtpTable
-      SES_FROM_EMAIL: ${env:SES_FROM_EMAIL, 'ashramseva2727@gmail.com'}
-      SES_REGION: ${self:provider.region}
+      SEND_OTP_EMAIL_FUNCTION: !Ref SendOtpEmailLambdaFunction
+
+  sendOtpEmail:
+    handler: dist/cognito-triggers/send-otp-email.handler
+    memorySize: 128
+    timeout: 30
+    environment:
+      SMTP_HOST: ${env:SMTP_HOST, 'mail.swamirupeshwaranand.in'}
+      SMTP_PORT: ${env:SMTP_PORT, '587'}
+      SMTP_USERNAME: ${env:SMTP_USERNAME, 'noreply@swamirupeshwaranand.in'}
+      SMTP_PASSWORD: ${env:SMTP_PASSWORD, ''}
+      SMTP_FROM_EMAIL: ${env:SMTP_FROM_EMAIL, 'noreply@swamirupeshwaranand.in'}
+      SMTP_FROM_NAME: ${env:SMTP_FROM_NAME, 'Swami Rupeshwaranand ji'}
 
   verifyAuthChallenge:
     handler: dist/cognito-triggers/verify-auth-challenge.handler
