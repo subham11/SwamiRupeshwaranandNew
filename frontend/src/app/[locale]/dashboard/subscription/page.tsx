@@ -36,6 +36,7 @@ export default function SubscriptionDashboardPage() {
   const { user, accessToken, isAuthenticated, isLoading } = useAuth();
 
   const [subscription, setSubscription] = useState<UserSubscription | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [availablePlans, setAvailablePlans] = useState<ApiSubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -51,20 +52,28 @@ export default function SubscriptionDashboardPage() {
 
     try {
       setLoading(true);
+      setError(null);
       const [subResponse, plansResponse, overviewResponse] = await Promise.all([
-        fetchMySubscription(accessToken).catch(() => null),
+        fetchMySubscription(accessToken).catch((err) => {
+          setError('Failed to fetch subscription.');
+          return null;
+        }),
         fetchSubscriptionPlans().catch(() => [] as ApiSubscriptionPlan[]),
         fetchMyMonthlyOverview(accessToken).catch(() => null),
       ]);
 
       if (subResponse) {
         setSubscription(subResponse as unknown as UserSubscription);
+      } else {
+        setSubscription(null);
       }
       setAvailablePlans(plansResponse);
       if (overviewResponse) {
         setMonthlyOverview(overviewResponse);
       }
     } catch (error) {
+      setError('Failed to load subscription data.');
+      setSubscription(null);
       console.error('Failed to load subscription data:', error);
     } finally {
       setLoading(false);
@@ -127,6 +136,29 @@ export default function SubscriptionDashboardPage() {
       <Container className="py-8">
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full" />
+        </div>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container className="py-8">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="w-20 h-20 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-4xl">🧘</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              No Active Subscription
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              {error}
+            </p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Subscribe to access premium spiritual content, exclusive teachings, and much more.
+            </p>
+          </div>
         </div>
       </Container>
     );
