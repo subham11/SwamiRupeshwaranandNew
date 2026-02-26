@@ -233,6 +233,10 @@ resources:
             AttributeType: S
           - AttributeName: GSI1SK
             AttributeType: S
+          - AttributeName: GSI2PK
+            AttributeType: S
+          - AttributeName: GSI2SK
+            AttributeType: S
         KeySchema:
           - AttributeName: PK
             KeyType: HASH
@@ -244,6 +248,17 @@ resources:
               - AttributeName: GSI1PK
                 KeyType: HASH
               - AttributeName: GSI1SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
+          - IndexName: GSI2
+            KeySchema:
+              - AttributeName: GSI2PK
+                KeyType: HASH
+              - AttributeName: GSI2SK
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
@@ -325,6 +340,30 @@ resources:
         PolicyName: MainTableGSI1ReadAutoScaling
         PolicyType: TargetTrackingScaling
         ScalingTargetId: !Ref MainTableGSI1ReadScalableTarget
+        TargetTrackingScalingPolicyConfiguration:
+          PredefinedMetricSpecification:
+            PredefinedMetricType: DynamoDBReadCapacityUtilization
+          TargetValue: 70
+          ScaleInCooldown: 60
+          ScaleOutCooldown: 60
+
+    # GSI2 Auto-Scaling
+    MainTableGSI2ReadScalableTarget:
+      Type: AWS::ApplicationAutoScaling::ScalableTarget
+      Properties:
+        MaxCapacity: 50
+        MinCapacity: 5
+        ResourceId: !Sub table/${self:service}-${self:provider.stage}-main/index/GSI2
+        ScalableDimension: dynamodb:index:ReadCapacityUnits
+        ServiceNamespace: dynamodb
+      DependsOn: MainTable
+
+    MainTableGSI2ReadScalingPolicy:
+      Type: AWS::ApplicationAutoScaling::ScalingPolicy
+      Properties:
+        PolicyName: MainTableGSI2ReadAutoScaling
+        PolicyType: TargetTrackingScaling
+        ScalingTargetId: !Ref MainTableGSI2ReadScalableTarget
         TargetTrackingScalingPolicyConfiguration:
           PredefinedMetricSpecification:
             PredefinedMetricType: DynamoDBReadCapacityUtilization
