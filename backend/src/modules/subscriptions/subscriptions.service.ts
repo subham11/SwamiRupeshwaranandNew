@@ -1,6 +1,7 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
+import { StorageService } from '@/common/storage';
 import {
   CreateSubscriptionPlanDto,
   UpdateSubscriptionPlanDto,
@@ -83,11 +84,15 @@ interface SubscriptionContentEntity {
   planId: string;
   contentType: ContentType;
   title: string;
+  titleHi?: string;
   description?: string;
+  descriptionHi?: string;
   fileUrl?: string;
+  fileKey?: string;
   thumbnailUrl?: string;
   duration?: number;
   displayOrder: number;
+  isActive?: boolean;
   locale: string;
   createdAt: string;
   updatedAt: string;
@@ -102,6 +107,7 @@ export class SubscriptionsService {
   constructor(
     @Inject(DATABASE_SERVICE)
     private readonly databaseService: DatabaseService,
+    private readonly storageService: StorageService,
   ) {}
 
   // ============================================
@@ -578,12 +584,22 @@ export class SubscriptionsService {
 
     const fieldsToUpdate = [
       'title',
+      'titleHi',
       'description',
+      'descriptionHi',
+      'contentType',
       'fileUrl',
+      'fileKey',
       'thumbnailUrl',
       'duration',
       'displayOrder',
+      'isActive',
     ];
+
+    // When fileKey is provided, also derive fileUrl
+    if (dto.fileKey) {
+      (dto as any).fileUrl = this.storageService.getPublicUrl(dto.fileKey);
+    }
 
     for (const field of fieldsToUpdate) {
       if ((dto as any)[field] !== undefined) {
@@ -744,11 +760,15 @@ export class SubscriptionsService {
       planId: content.planId,
       contentType: content.contentType,
       title: content.title,
+      titleHi: content.titleHi,
       description: content.description,
+      descriptionHi: content.descriptionHi,
       fileUrl: content.fileUrl,
+      fileKey: content.fileKey,
       thumbnailUrl: content.thumbnailUrl,
       duration: content.duration,
       displayOrder: content.displayOrder,
+      isActive: content.isActive,
       locale: content.locale,
       createdAt: content.createdAt,
       updatedAt: content.updatedAt,

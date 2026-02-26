@@ -359,10 +359,25 @@ export class CreateSubscriptionContentDto {
   @IsString()
   description?: string;
 
+  @ApiPropertyOptional({ description: 'Content title in Hindi' })
+  @IsOptional()
+  @IsString()
+  titleHi?: string;
+
+  @ApiPropertyOptional({ description: 'Content description in Hindi' })
+  @IsOptional()
+  @IsString()
+  descriptionHi?: string;
+
   @ApiPropertyOptional({ description: 'File URL (S3)' })
   @IsOptional()
   @IsString()
   fileUrl?: string;
+
+  @ApiPropertyOptional({ description: 'S3 file key' })
+  @IsOptional()
+  @IsString()
+  fileKey?: string;
 
   @ApiPropertyOptional({ description: 'Thumbnail URL' })
   @IsOptional()
@@ -378,6 +393,11 @@ export class CreateSubscriptionContentDto {
   @IsOptional()
   @IsNumber()
   displayOrder?: number;
+
+  @ApiPropertyOptional({ description: 'Whether content is active' })
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
 
   @ApiPropertyOptional({ description: 'Locale for the content' })
   @IsOptional()
@@ -401,10 +421,19 @@ export class SubscriptionContentResponseDto {
   title!: string;
 
   @ApiPropertyOptional()
+  titleHi?: string;
+
+  @ApiPropertyOptional()
   description?: string;
 
   @ApiPropertyOptional()
+  descriptionHi?: string;
+
+  @ApiPropertyOptional()
   fileUrl?: string;
+
+  @ApiPropertyOptional()
+  fileKey?: string;
 
   @ApiPropertyOptional()
   thumbnailUrl?: string;
@@ -414,6 +443,9 @@ export class SubscriptionContentResponseDto {
 
   @ApiProperty()
   displayOrder!: number;
+
+  @ApiPropertyOptional()
+  isActive?: boolean;
 
   @ApiProperty()
   locale!: string;
