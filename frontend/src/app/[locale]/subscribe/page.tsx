@@ -43,16 +43,6 @@ function SubscribeContent() {
       });
   }, []);
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      const redirect = preselectedPlanId
-        ? `/subscribe?plan=${preselectedPlanId}`
-        : '/subscribe';
-      router.push(`/login?redirect=${encodeURIComponent(redirect)}`);
-    }
-  }, [authLoading, isAuthenticated, router, preselectedPlanId]);
-
   // Auto-initiate if plan is preselected and user is authenticated
   useEffect(() => {
     if (preselectedPlanId && isAuthenticated && accessToken && plans.length > 0 && state === 'plans') {
@@ -66,7 +56,11 @@ function SubscribeContent() {
 
   const handleSelectPlan = useCallback(
     async (planId: string) => {
-      if (!accessToken) return;
+      // If not logged in, redirect to login with return URL
+      if (!isAuthenticated || !accessToken) {
+        router.push(`/login?redirect=${encodeURIComponent(`/subscribe?plan=${planId}`)}`);
+        return;
+      }
 
       setSelectedPlanId(planId);
       setState('initiating');
@@ -121,7 +115,7 @@ function SubscribeContent() {
     return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
   };
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <Container className="py-8">
         <div className="flex items-center justify-center min-h-[60vh]">
