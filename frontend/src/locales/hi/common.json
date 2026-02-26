@@ -7,7 +7,7 @@
     "services": "पूजन सेवाएं",
     "events": "कार्यक्रम",
     "teachings": "शिक्षाएं",
-    "gurukul": "एक जिला एक गुरुकुल",
+    "gurukul": "गुरुकुल",
     "donation": "धर्मदान",
     "stotras": "स्तोत्र",
     "kavach": "कवच",
@@ -43,7 +43,6 @@
   "navGroup": {
     "about": "परिचय",
     "offerings": "सेवाएं",
-    "sacred_texts": "पवित्र ग्रंथ",
     "initiatives": "पहल",
     "connect": "संपर्क"
   },

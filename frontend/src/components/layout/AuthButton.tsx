@@ -81,6 +81,8 @@ export default function AuthButton({ locale }: AuthButtonProps) {
     dashboard: locale === 'en' ? 'Dashboard' : 'डैशबोर्ड',
     admin: locale === 'en' ? 'Admin Panel' : 'व्यवस्थापक',
     cms: locale === 'en' ? 'Content Editor' : 'सामग्री संपादक',
+    subscriptions: locale === 'en' ? 'Manage Subscriptions' : 'सदस्यता प्रबंधन',
+    contentLibrary: locale === 'en' ? 'Stotras & Kavach' : 'स्तोत्र और कवच',
     logout: locale === 'en' ? 'Logout' : 'लॉगआउट',
     myAccount: locale === 'en' ? 'My Account' : 'मेरा खाता',
   };
@@ -155,7 +157,7 @@ export default function AuthButton({ locale }: AuthButtonProps) {
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className="absolute right-0 mt-2 w-48 rounded-lg shadow-lg border bg-white py-1 z-50"
+          className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg border bg-white py-1 z-50"
           style={{ borderColor: 'var(--color-border)' }}
         >
           <Link
@@ -168,15 +170,41 @@ export default function AuthButton({ locale }: AuthButtonProps) {
             {labels.dashboard}
           </Link>
           {isEditor && (
-            <Link
-              href={`/${locale}/admin/cms`}
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
-              style={{ color: 'var(--color-text)' }}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-              {labels.cms}
-            </Link>
+            <>
+              <hr className="my-1" style={{ borderColor: 'var(--color-border)' }} />
+              <div className="px-4 py-1">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+                  {locale === 'en' ? 'Admin' : 'व्यवस्थापन'}
+                </span>
+              </div>
+              <Link
+                href={`/${locale}/admin/cms`}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                {labels.cms}
+              </Link>
+              <Link
+                href={`/${locale}/admin/content-library`}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                {labels.contentLibrary}
+              </Link>
+              <Link
+                href={`/${locale}/admin/subscriptions`}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                {labels.subscriptions}
+              </Link>
+            </>
           )}
           {isAdmin && (
             <Link

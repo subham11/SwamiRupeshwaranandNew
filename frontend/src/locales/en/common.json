@@ -7,7 +7,7 @@
     "services": "Poojan Services",
     "events": "Events",
     "teachings": "Teachings",
-    "gurukul": "One District One Gurukul",
+    "gurukul": "Gurukul",
     "donation": "Donation",
     "stotras": "Stotras",
     "kavach": "Kavach",
@@ -43,7 +43,6 @@
   "navGroup": {
     "about": "About",
     "offerings": "Offerings",
-    "sacred_texts": "Sacred Texts",
     "initiatives": "Initiatives",
     "connect": "Connect"
   },
