@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Container from '@/components/ui/Container';
+import ContentViewerModal from '@/components/ui/ContentViewerModal';
 import { fetchPublicContent, SubscriptionContent } from '@/lib/api';
 import type { AppLocale } from '@/i18n/config';
 
@@ -15,6 +16,7 @@ export default function KavachPage() {
   const [items, setItems] = useState<SubscriptionContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewerItem, setViewerItem] = useState<SubscriptionContent | null>(null);
 
   useEffect(() => {
     fetchPublicContent('kavach', locale)
@@ -93,7 +95,11 @@ export default function KavachPage() {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="group bg-white rounded-xl border border-amber-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
+                className="group bg-white rounded-xl border border-amber-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer"
+                onClick={() => item.fileUrl && setViewerItem(item)}
+                role={item.fileUrl ? 'button' : undefined}
+                tabIndex={item.fileUrl ? 0 : undefined}
+                onKeyDown={(e) => { if (e.key === 'Enter' && item.fileUrl) setViewerItem(item); }}
               >
                 {/* Thumbnail */}
                 {item.thumbnailUrl ? (
@@ -126,17 +132,13 @@ export default function KavachPage() {
                       ✓ {isHindi ? 'मुफ़्त' : 'Free'}
                     </span>
                     {item.fileUrl && (
-                      <a
-                        href={item.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600 hover:text-amber-800 transition"
-                      >
+                      <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600 group-hover:text-amber-800 transition">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
-                        {isHindi ? 'डाउनलोड PDF' : 'Download PDF'}
-                      </a>
+                        {isHindi ? 'देखें' : 'View'}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -163,6 +165,17 @@ export default function KavachPage() {
               {isHindi ? 'सदस्यता योजनाएं देखें' : 'View Subscription Plans'} →
             </Link>
           </div>
+        )}
+
+        {/* Content Viewer Modal */}
+        {viewerItem && viewerItem.fileUrl && (
+          <ContentViewerModal
+            isOpen={!!viewerItem}
+            onClose={() => setViewerItem(null)}
+            fileUrl={viewerItem.fileUrl}
+            title={isHindi && viewerItem.titleHi ? viewerItem.titleHi : viewerItem.title}
+            accent="amber"
+          />
         )}
       </Container>
     </main>
