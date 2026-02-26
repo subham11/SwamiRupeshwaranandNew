@@ -1014,7 +1014,16 @@ export interface ApiSubscriptionPlan {
 
 export async function fetchSubscriptionPlans(): Promise<ApiSubscriptionPlan[]> {
   const response = await apiRequest("/subscriptions/plans") as { items?: ApiSubscriptionPlan[] } | ApiSubscriptionPlan[];
-  return (response as { items?: ApiSubscriptionPlan[] })?.items || (response as ApiSubscriptionPlan[]) || [];
+  const plans = (response as { items?: ApiSubscriptionPlan[] })?.items || (response as ApiSubscriptionPlan[]) || [];
+  // DynamoDB may return features/contents as JSON strings — parse them
+  return plans.map((plan) => ({
+    ...plan,
+    features: Array.isArray(plan.features)
+      ? plan.features
+      : typeof plan.features === 'string'
+        ? (() => { try { return JSON.parse(plan.features); } catch { return []; } })()
+        : [],
+  }));
 }
 
 export async function fetchMySubscription(accessToken: string): Promise<unknown> {
