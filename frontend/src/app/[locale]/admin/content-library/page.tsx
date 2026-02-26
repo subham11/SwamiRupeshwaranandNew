@@ -139,14 +139,14 @@ export default function AdminContentLibraryPage() {
     setUploading(true);
     setError('');
     try {
-      // Map content type to S3 category
+      // Map content type to backend FileCategory enum values
       const categoryMap: Record<ContentType, string> = {
-        stotra: 'stotras',
+        stotra: 'stotra',
         kavach: 'kavach',
-        pdf: 'pdfs',
-        video: 'videos',
-        image: 'images',
-        guidance: 'pdfs',
+        pdf: 'pdf',
+        video: 'video',
+        image: 'image',
+        guidance: 'guidance',
       };
 
       const category = categoryMap[form.contentType] || 'pdfs';
