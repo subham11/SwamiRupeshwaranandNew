@@ -83,6 +83,7 @@ export default function AuthButton({ locale }: AuthButtonProps) {
     cms: locale === 'en' ? 'Content Editor' : 'सामग्री संपादक',
     subscriptions: locale === 'en' ? 'Manage Subscriptions' : 'सदस्यता प्रबंधन',
     contentLibrary: locale === 'en' ? 'Stotras & Kavach' : 'स्तोत्र और कवच',
+    products: locale === 'en' ? 'Products' : 'उत्पाद',
     logout: locale === 'en' ? 'Logout' : 'लॉगआउट',
     myAccount: locale === 'en' ? 'My Account' : 'मेरा खाता',
   };
@@ -203,6 +204,15 @@ export default function AuthButton({ locale }: AuthButtonProps) {
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
                 {labels.subscriptions}
+              </Link>
+              <Link
+                href={`/${locale}/admin/products`}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" /></svg>
+                {labels.products}
               </Link>
             </>
           )}
