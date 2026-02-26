@@ -80,7 +80,7 @@ export default function ContentViewerModal({
       <div className="relative z-10 flex flex-col w-[95vw] max-w-5xl h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className={`flex items-center justify-between px-5 py-3.5 ${accentClasses.header} text-white`}>
-          <h2 className="text-lg font-semibold truncate pr-4">{title}</h2>
+          <h2 className="text-lg font-semibold truncate pr-4 text-white">{title}</h2>
           <div className="flex items-center gap-2 shrink-0">
             {/* Download */}
             <a
