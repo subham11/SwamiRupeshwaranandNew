@@ -1781,6 +1781,283 @@ export async function fetchUploadFolders(accessToken: string): Promise<{ folders
   });
 }
 
+// ============================================
+// Products
+// ============================================
+
+export interface ProductCategory {
+  id: string;
+  name: string;
+  nameHi?: string;
+  description?: string;
+  descriptionHi?: string;
+  slug: string;
+  imageKey?: string;
+  imageUrl?: string;
+  isActive: boolean;
+  displayOrder: number;
+  productCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Product {
+  id: string;
+  title: string;
+  titleHi?: string;
+  subtitle?: string;
+  subtitleHi?: string;
+  description: string;
+  descriptionHi?: string;
+  slug: string;
+  categoryId: string;
+  categoryName: string;
+  categoryNameHi?: string;
+  price: number;
+  originalPrice?: number;
+  discountPercent?: number;
+  images: string[];
+  imageUrls: string[];
+  videoKey?: string;
+  videoUrl?: string;
+  weight?: string;
+  weightHi?: string;
+  tags: string[];
+  stockStatus: string;
+  isFeatured: boolean;
+  isActive: boolean;
+  displayOrder: number;
+  avgRating: number;
+  totalReviews: number;
+  purchaseLink?: string;
+  purchaseLinkHi?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductListResponse {
+  items: Product[];
+  count: number;
+  cursor?: string;
+}
+
+export interface ProductCategoryListResponse {
+  items: ProductCategory[];
+  count: number;
+}
+
+export interface ProductReview {
+  id: string;
+  productId: string;
+  productTitle?: string;
+  userId: string;
+  userEmail: string;
+  rating: number;
+  reviewText?: string;
+  reviewTextHi?: string;
+  isApproved: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductReviewListResponse {
+  items: ProductReview[];
+  count: number;
+  cursor?: string;
+}
+
+// --- Admin Product APIs ---
+
+export async function fetchProductsAdmin(
+  accessToken: string,
+  params?: { categoryId?: string; limit?: number; cursor?: string },
+): Promise<ProductListResponse> {
+  const query = new URLSearchParams();
+  if (params?.categoryId) query.set('categoryId', params.categoryId);
+  if (params?.limit) query.set('limit', String(params.limit));
+  if (params?.cursor) query.set('cursor', params.cursor);
+  const qs = query.toString();
+  return apiRequest(`/products/admin/list${qs ? `?${qs}` : ''}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function createProduct(
+  data: Record<string, unknown>,
+  accessToken: string,
+): Promise<Product> {
+  return apiRequest('/products', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateProduct(
+  id: string,
+  data: Record<string, unknown>,
+  accessToken: string,
+): Promise<Product> {
+  return apiRequest(`/products/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteProduct(id: string, accessToken: string): Promise<void> {
+  return apiRequest(`/products/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function getProductUploadUrl(
+  data: { fileName: string; contentType: string },
+  accessToken: string,
+): Promise<{ uploadUrl: string; downloadUrl: string; key: string; expiresIn: number }> {
+  return apiRequest('/products/upload/presigned-url', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+// --- Admin Category APIs ---
+
+export async function fetchProductCategories(
+  accessToken?: string,
+): Promise<ProductCategoryListResponse> {
+  const headers: Record<string, string> = {};
+  if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+  return apiRequest('/products/public/categories', { headers });
+}
+
+export async function createProductCategory(
+  data: Record<string, unknown>,
+  accessToken: string,
+): Promise<ProductCategory> {
+  return apiRequest('/products/categories', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateProductCategory(
+  id: string,
+  data: Record<string, unknown>,
+  accessToken: string,
+): Promise<ProductCategory> {
+  return apiRequest(`/products/categories/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteProductCategory(id: string, accessToken: string): Promise<void> {
+  return apiRequest(`/products/categories/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+// --- Public Product APIs ---
+
+export async function fetchPublicProducts(
+  params?: { categoryId?: string; featured?: boolean; search?: string; locale?: string; limit?: number; cursor?: string },
+): Promise<ProductListResponse> {
+  const query = new URLSearchParams();
+  if (params?.categoryId) query.set('categoryId', params.categoryId);
+  if (params?.featured !== undefined) query.set('featured', String(params.featured));
+  if (params?.search) query.set('search', params.search);
+  if (params?.locale) query.set('locale', params.locale);
+  if (params?.limit) query.set('limit', String(params.limit));
+  if (params?.cursor) query.set('cursor', params.cursor);
+  const qs = query.toString();
+  return apiRequest(`/products/public${qs ? `?${qs}` : ''}`);
+}
+
+export async function fetchFeaturedProducts(): Promise<ProductListResponse> {
+  return apiRequest('/products/public/featured');
+}
+
+export async function fetchProductBySlug(slug: string): Promise<Product> {
+  return apiRequest(`/products/public/${slug}`);
+}
+
+export async function fetchProductsByCategory(
+  categorySlug: string,
+  limit?: number,
+  cursor?: string,
+): Promise<ProductListResponse> {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+  if (cursor) query.set('cursor', cursor);
+  const qs = query.toString();
+  return apiRequest(`/products/public/category/${categorySlug}${qs ? `?${qs}` : ''}`);
+}
+
+// --- Product Review APIs ---
+
+export async function createProductReview(
+  productId: string,
+  data: { rating: number; reviewText?: string; reviewTextHi?: string },
+  accessToken: string,
+): Promise<ProductReview> {
+  return apiRequest(`/products/${productId}/reviews`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function fetchProductReviews(
+  productId: string,
+  limit?: number,
+  cursor?: string,
+): Promise<ProductReviewListResponse> {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+  if (cursor) query.set('cursor', cursor);
+  const qs = query.toString();
+  return apiRequest(`/products/${productId}/reviews${qs ? `?${qs}` : ''}`);
+}
+
+export async function fetchAllReviewsAdmin(
+  accessToken: string,
+  limit?: number,
+  cursor?: string,
+): Promise<ProductReviewListResponse> {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+  if (cursor) query.set('cursor', cursor);
+  const qs = query.toString();
+  return apiRequest(`/products/reviews/admin/list${qs ? `?${qs}` : ''}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function approveProductReview(
+  reviewId: string,
+  data: { isApproved: boolean; reviewText?: string; reviewTextHi?: string },
+  accessToken: string,
+): Promise<ProductReview> {
+  return apiRequest(`/products/reviews/${reviewId}/approve`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteProductReview(reviewId: string, accessToken: string): Promise<void> {
+  return apiRequest(`/products/reviews/${reviewId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
 export default {
   fetchPageContent,
   fetchPagesList,
@@ -1865,4 +2142,23 @@ export default {
   verifyDonationPayment,
   fetchMyPayments,
   fetchPaymentFailures,
+  // Products
+  fetchProductsAdmin,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  getProductUploadUrl,
+  fetchProductCategories,
+  createProductCategory,
+  updateProductCategory,
+  deleteProductCategory,
+  fetchPublicProducts,
+  fetchFeaturedProducts,
+  fetchProductBySlug,
+  fetchProductsByCategory,
+  createProductReview,
+  fetchProductReviews,
+  fetchAllReviewsAdmin,
+  approveProductReview,
+  deleteProductReview,
 };

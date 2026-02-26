@@ -31,6 +31,7 @@ const ADMIN_LINKS = [
   { href: '/admin/donations', label: 'Donations', icon: '🙏', description: 'View donations & configure' },
   { href: '/admin/support', label: 'Support Tickets', icon: '🎫', description: 'Handle user queries' },
   { href: '/admin/media', label: 'Media Library', icon: '🖼️', description: 'Manage uploaded files' },
+  { href: '/admin/products', label: 'Products', icon: '🛒', description: 'Manage products & categories' },
 ];
 
 export default function AdminDashboardPage() {

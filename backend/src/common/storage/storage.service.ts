@@ -41,6 +41,7 @@ export enum StorageFolder {
   IMAGES = 'images',
   THUMBNAILS = 'thumbnails',
   GUIDANCE = 'guidance',
+  PRODUCTS = 'products',
   TEMP = 'temp',
 }
 

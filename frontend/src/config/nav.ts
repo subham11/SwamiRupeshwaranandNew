@@ -39,6 +39,7 @@ export const NAV_GROUPS_DEF: NavGroupDef[] = [
       { key: "teachings", href: (l) => `/${l}/teachings` },
       { key: "stotras", href: (l) => `/${l}/stotras` },
       { key: "kavach", href: (l) => `/${l}/kavach` },
+      { key: "products", href: (l) => `/${l}/products` },
       { key: "donation", href: (l) => `/${l}/donation` }
     ]
   },
