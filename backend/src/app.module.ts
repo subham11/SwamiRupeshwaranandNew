@@ -14,6 +14,7 @@ import { DonationModule } from './modules/donation/donation.module';
 import { SupportModule } from './modules/support/support.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { ProductsModule } from './modules/products/products.module';
+import { CartModule } from './modules/cart/cart.module';
 import { DatabaseModule } from './common/database/database.module';
 import { CognitoModule } from './common/cognito/cognito.module';
 import { EmailModule } from './common/email/email.module';
@@ -46,6 +47,7 @@ import { StorageModule } from './common/storage/storage.module';
     SupportModule,
     PaymentModule,
     ProductsModule,
+    CartModule,
   ],
 })
 export class AppModule {}

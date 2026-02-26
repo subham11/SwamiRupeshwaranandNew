@@ -13,6 +13,7 @@ import {
   ProductReview,
 } from "@/lib/api";
 import { useAuth } from "@/lib/useAuth";
+import { useCart } from "@/lib/CartContext";
 
 const TEXTS = {
   en: {
@@ -37,6 +38,10 @@ const TEXTS = {
     loadMore: "Load More Reviews",
     outOf5: "out of 5",
     buyNow: "Buy Now",
+    addToCart: "Add to Cart",
+    addedToCart: "Added!",
+    addingToCart: "Adding…",
+    loginToBuy: "Login to Buy",
     comingSoon: "Coming Soon",
     notFound: "Product not found",
     backToProducts: "← Back to Products",
@@ -64,6 +69,10 @@ const TEXTS = {
     loadMore: "और समीक्षाएं लोड करें",
     outOf5: "में से 5",
     buyNow: "अभी खरीदें",
+    addToCart: "कार्ट में जोड़ें",
+    addedToCart: "जोड़ा गया!",
+    addingToCart: "जोड़ रहे हैं…",
+    loginToBuy: "खरीदने के लिए लॉगिन करें",
     comingSoon: "जल्द आ रहा है",
     notFound: "उत्पाद नहीं मिला",
     backToProducts: "← उत्पादों पर वापस जाएं",
@@ -84,11 +93,14 @@ export default function ProductDetailPage() {
   const txt = TEXTS[locale] || TEXTS.en;
 
   const { user, accessToken, isAuthenticated } = useAuth();
+  const { addToCart: cartAdd } = useCart();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState<string>("");
   const [showVideo, setShowVideo] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
 
   // Reviews
   const [reviews, setReviews] = useState<ProductReview[]>([]);
@@ -380,17 +392,47 @@ export default function ProductDetailPage() {
             )}
 
             {/* Purchase / CTA */}
-            <div className="mb-8">
-              {purchaseLink ? (
-                <a
-                  href={purchaseLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-8 py-3 rounded-full text-white font-semibold text-lg transition hover:shadow-lg hover:scale-105"
-                  style={{ backgroundColor: "var(--color-gold)" }}
-                >
-                  🛒 {txt.buyNow}
-                </a>
+            <div className="mb-8 flex flex-wrap gap-3">
+              {product.stockStatus !== "out_of_stock" ? (
+                <>
+                  {isAuthenticated ? (
+                    <button
+                      onClick={async () => {
+                        setAddingToCart(true);
+                        const success = await cartAdd(product.id);
+                        setAddingToCart(false);
+                        if (success) {
+                          setAddedToCart(true);
+                          setTimeout(() => setAddedToCart(false), 2000);
+                        }
+                      }}
+                      disabled={addingToCart}
+                      className="inline-flex items-center gap-2 px-8 py-3 rounded-full text-white font-semibold text-lg transition hover:shadow-lg hover:scale-105 disabled:opacity-60"
+                      style={{ backgroundColor: "var(--color-gold)" }}
+                    >
+                      🛒 {addingToCart ? txt.addingToCart : addedToCart ? txt.addedToCart : txt.addToCart}
+                    </button>
+                  ) : (
+                    <Link
+                      href={`/${locale}/login?redirect=/${locale}/products/${product.slug}`}
+                      className="inline-flex items-center gap-2 px-8 py-3 rounded-full text-white font-semibold text-lg transition hover:shadow-lg hover:scale-105"
+                      style={{ backgroundColor: "var(--color-gold)" }}
+                    >
+                      🛒 {txt.loginToBuy}
+                    </Link>
+                  )}
+                  {purchaseLink && (
+                    <a
+                      href={purchaseLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-8 py-3 rounded-full border-2 font-semibold text-lg transition hover:shadow-lg hover:scale-105"
+                      style={{ borderColor: "var(--color-gold)", color: "var(--color-gold)" }}
+                    >
+                      {txt.buyNow}
+                    </a>
+                  )}
+                </>
               ) : (
                 <span className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-gray-200 text-gray-500 font-semibold text-lg dark:bg-gray-700 dark:text-gray-400">
                   {txt.comingSoon}

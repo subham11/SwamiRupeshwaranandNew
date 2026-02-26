@@ -2058,6 +2058,103 @@ export async function deleteProductReview(reviewId: string, accessToken: string)
   });
 }
 
+// ============================================
+// Cart & Address APIs
+// ============================================
+
+export interface CartItem {
+  productId: string;
+  title: string;
+  titleHi?: string;
+  slug: string;
+  price: number;
+  originalPrice?: number;
+  discountPercent?: number;
+  imageUrl?: string;
+  quantity: number;
+  stockStatus: string;
+  subtotal: number;
+}
+
+export interface Cart {
+  items: CartItem[];
+  totalItems: number;
+  totalAmount: number;
+  currency: string;
+}
+
+export interface ShippingAddress {
+  fullName: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  pincode: string;
+  country: string;
+}
+
+export async function fetchCart(accessToken: string): Promise<Cart> {
+  return apiRequest('/cart', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function addToCart(
+  productId: string,
+  quantity: number = 1,
+  accessToken: string,
+): Promise<Cart> {
+  return apiRequest('/cart/items', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ productId, quantity }),
+  });
+}
+
+export async function updateCartItem(
+  productId: string,
+  quantity: number,
+  accessToken: string,
+): Promise<Cart> {
+  return apiRequest(`/cart/items/${productId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ quantity }),
+  });
+}
+
+export async function removeFromCart(productId: string, accessToken: string): Promise<Cart> {
+  return apiRequest(`/cart/items/${productId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function clearCart(accessToken: string): Promise<Cart> {
+  return apiRequest('/cart', {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function fetchShippingAddress(accessToken: string): Promise<ShippingAddress | null> {
+  return apiRequest('/cart/address', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function updateShippingAddress(
+  address: ShippingAddress,
+  accessToken: string,
+): Promise<ShippingAddress> {
+  return apiRequest('/cart/address', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(address),
+  });
+}
+
 export default {
   fetchPageContent,
   fetchPagesList,
@@ -2161,4 +2258,12 @@ export default {
   fetchAllReviewsAdmin,
   approveProductReview,
   deleteProductReview,
+  // Cart & Address
+  fetchCart,
+  addToCart,
+  updateCartItem,
+  removeFromCart,
+  clearCart,
+  fetchShippingAddress,
+  updateShippingAddress,
 };
