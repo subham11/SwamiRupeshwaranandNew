@@ -165,7 +165,7 @@ export default function ProductDetailPage() {
     setSubmittingReview(true);
     setReviewError(null);
     try {
-      const payload: Record<string, unknown> = { rating: reviewRating };
+      const payload: { rating: number; reviewText?: string; reviewTextHi?: string } = { rating: reviewRating };
       if (reviewText) payload.reviewText = reviewText;
       if (reviewTextHi) payload.reviewTextHi = reviewTextHi;
       await createProductReview(product.id, payload, accessToken);
