@@ -395,7 +395,7 @@ export class SubscriptionsController {
   // Public Content Endpoints (No Auth Required)
   // ============================================
 
-  @Get('public/content/:contentType')
+  @Get('public-content/:contentType')
   @Public()
   @ApiOperation({
     summary: 'Get free-tier content by type (public)',

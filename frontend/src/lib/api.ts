@@ -1177,7 +1177,7 @@ export async function fetchPublicContent(
   const params = new URLSearchParams();
   if (locale) params.set('locale', locale);
   const qs = params.toString() ? `?${params.toString()}` : '';
-  return apiRequest(`/subscriptions/public/content/${contentType}${qs}`);
+  return apiRequest(`/subscriptions/public-content/${contentType}${qs}`);
 }
 
 export async function fetchContentByPlan(
