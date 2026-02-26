@@ -1137,6 +1137,319 @@ export async function cancelSubscription(
 }
 
 // ============================================
+// Subscription Content Library API
+// ============================================
+
+export interface SubscriptionContent {
+  id: string;
+  planId: string;
+  title: string;
+  titleHi?: string;
+  description?: string;
+  descriptionHi?: string;
+  contentType: 'stotra' | 'kavach' | 'pdf' | 'video' | 'image' | 'guidance';
+  fileKey?: string;
+  fileUrl?: string;
+  thumbnailKey?: string;
+  thumbnailUrl?: string;
+  displayOrder?: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function fetchContentByPlan(
+  planId: string,
+  accessToken: string,
+  contentType?: string,
+): Promise<{ items: SubscriptionContent[]; count: number }> {
+  const params = new URLSearchParams();
+  if (contentType) params.set('contentType', contentType);
+  const qs = params.toString() ? `?${params.toString()}` : '';
+  return apiRequest(`/subscriptions/content/plan/${planId}${qs}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function fetchContentById(
+  id: string,
+  accessToken: string,
+): Promise<SubscriptionContent> {
+  return apiRequest(`/subscriptions/content/${id}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function createSubscriptionContent(
+  data: {
+    planId: string;
+    title: string;
+    titleHi?: string;
+    description?: string;
+    descriptionHi?: string;
+    contentType: string;
+    fileKey?: string;
+    thumbnailKey?: string;
+    displayOrder?: number;
+    isActive?: boolean;
+  },
+  accessToken: string,
+): Promise<SubscriptionContent> {
+  return apiRequest('/subscriptions/content', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateSubscriptionContent(
+  id: string,
+  data: Partial<{
+    title: string;
+    titleHi: string;
+    description: string;
+    descriptionHi: string;
+    contentType: string;
+    fileKey: string;
+    thumbnailKey: string;
+    displayOrder: number;
+    isActive: boolean;
+  }>,
+  accessToken: string,
+): Promise<SubscriptionContent> {
+  return apiRequest(`/subscriptions/content/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteSubscriptionContent(
+  id: string,
+  accessToken: string,
+): Promise<void> {
+  return apiRequest(`/subscriptions/content/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function getContentPresignedUploadUrl(
+  data: { fileName: string; contentType: string; category: string },
+  accessToken: string,
+): Promise<{ uploadUrl: string; downloadUrl: string; key: string; expiresIn: number }> {
+  return apiRequest('/subscriptions/content-upload/presigned-upload-url', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function createContentWithFile(
+  data: {
+    planId: string;
+    title: string;
+    titleHi?: string;
+    description?: string;
+    descriptionHi?: string;
+    contentType: string;
+    fileKey: string;
+    thumbnailKey?: string;
+    displayOrder?: number;
+  },
+  accessToken: string,
+): Promise<SubscriptionContent> {
+  return apiRequest('/subscriptions/content-upload/create-with-file', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+// ============================================
+// Monthly Content Schedule API
+// ============================================
+
+export interface ScheduleContentItem {
+  contentId: string;
+  displayOrder: number;
+}
+
+export interface MonthlySchedule {
+  id: string;
+  planId: string;
+  planName?: string;
+  year: number;
+  month: number;
+  title?: string;
+  description?: string;
+  contentItems: ScheduleContentItem[];
+  resolvedContent?: SubscriptionContent[];
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ---- Admin Schedule CRUD ----
+
+export async function fetchMonthlySchedules(
+  accessToken: string,
+  planId?: string,
+): Promise<{ items: MonthlySchedule[]; count: number }> {
+  const params = planId ? `?planId=${planId}` : '';
+  return apiRequest(`/subscriptions/schedules${params}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function fetchMonthlyScheduleById(
+  id: string,
+  accessToken: string,
+): Promise<MonthlySchedule> {
+  return apiRequest(`/subscriptions/schedules/${id}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function fetchScheduleByPlanAndMonth(
+  planId: string,
+  year: number,
+  month: number,
+  accessToken: string,
+): Promise<MonthlySchedule | null> {
+  try {
+    return await apiRequest(`/subscriptions/schedules/plan/${planId}/${year}/${month}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }) as MonthlySchedule;
+  } catch {
+    return null;
+  }
+}
+
+export async function createMonthlySchedule(
+  data: {
+    planId: string;
+    year: number;
+    month: number;
+    title?: string;
+    description?: string;
+    contentItems: ScheduleContentItem[];
+    isPublished?: boolean;
+  },
+  accessToken: string,
+): Promise<MonthlySchedule> {
+  return apiRequest('/subscriptions/schedules', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateMonthlySchedule(
+  id: string,
+  data: Partial<{
+    title: string;
+    description: string;
+    contentItems: ScheduleContentItem[];
+    isPublished: boolean;
+  }>,
+  accessToken: string,
+): Promise<MonthlySchedule> {
+  return apiRequest(`/subscriptions/schedules/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteMonthlySchedule(
+  id: string,
+  accessToken: string,
+): Promise<void> {
+  return apiRequest(`/subscriptions/schedules/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+// ---- User Monthly Content Access ----
+
+export interface UserMonthlyOverview {
+  planId: string;
+  planName: string;
+  months: Array<{
+    year: number;
+    month: number;
+    title?: string;
+    contentCount: number;
+    isPublished: boolean;
+  }>;
+}
+
+export interface UserMonthlyContent {
+  year: number;
+  month: number;
+  title?: string;
+  description?: string;
+  planName: string;
+  contentItems: Array<{
+    id: string;
+    title: string;
+    titleHi?: string;
+    description?: string;
+    descriptionHi?: string;
+    contentType: string;
+    fileUrl?: string;
+    thumbnailUrl?: string;
+    displayOrder: number;
+  }>;
+}
+
+export async function fetchMyMonthlyOverview(
+  accessToken: string,
+): Promise<UserMonthlyOverview | null> {
+  try {
+    return await apiRequest('/subscriptions/schedules/my/overview', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }) as UserMonthlyOverview;
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchMyMonthlyContent(
+  year: number,
+  month: number,
+  accessToken: string,
+): Promise<UserMonthlyContent | null> {
+  try {
+    return await apiRequest(`/subscriptions/schedules/my/${year}/${month}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }) as UserMonthlyContent;
+  } catch {
+    return null;
+  }
+}
+
+// ============================================
 // Payment API (Razorpay Integration)
 // ============================================
 

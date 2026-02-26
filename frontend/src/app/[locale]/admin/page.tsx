@@ -25,6 +25,8 @@ const ADMIN_LINKS = [
   { href: '/admin/cms', label: 'Content Editor', icon: '📝', description: 'Edit page content' },
   { href: '/admin/events', label: 'Events', icon: '📅', description: 'Manage events & schedules' },
   { href: '/admin/subscriptions', label: 'Subscriptions', icon: '💳', description: 'Plans & user subscriptions' },
+  { href: '/admin/content-library', label: 'Content Library', icon: '📿', description: 'Upload stotras, kavach & PDFs' },
+  { href: '/admin/monthly-schedule', label: 'Monthly Schedule', icon: '🗓️', description: 'Assign content to months per plan' },
   { href: '/admin/newsletter', label: 'Newsletter', icon: '📧', description: 'Manage subscribers & campaigns' },
   { href: '/admin/donations', label: 'Donations', icon: '🙏', description: 'View donations & configure' },
   { href: '/admin/support', label: 'Support Tickets', icon: '🎫', description: 'Handle user queries' },

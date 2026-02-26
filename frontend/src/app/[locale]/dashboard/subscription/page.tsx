@@ -8,7 +8,11 @@ import Container from '@/components/ui/Container';
 import {
   fetchMySubscription,
   fetchSubscriptionPlans,
+  fetchMyMonthlyOverview,
+  fetchMyMonthlyContent,
   ApiSubscriptionPlan,
+  UserMonthlyOverview,
+  UserMonthlyContent,
 } from '@/lib/api';
 
 interface UserSubscription {
@@ -36,24 +40,48 @@ export default function SubscriptionDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
+  // Monthly content state
+  const [monthlyOverview, setMonthlyOverview] = useState<UserMonthlyOverview | null>(null);
+  const [selectedMonthContent, setSelectedMonthContent] = useState<UserMonthlyContent | null>(null);
+  const [loadingMonthContent, setLoadingMonthContent] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState<{ year: number; month: number } | null>(null);
+
   const loadData = useCallback(async () => {
     if (!accessToken) return;
 
     try {
       setLoading(true);
-      const [subResponse, plansResponse] = await Promise.all([
+      const [subResponse, plansResponse, overviewResponse] = await Promise.all([
         fetchMySubscription(accessToken).catch(() => null),
         fetchSubscriptionPlans().catch(() => [] as ApiSubscriptionPlan[]),
+        fetchMyMonthlyOverview(accessToken).catch(() => null),
       ]);
 
       if (subResponse) {
         setSubscription(subResponse as unknown as UserSubscription);
       }
       setAvailablePlans(plansResponse);
+      if (overviewResponse) {
+        setMonthlyOverview(overviewResponse);
+      }
     } catch (error) {
       console.error('Failed to load subscription data:', error);
     } finally {
       setLoading(false);
+    }
+  }, [accessToken]);
+
+  const loadMonthContent = useCallback(async (year: number, month: number) => {
+    if (!accessToken) return;
+    setLoadingMonthContent(true);
+    setSelectedMonth({ year, month });
+    try {
+      const content = await fetchMyMonthlyContent(year, month, accessToken);
+      setSelectedMonthContent(content);
+    } catch {
+      setSelectedMonthContent(null);
+    } finally {
+      setLoadingMonthContent(false);
     }
   }, [accessToken]);
 
@@ -255,6 +283,129 @@ export default function SubscriptionDashboardPage() {
               </div>
             </div>
           </div>
+
+          {/* Monthly Content Section */}
+          {monthlyOverview && monthlyOverview.months.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mt-8">
+              <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  📿 Monthly Spiritual Content
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Access your monthly stotras, kavach, and spiritual resources
+                </p>
+              </div>
+              <div className="p-6">
+                {/* Month Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
+                  {monthlyOverview.months.map((m) => {
+                    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    const isSelected = selectedMonth?.year === m.year && selectedMonth?.month === m.month;
+                    return (
+                      <button
+                        key={`${m.year}-${m.month}`}
+                        onClick={() => loadMonthContent(m.year, m.month)}
+                        className={`p-3 rounded-lg border-2 text-center transition-all ${
+                          isSelected
+                            ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+                            : 'border-gray-200 dark:border-gray-600 hover:border-orange-300'
+                        }`}
+                      >
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {monthNames[m.month - 1]}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{m.year}</p>
+                        <p className="text-xs text-orange-600 mt-1">
+                          {m.contentCount} item{m.contentCount !== 1 ? 's' : ''}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Month Content Drill-Down */}
+                {loadingMonthContent && (
+                  <div className="text-center py-8">
+                    <div className="animate-spin w-6 h-6 border-4 border-orange-500 border-t-transparent rounded-full mx-auto" />
+                    <p className="text-sm text-gray-500 mt-2">Loading content…</p>
+                  </div>
+                )}
+
+                {!loadingMonthContent && selectedMonthContent && (
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <div className="mb-4">
+                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {selectedMonthContent.title || `${['January','February','March','April','May','June','July','August','September','October','November','December'][selectedMonthContent.month - 1]} ${selectedMonthContent.year}`}
+                      </h4>
+                      {selectedMonthContent.description && (
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                          {selectedMonthContent.description}
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-3">
+                      {selectedMonthContent.contentItems.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600"
+                        >
+                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                            <span className="text-lg">
+                              {item.contentType === 'stotra' ? '📿' : item.contentType === 'kavach' ? '🛡️' : item.contentType === 'pdf' ? '📄' : item.contentType === 'video' ? '🎬' : '🙏'}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-900 dark:text-white truncate">
+                              {item.title}
+                            </p>
+                            {item.titleHi && (
+                              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                                {item.titleHi}
+                              </p>
+                            )}
+                            {item.description && (
+                              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 truncate">
+                                {item.description}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex-shrink-0">
+                            <span className="text-xs capitalize px-2 py-1 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                              {item.contentType}
+                            </span>
+                          </div>
+                          {item.fileUrl && (
+                            <a
+                              href={item.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-shrink-0 px-3 py-1.5 text-sm bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition"
+                            >
+                              Download
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {!loadingMonthContent && !selectedMonthContent && selectedMonth && (
+                  <div className="text-center py-8 border-t border-gray-200 dark:border-gray-700">
+                    <p className="text-gray-500 dark:text-gray-400">
+                      No content available for this month yet.
+                    </p>
+                  </div>
+                )}
+
+                {!selectedMonth && (
+                  <p className="text-sm text-gray-400 dark:text-gray-500 text-center">
+                    Select a month above to view your spiritual content
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
         </>
       ) : (
         /* No Subscription - Show Plans */
