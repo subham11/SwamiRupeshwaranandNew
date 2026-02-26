@@ -390,4 +390,29 @@ export class SubscriptionsController {
   async deleteContent(@Param('id') id: string, @Query('locale') locale?: string): Promise<void> {
     return this.subscriptionsService.deleteContent(id, locale);
   }
+
+  // ============================================
+  // Public Content Endpoints (No Auth Required)
+  // ============================================
+
+  @Get('public/content/:contentType')
+  @Public()
+  @ApiOperation({
+    summary: 'Get free-tier content by type (public)',
+    description:
+      'Returns content of the specified type from the free subscription plan. No authentication required.',
+  })
+  @ApiParam({ name: 'contentType', enum: ContentType, description: 'Type of content (stotra, kavach, etc.)' })
+  @ApiQuery({ name: 'locale', required: false })
+  @ApiResponse({
+    status: 200,
+    description: 'Free tier content list',
+    type: SubscriptionContentListResponseDto,
+  })
+  async getPublicContentByType(
+    @Param('contentType') contentType: ContentType,
+    @Query('locale') locale?: string,
+  ): Promise<SubscriptionContentListResponseDto> {
+    return this.subscriptionsService.getPublicContentByType(contentType, locale);
+  }
 }

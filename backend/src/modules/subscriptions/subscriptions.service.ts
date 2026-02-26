@@ -724,6 +724,20 @@ export class SubscriptionsService {
     };
   }
 
+  /**
+   * Get free-tier content by type for public access (no auth required)
+   */
+  async getPublicContentByType(
+    contentType: ContentType,
+    locale?: string,
+  ): Promise<SubscriptionContentListResponseDto> {
+    const freePlan = await this.findPlanByType(SubscriptionPlanType.FREE);
+    if (!freePlan) {
+      return { items: [], count: 0 };
+    }
+    return this.findContentByPlan(freePlan.id, contentType, locale);
+  }
+
   private mapContentToResponse(content: SubscriptionContentEntity): SubscriptionContentResponseDto {
     return {
       id: content.id,

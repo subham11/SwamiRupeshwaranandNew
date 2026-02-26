@@ -9,6 +9,8 @@
     "teachings": "Teachings",
     "gurukul": "One District One Gurukul",
     "donation": "Donation",
+    "stotras": "Stotras",
+    "kavach": "Kavach",
     "subscriptions": "Subscriptions",
     "contact": "Contact"
   },
@@ -41,6 +43,7 @@
   "navGroup": {
     "about": "About",
     "offerings": "Offerings",
+    "sacred_texts": "Sacred Texts",
     "initiatives": "Initiatives",
     "connect": "Connect"
   },
@@ -52,6 +55,8 @@
     "teachings": "Sacred spiritual teachings",
     "gurukul": "One District One Gurukul initiative",
     "donation": "Support seva and dharma work",
+    "stotras": "Sacred hymns and prayers",
+    "kavach": "Divine protective chants",
     "subscriptions": "Monthly spiritual content plans",
     "contact": "Reach us and visit"
   },

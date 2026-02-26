@@ -1167,6 +1167,19 @@ export interface SubscriptionContent {
   updatedAt: string;
 }
 
+/**
+ * Fetch free-tier content by type (public, no auth required)
+ */
+export async function fetchPublicContent(
+  contentType: 'stotra' | 'kavach' | 'pdf' | 'video' | 'image' | 'guidance',
+  locale?: string,
+): Promise<{ items: SubscriptionContent[]; count: number }> {
+  const params = new URLSearchParams();
+  if (locale) params.set('locale', locale);
+  const qs = params.toString() ? `?${params.toString()}` : '';
+  return apiRequest(`/subscriptions/public/content/${contentType}${qs}`);
+}
+
 export async function fetchContentByPlan(
   planId: string,
   accessToken: string,

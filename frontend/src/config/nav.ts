@@ -41,6 +41,13 @@ export const NAV_GROUPS_DEF: NavGroupDef[] = [
     ]
   },
   {
+    key: "sacred_texts",
+    links: [
+      { key: "stotras", href: (l) => `/${l}/stotras` },
+      { key: "kavach", href: (l) => `/${l}/kavach` }
+    ]
+  },
+  {
     key: "subscriptions",
     links: [
       { key: "subscriptions", href: (l) => `/${l}/subscribe` }
