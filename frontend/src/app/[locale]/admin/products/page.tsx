@@ -290,6 +290,11 @@ export default function AdminProductsPage() {
   // ============================================
 
   const openCreateProduct = () => {
+    if (categories.length === 0) {
+      setError('⚠️ Please create at least one category before adding products.');
+      setActiveTab('categories');
+      return;
+    }
     setEditingProductId(null);
     setProductForm(EMPTY_PRODUCT);
     setProductImages([]);
@@ -611,7 +616,19 @@ export default function AdminProductsPage() {
           {filteredProducts.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-xl border dark:bg-gray-900 dark:border-gray-700">
               <p className="text-4xl mb-3">🛒</p>
-              <p className="text-gray-500">No products found. Create your first product!</p>
+              {categories.length === 0 ? (
+                <>
+                  <p className="text-gray-500 mb-2">You need to create a category before adding products.</p>
+                  <button
+                    onClick={() => { setActiveTab('categories'); openCreateCategory(); }}
+                    className="mt-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm font-medium"
+                  >
+                    + Create Category First
+                  </button>
+                </>
+              ) : (
+                <p className="text-gray-500">No products found. Create your first product!</p>
+              )}
             </div>
           ) : (
             <div className="bg-white rounded-xl border overflow-hidden dark:bg-gray-900 dark:border-gray-700">
@@ -705,7 +722,14 @@ export default function AdminProductsPage() {
           {categories.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-xl border dark:bg-gray-900 dark:border-gray-700">
               <p className="text-4xl mb-3">📂</p>
-              <p className="text-gray-500">No categories yet. Create your first category!</p>
+              <p className="text-gray-500 mb-2">No categories yet. Products must belong to a category.</p>
+              <p className="text-sm text-gray-400 mb-4">Create your first category to start adding products.</p>
+              <button
+                onClick={openCreateCategory}
+                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm font-medium"
+              >
+                + Create First Category
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
