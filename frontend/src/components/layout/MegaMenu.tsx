@@ -99,12 +99,12 @@ export default function MegaMenu({ locale, groups, labels }: Props) {
                       ) : null}
                     </div>
 
-                    <div className="col-span-7 grid grid-cols-2 gap-3">
+                    <div className="col-span-7 grid grid-cols-2 gap-3 content-start">
                       {group.links.map((l) => (
                         <Link
                           key={l.key}
                           href={l.href}
-                          className="rounded-xl border border-zinc-100 p-3 hover:bg-zinc-50"
+                          className="rounded-xl border border-zinc-100 p-3 hover:bg-zinc-50 h-fit"
                         >
                           <div className="text-sm font-medium">{labels[`nav.${l.key}`] ?? l.key}</div>
                           <div className="mt-1 text-xs text-zinc-600">
