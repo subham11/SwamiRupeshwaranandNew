@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type { AppLocale } from "@/i18n/config";
 import type { NavGroup } from "@/config/nav";
 import { motion, AnimatePresence } from "motion/react";
@@ -71,6 +72,17 @@ export default function MegaMenu({ locale, groups, labels }: Props) {
                 >
                   <div className="grid grid-cols-12 gap-5">
                     <div className="col-span-5 rounded-2xl bg-zinc-50 p-4">
+                      {group.featured?.image && (
+                        <div className="relative w-full aspect-square mb-3 rounded-xl overflow-hidden">
+                          <Image
+                            src={group.featured.image}
+                            alt={group.featured ? labels[group.featured.titleKey] : labels["brand"]}
+                            fill
+                            className="object-cover"
+                            sizes="200px"
+                          />
+                        </div>
+                      )}
                       <div className="text-sm font-semibold">
                         {group.featured ? labels[group.featured.titleKey] : labels["brand"]}
                       </div>

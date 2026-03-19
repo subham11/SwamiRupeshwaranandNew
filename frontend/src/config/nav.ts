@@ -5,12 +5,12 @@ export type NavLink = { key: string; href: string };
 
 export type NavGroupDef = {
   key: string;
-  featured?: { titleKey: string; descriptionKey: string; href: (locale: AppLocale) => string };
+  featured?: { titleKey: string; descriptionKey: string; href: (locale: AppLocale) => string; image?: string };
   links: NavLinkDef[];
 };
 export type NavGroup = {
   key: string;
-  featured?: { titleKey: string; descriptionKey: string; href: string };
+  featured?: { titleKey: string; descriptionKey: string; href: string; image?: string };
   links: NavLink[];
 };
 
@@ -24,7 +24,8 @@ export const NAV_GROUPS_DEF: NavGroupDef[] = [
     featured: {
       titleKey: "nav.swamiji",
       descriptionKey: "hero.subtitle",
-      href: (l) => `/${l}/swamiji`
+      href: (l) => `/${l}/swamiji`,
+      image: "/images/swamiji-portrait.jpg"
     },
     links: [
       { key: "swamiji", href: (l) => `/${l}/swamiji` },
@@ -33,6 +34,12 @@ export const NAV_GROUPS_DEF: NavGroupDef[] = [
   },
   {
     key: "offerings",
+    featured: {
+      titleKey: "brand",
+      descriptionKey: "hero.subtitle",
+      href: (l) => `/${l}/services`,
+      image: "/images/swamiji-blessing.jpg"
+    },
     links: [
       { key: "services", href: (l) => `/${l}/services` },
       { key: "events", href: (l) => `/${l}/events` },
