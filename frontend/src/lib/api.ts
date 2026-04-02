@@ -2240,6 +2240,104 @@ export async function fetchOrderById(orderId: string, accessToken: string): Prom
   });
 }
 
+// ============================================
+// Settings (Admin - Super Admin only)
+// ============================================
+
+export interface SettingItem {
+  key: string;
+  value: string;
+  category: string;
+  description?: string;
+  isSecret: boolean;
+  updatedAt: string;
+  updatedBy?: string;
+}
+
+export async function fetchAllSettings(accessToken: string): Promise<SettingItem[]> {
+  const resp = await apiRequest<{ settings: SettingItem[] }>("/settings", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return resp.settings;
+}
+
+export async function fetchSettingsByCategory(
+  category: string,
+  accessToken: string
+): Promise<SettingItem[]> {
+  const resp = await apiRequest<{ settings: SettingItem[] }>(`/settings/category/${category}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return resp.settings;
+}
+
+export async function updateSetting(
+  data: {
+    key: string;
+    value: string;
+    category?: string;
+    description?: string;
+    isSecret?: boolean;
+  },
+  accessToken: string
+): Promise<{ success: boolean; message: string }> {
+  return apiRequest("/settings", {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function bulkUpdateSettings(
+  data: {
+    category: string;
+    settings: Array<{
+      key: string;
+      value: string;
+      description?: string;
+      isSecret?: boolean;
+    }>;
+  },
+  accessToken: string
+): Promise<{ success: boolean; message: string }> {
+  return apiRequest("/settings/bulk", {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function testRazorpayConnection(
+  keyId: string,
+  keySecret: string,
+  accessToken: string
+): Promise<{ success: boolean; message: string }> {
+  return apiRequest("/settings/razorpay/test", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ keyId, keySecret }),
+  });
+}
+
+export async function deleteSetting(
+  key: string,
+  accessToken: string
+): Promise<{ success: boolean; message: string }> {
+  return apiRequest(`/settings/${key}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function invalidateSettingsCache(
+  accessToken: string
+): Promise<{ success: boolean; message: string }> {
+  return apiRequest("/settings/cache/invalidate", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
 export default {
   fetchPageContent,
   fetchPagesList,
@@ -2356,4 +2454,12 @@ export default {
   verifyProductOrderPayment,
   fetchMyOrders,
   fetchOrderById,
+  // Settings (Admin)
+  fetchAllSettings,
+  fetchSettingsByCategory,
+  updateSetting,
+  bulkUpdateSettings,
+  testRazorpayConnection,
+  deleteSetting,
+  invalidateSettingsCache,
 };

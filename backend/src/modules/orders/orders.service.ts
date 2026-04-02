@@ -14,6 +14,7 @@ const Razorpay = require('razorpay');
 import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
 import { EmailService } from '@/common/email/email.service';
 import { CartService } from '@/modules/cart/cart.service';
+import { SettingsService } from '@/modules/settings/settings.service';
 import {
   OrderStatus,
   CheckoutResponseDto,
@@ -78,9 +79,13 @@ interface OrderEntity {
 export class OrdersService {
   private readonly logger = new Logger(OrdersService.name);
   private readonly orderEntityType = 'ORDER';
+
+  // Razorpay instance and keys — lazily initialized from SettingsService
   private razorpay: any = null;
-  private readonly keyId: string;
-  private readonly keySecret: string;
+  private keyId = '';
+  private keySecret = '';
+  private razorpayInitializedAt = 0;
+  private readonly RAZORPAY_REINIT_INTERVAL_MS = 5 * 60 * 1000; // 5 min
 
   constructor(
     @Inject(DATABASE_SERVICE)
@@ -88,7 +93,9 @@ export class OrdersService {
     private readonly configService: ConfigService,
     private readonly emailService: EmailService,
     private readonly cartService: CartService,
+    private readonly settingsService: SettingsService,
   ) {
+    // Eager init from env vars for immediate availability (cold start)
     this.keyId = this.configService.get<string>('RAZORPAY_KEY_ID', '');
     this.keySecret = this.configService.get<string>('RAZORPAY_KEY_SECRET', '');
 
@@ -98,17 +105,46 @@ export class OrdersService {
           key_id: this.keyId,
           key_secret: this.keySecret,
         });
-        this.logger.log('Razorpay initialized for Orders');
+        this.razorpayInitializedAt = Date.now();
+        this.logger.log('Razorpay initialized for Orders from env vars');
       } catch (error) {
         this.logger.warn('Failed to initialize Razorpay for Orders:', error.message);
       }
     }
   }
 
-  private ensureRazorpayInitialized(): void {
+  /**
+   * Ensures Razorpay is initialized. Re-reads from SettingsService periodically
+   * to pick up admin-updated keys without a deployment.
+   */
+  private async ensureRazorpayInitialized(): Promise<void> {
+    const needsReinit =
+      !this.razorpay ||
+      Date.now() - this.razorpayInitializedAt > this.RAZORPAY_REINIT_INTERVAL_MS;
+
+    if (needsReinit) {
+      try {
+        const config = await this.settingsService.getRazorpayConfig();
+        if (config.keyId && config.keySecret) {
+          if (config.keyId !== this.keyId || config.keySecret !== this.keySecret) {
+            this.razorpay = new Razorpay({
+              key_id: config.keyId,
+              key_secret: config.keySecret,
+            });
+            this.keyId = config.keyId;
+            this.keySecret = config.keySecret;
+            this.logger.log('Razorpay re-initialized for Orders with updated keys');
+          }
+          this.razorpayInitializedAt = Date.now();
+        }
+      } catch (error) {
+        this.logger.warn(`Failed to refresh Razorpay keys for Orders: ${error.message}`);
+      }
+    }
+
     if (!this.razorpay) {
       throw new BadRequestException(
-        'Payment service is not configured. Please contact administrator.',
+        'Payment service is not configured. Please set Razorpay keys in Admin Settings.',
       );
     }
   }
@@ -121,7 +157,7 @@ export class OrdersService {
     userId: string,
     userEmail: string,
   ): Promise<CheckoutResponseDto> {
-    this.ensureRazorpayInitialized();
+    await this.ensureRazorpayInitialized();
 
     // 1. Fetch cart
     const cart = await this.cartService.getCart(userId);

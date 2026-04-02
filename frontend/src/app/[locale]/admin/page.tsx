@@ -32,6 +32,7 @@ const ADMIN_LINKS = [
   { href: '/admin/support', label: 'Support Tickets', icon: '🎫', description: 'Handle user queries' },
   { href: '/admin/media', label: 'Media Library', icon: '🖼️', description: 'Manage uploaded files' },
   { href: '/admin/products', label: 'Products', icon: '🛒', description: 'Manage products & categories' },
+  { href: '/admin/settings', label: 'Settings', icon: '\u2699\uFE0F', description: 'Razorpay keys & system config', superAdminOnly: true },
 ];
 
 export default function AdminDashboardPage() {
@@ -185,7 +186,7 @@ export default function AdminDashboardPage() {
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {ADMIN_LINKS.map((link) => (
+          {ADMIN_LINKS.filter((link) => !(link as any).superAdminOnly || user?.role === 'super_admin').map((link) => (
             <Link
               key={link.href}
               href={link.href}

@@ -16,6 +16,7 @@ import { PaymentModule } from './modules/payment/payment.module';
 import { ProductsModule } from './modules/products/products.module';
 import { CartModule } from './modules/cart/cart.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { SettingsModule } from './modules/settings/settings.module';
 import { DatabaseModule } from './common/database/database.module';
 import { CognitoModule } from './common/cognito/cognito.module';
 import { EmailModule } from './common/email/email.module';
@@ -33,6 +34,8 @@ import { StorageModule } from './common/storage/storage.module';
     CognitoModule,
     EmailModule,
     StorageModule,
+    // Global settings module (must be before feature modules that depend on it)
+    SettingsModule,
     // Feature modules
     HealthModule,
     AuthModule,

@@ -15,6 +15,7 @@ import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
 import { SubscriptionsService } from '@/modules/subscriptions/subscriptions.service';
 import { OrdersService } from '@/modules/orders/orders.service';
 import { EmailService } from '@/common/email/email.service';
+import { SettingsService } from '@/modules/settings/settings.service';
 import {
   InitiateSubscriptionPaymentDto,
   VerifyOrderPaymentDto,
@@ -64,10 +65,14 @@ interface PaymentRecordEntity {
 export class PaymentService {
   private readonly logger = new Logger(PaymentService.name);
   private readonly paymentEntityType = 'PAYMENT';
+
+  // Razorpay instance and keys — lazily initialized from SettingsService
   private razorpay: any = null;
-  private readonly keyId: string;
-  private readonly keySecret: string;
-  private readonly webhookSecret: string;
+  private keyId = '';
+  private keySecret = '';
+  private webhookSecret = '';
+  private razorpayInitializedAt = 0;
+  private readonly RAZORPAY_REINIT_INTERVAL_MS = 5 * 60 * 1000; // 5 min
 
   constructor(
     @Inject(DATABASE_SERVICE)
@@ -77,38 +82,80 @@ export class PaymentService {
     @Inject(forwardRef(() => OrdersService))
     private readonly ordersService: OrdersService,
     private readonly emailService: EmailService,
+    private readonly settingsService: SettingsService,
   ) {
+    // Eager init from env vars for immediate availability (cold start)
     this.keyId = this.configService.get<string>('RAZORPAY_KEY_ID', '');
     this.keySecret = this.configService.get<string>('RAZORPAY_KEY_SECRET', '');
     this.webhookSecret = this.configService.get<string>('RAZORPAY_WEBHOOK_SECRET', '');
 
-    // Initialize Razorpay instance only when credentials are configured
     if (this.keyId && this.keySecret) {
       try {
         this.razorpay = new Razorpay({
           key_id: this.keyId,
           key_secret: this.keySecret,
         });
-        this.logger.log('Razorpay initialized successfully');
+        this.razorpayInitializedAt = Date.now();
+        this.logger.log('Razorpay initialized from env vars');
       } catch (error) {
         this.logger.warn('Failed to initialize Razorpay:', error.message);
       }
     } else {
       this.logger.warn(
-        'Razorpay keys not configured. Payment features will not work. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.',
+        'Razorpay keys not in env vars. Will try loading from Settings on first use.',
       );
     }
   }
 
   /**
    * Ensures Razorpay is initialized before any payment operation.
-   * Throws a clear error if Razorpay keys are not configured.
+   * Re-initializes from SettingsService if keys may have changed (every 5 min).
    */
-  private ensureRazorpayInitialized(): void {
+  private async ensureRazorpayInitialized(): Promise<void> {
+    const needsReinit =
+      !this.razorpay ||
+      Date.now() - this.razorpayInitializedAt > this.RAZORPAY_REINIT_INTERVAL_MS;
+
+    if (needsReinit) {
+      await this.refreshRazorpayKeys();
+    }
+
     if (!this.razorpay) {
       throw new BadRequestException(
-        'Payment service is not configured. Please contact administrator.',
+        'Payment service is not configured. Please set Razorpay keys in Admin Settings.',
       );
+    }
+  }
+
+  /**
+   * Reload Razorpay keys from SettingsService (DynamoDB → env fallback).
+   * Called periodically to pick up admin-updated keys without restart.
+   */
+  private async refreshRazorpayKeys(): Promise<void> {
+    try {
+      const config = await this.settingsService.getRazorpayConfig();
+
+      // Only re-init if keys actually changed
+      if (config.keyId && config.keySecret) {
+        if (config.keyId !== this.keyId || config.keySecret !== this.keySecret) {
+          this.razorpay = new Razorpay({
+            key_id: config.keyId,
+            key_secret: config.keySecret,
+          });
+          this.keyId = config.keyId;
+          this.keySecret = config.keySecret;
+          this.logger.log('Razorpay re-initialized with updated keys from Settings');
+        }
+
+        if (config.webhookSecret) {
+          this.webhookSecret = config.webhookSecret;
+        }
+
+        this.razorpayInitializedAt = Date.now();
+      }
+    } catch (error) {
+      this.logger.warn(`Failed to refresh Razorpay keys from Settings: ${error.message}`);
+      // Keep using existing keys if refresh fails
     }
   }
 
@@ -212,7 +259,7 @@ export class PaymentService {
 
     const billing = periodMap[plan.billingCycle] || { period: 'monthly' as RazorpayPeriod, interval: 1 };
 
-    this.ensureRazorpayInitialized();
+    await this.ensureRazorpayInitialized();
 
     // Create a Razorpay Plan
     const razorpayPlan = (await this.razorpay.plans.create({
@@ -287,7 +334,7 @@ export class PaymentService {
     userId: string,
     userEmail: string,
   ): Promise<SubscriptionPaymentResponseDto> {
-    this.ensureRazorpayInitialized();
+    await this.ensureRazorpayInitialized();
 
     const order = await this.razorpay.orders.create({
       amount: plan.price * 100, // Convert to paise
@@ -426,7 +473,7 @@ export class PaymentService {
     dto: InitiateDonationPaymentDto,
     userId?: string,
   ): Promise<DonationPaymentResponseDto> {
-    this.ensureRazorpayInitialized();
+    await this.ensureRazorpayInitialized();
 
     const order = await this.razorpay.orders.create({
       amount: dto.amount * 100,
