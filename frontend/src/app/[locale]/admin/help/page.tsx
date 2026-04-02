@@ -965,10 +965,40 @@ subscription.pending    → Marks payment pending`}
           />
 
           <SubHeading id="orders-tracking">Tracking & Fulfillment</SubHeading>
-          <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-            To fulfill an order: update its status from &quot;paid&quot; to &quot;processing&quot; when you start preparing it,
-            then to &quot;shipped&quot; with a tracking number. The user gets email notifications at each stage.
-          </p>
+          <StepList
+            steps={[
+              {
+                title: 'Go to Admin > Orders',
+                description: 'Navigate to /admin/orders. You\'ll see all orders with stats cards (Total, Paid, Processing, Shipped) and filter tabs.',
+                screenshot: 'Screenshot: Admin Orders page showing stats cards and orders table',
+              },
+              {
+                title: 'Filter by status',
+                description: 'Use the tabs at the top to filter: All, Payment Pending, Paid, Processing, Shipped, Delivered, Cancelled.',
+              },
+              {
+                title: 'Click on an order to expand details',
+                description: 'Click any order row to see: items list, shipping address, payment info, and tracking details.',
+                screenshot: 'Screenshot: Expanded order row showing items and shipping address',
+              },
+              {
+                title: 'Update status to "Processing"',
+                description: 'Click "Update Status" on a paid order. Select "processing" and optionally add admin notes. The customer receives an email: "Your order is being prepared!"',
+              },
+              {
+                title: 'Mark as "Shipped" with tracking number',
+                description: 'When you ship the order, update status to "shipped" and enter the courier tracking number. The customer gets an email with the tracking number.',
+                screenshot: 'Screenshot: Update status modal with tracking number field',
+              },
+              {
+                title: 'Confirm delivery',
+                description: 'Once the customer receives the order, update to "delivered". A final confirmation email is sent.',
+              },
+            ]}
+          />
+          <InfoBox type="success" title="Automatic Email Notifications">
+            <p>Customers receive automatic email notifications at each stage: Order Confirmed (on payment), Processing, Shipped (with tracking), and Delivered. No manual email sending needed!</p>
+          </InfoBox>
 
           {/* ══════════════════════════════════════════════
               SECTION: SUBSCRIPTIONS

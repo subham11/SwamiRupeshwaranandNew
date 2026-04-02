@@ -14,7 +14,7 @@ import {
   SettingItem,
 } from '@/lib/api';
 
-type Tab = 'razorpay' | 'general';
+type Tab = 'razorpay' | 'smtp' | 'general';
 
 // Razorpay setting keys
 const RAZORPAY_SETTINGS = [
@@ -41,6 +41,15 @@ const RAZORPAY_SETTINGS = [
   },
 ];
 
+const SMTP_SETTINGS = [
+  { key: 'SMTP_HOST', label: 'SMTP Host', description: 'Mail server hostname', placeholder: 'mail.example.com', isSecret: false },
+  { key: 'SMTP_PORT', label: 'SMTP Port', description: 'Mail server port (usually 587 for TLS or 465 for SSL)', placeholder: '587', isSecret: false },
+  { key: 'SMTP_USERNAME', label: 'SMTP Username', description: 'Email account username for authentication', placeholder: 'noreply@example.com', isSecret: false },
+  { key: 'SMTP_PASSWORD', label: 'SMTP Password', description: 'Email account password', placeholder: 'Enter password', isSecret: true },
+  { key: 'SMTP_FROM_EMAIL', label: 'From Email', description: 'The "From" email address shown to recipients', placeholder: 'noreply@example.com', isSecret: false },
+  { key: 'SMTP_FROM_NAME', label: 'From Name', description: 'The sender name shown to recipients', placeholder: 'Swami Rupeshwaranand Ashram', isSecret: false },
+];
+
 export default function AdminSettingsPage() {
   const router = useRouter();
   const { user, accessToken, isAuthenticated, isLoading } = useAuth();
@@ -58,6 +67,14 @@ export default function AdminSettingsPage() {
     RAZORPAY_KEY_SECRET: '',
     RAZORPAY_WEBHOOK_SECRET: '',
   });
+  const [smtpForm, setSmtpForm] = useState<Record<string, string>>({
+    SMTP_HOST: '',
+    SMTP_PORT: '',
+    SMTP_USERNAME: '',
+    SMTP_PASSWORD: '',
+    SMTP_FROM_EMAIL: '',
+    SMTP_FROM_NAME: '',
+  });
   const [existingSettings, setExistingSettings] = useState<SettingItem[]>([]);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
 
@@ -69,15 +86,26 @@ export default function AdminSettingsPage() {
     try {
       setLoading(true);
       setError(null);
-      const settings = await fetchSettingsByCategory('razorpay', accessToken);
-      setExistingSettings(settings);
+      const [razorpaySettings, smtpSettings] = await Promise.all([
+        fetchSettingsByCategory('razorpay', accessToken),
+        fetchSettingsByCategory('smtp', accessToken),
+      ]);
+      const allSettings = [...razorpaySettings, ...smtpSettings];
+      setExistingSettings(allSettings);
 
-      // Pre-fill form with existing values
-      const formValues: Record<string, string> = { ...razorpayForm };
-      for (const setting of settings) {
-        formValues[setting.key] = setting.value;
+      // Pre-fill Razorpay form
+      const rpValues: Record<string, string> = { ...razorpayForm };
+      for (const setting of razorpaySettings) {
+        rpValues[setting.key] = setting.value;
       }
-      setRazorpayForm(formValues);
+      setRazorpayForm(rpValues);
+
+      // Pre-fill SMTP form
+      const smtpValues: Record<string, string> = { ...smtpForm };
+      for (const setting of smtpSettings) {
+        smtpValues[setting.key] = setting.value;
+      }
+      setSmtpForm(smtpValues);
     } catch (err: any) {
       setError(err.message || 'Failed to load settings');
     } finally {
@@ -205,6 +233,50 @@ export default function AdminSettingsPage() {
     }
   };
 
+  // Save SMTP settings
+  const handleSaveSmtp = async () => {
+    if (!accessToken) return;
+
+    try {
+      setSaving(true);
+      setError(null);
+
+      const settingsToUpdate = SMTP_SETTINGS
+        .filter(s => {
+          const val = smtpForm[s.key]?.trim();
+          if (!val) return false;
+          if (isSecretMasked(val)) return false;
+          return true;
+        })
+        .map(s => ({
+          key: s.key,
+          value: smtpForm[s.key].trim(),
+          description: s.description,
+          isSecret: s.isSecret,
+        }));
+
+      if (settingsToUpdate.length === 0) {
+        setError('No changes to save');
+        setSaving(false);
+        return;
+      }
+
+      await bulkUpdateSettings(
+        { category: 'smtp', settings: settingsToUpdate },
+        accessToken
+      );
+
+      await invalidateSettingsCache(accessToken);
+
+      setSuccess('SMTP settings saved successfully! Changes will take effect within 5 minutes.');
+      await loadSettings();
+    } catch (err: any) {
+      setError(err.message || 'Failed to save SMTP settings');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // Check if a value is a masked secret (e.g., "rzp_****5Uio")
   const isSecretMasked = (value: string): boolean => {
     return value?.includes('****') ?? false;
@@ -283,6 +355,7 @@ export default function AdminSettingsPage() {
         <nav className="flex gap-6">
           {[
             { id: 'razorpay' as Tab, label: 'Razorpay Payment Gateway' },
+            { id: 'smtp' as Tab, label: 'Email / SMTP' },
             { id: 'general' as Tab, label: 'General' },
           ].map((tab) => (
             <button
@@ -499,6 +572,85 @@ export default function AdminSettingsPage() {
         </div>
       )}
 
+      {/* SMTP Tab */}
+      {activeTab === 'smtp' && (
+        <div>
+          {/* Info Banner */}
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <h3 className="font-medium text-blue-800 dark:text-blue-200 mb-1">
+              Email / SMTP Configuration
+            </h3>
+            <p className="text-sm text-blue-600 dark:text-blue-300">
+              Configure SMTP settings for transactional emails such as OTP verification,
+              order confirmations, payment receipts, and password reset emails.
+              These settings are used by the backend mailer service.
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600" />
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {SMTP_SETTINGS.map((setting) => {
+                const existing = getSettingInfo(setting.key);
+                return (
+                  <div key={setting.key} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-900 dark:text-white">
+                          {setting.label}
+                        </label>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {setting.description}
+                        </p>
+                      </div>
+                      {existing?.updatedAt && (
+                        <span className="text-xs text-gray-400 whitespace-nowrap ml-4">
+                          Updated {new Date(existing.updatedAt).toLocaleDateString()}
+                          {existing.updatedBy && ` by ${existing.updatedBy}`}
+                        </span>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <input
+                        type={setting.isSecret ? 'password' : 'text'}
+                        value={smtpForm[setting.key] || ''}
+                        onChange={(e) =>
+                          setSmtpForm((prev) => ({
+                            ...prev,
+                            [setting.key]: e.target.value,
+                          }))
+                        }
+                        placeholder={setting.placeholder}
+                        className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-mono text-sm"
+                      />
+                      {setting.isSecret && smtpForm[setting.key] && isSecretMasked(smtpForm[setting.key]) && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 rounded">
+                          Masked — enter new value to change
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <Button
+                  onClick={handleSaveSmtp}
+                  disabled={saving}
+                  className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2.5 rounded-lg font-medium transition disabled:opacity-50"
+                >
+                  {saving ? 'Saving...' : 'Save SMTP Settings'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* General Tab (placeholder for future settings) */}
       {activeTab === 'general' && (
         <div className="text-center py-16">
@@ -507,7 +659,7 @@ export default function AdminSettingsPage() {
             General Settings
           </h3>
           <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-            Additional settings like SMTP configuration, site name, contact info,
+            Additional settings like site name, contact info,
             and more will be available here in a future update.
           </p>
         </div>

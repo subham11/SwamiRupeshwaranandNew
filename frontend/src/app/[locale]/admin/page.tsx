@@ -32,6 +32,7 @@ const ADMIN_LINKS = [
   { href: '/admin/support', label: 'Support Tickets', icon: '🎫', description: 'Handle user queries' },
   { href: '/admin/media', label: 'Media Library', icon: '🖼️', description: 'Manage uploaded files' },
   { href: '/admin/products', label: 'Products', icon: '🛒', description: 'Manage products & categories' },
+  { href: '/admin/orders', label: 'Orders', icon: '\uD83D\uDCE6', description: 'View & manage customer orders' },
   { href: '/admin/settings', label: 'Settings', icon: '\u2699\uFE0F', description: 'Razorpay keys & system config', superAdminOnly: true },
   { href: '/admin/help', label: 'Help Center', icon: '\uD83D\uDCD6', description: 'Documentation & guides for admins' },
 ];

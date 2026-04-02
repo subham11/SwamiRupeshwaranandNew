@@ -2241,6 +2241,28 @@ export async function fetchOrderById(orderId: string, accessToken: string): Prom
 }
 
 // ============================================
+// Orders (Admin)
+// ============================================
+
+export async function fetchAllOrdersAdmin(accessToken: string): Promise<Order[]> {
+  return apiRequest('/orders/admin/all', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function updateOrderStatusAdmin(
+  orderId: string,
+  data: { status: string; adminNotes?: string; trackingNumber?: string },
+  accessToken: string
+): Promise<Order> {
+  return apiRequest(`/orders/admin/${orderId}/status`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+// ============================================
 // Settings (Admin - Super Admin only)
 // ============================================
 
@@ -2454,6 +2476,8 @@ export default {
   verifyProductOrderPayment,
   fetchMyOrders,
   fetchOrderById,
+  fetchAllOrdersAdmin,
+  updateOrderStatusAdmin,
   // Settings (Admin)
   fetchAllSettings,
   fetchSettingsByCategory,

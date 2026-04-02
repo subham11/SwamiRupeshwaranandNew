@@ -484,6 +484,11 @@ export class OrdersService {
       `ORDER#${orderId}`,
     );
 
+    // Send status update email (non-blocking)
+    this.sendOrderStatusUpdateEmail(updated!, dto.status, dto.trackingNumber).catch((err) =>
+      this.logger.warn(`Failed to send order status update email: ${err.message}`),
+    );
+
     return this.toResponseDto(updated!);
   }
 
@@ -639,6 +644,180 @@ Swami Rupeshwaranand Ashram
     });
 
     this.logger.log(`Order confirmation email sent to ${order.userEmail} for order ${order.id}`);
+  }
+
+  private async sendOrderStatusUpdateEmail(
+    order: OrderEntity,
+    newStatus: string,
+    trackingNumber?: string,
+  ): Promise<void> {
+    const statusTextMap: Record<string, string> = {
+      processing: 'Being Prepared',
+      shipped: 'Shipped',
+      delivered: 'Delivered',
+      cancelled: 'Cancelled',
+    };
+
+    const statusText = statusTextMap[newStatus];
+    if (!statusText) {
+      return; // Only send emails for the statuses above
+    }
+
+    const statusMessageMap: Record<string, string> = {
+      processing: `Your order #${order.id.substring(0, 8).toUpperCase()} is being prepared! We're working on getting your items ready.`,
+      shipped: `Your order #${order.id.substring(0, 8).toUpperCase()} has been shipped! Tracking: ${trackingNumber || 'N/A'}. Expected delivery in 3-7 business days.`,
+      delivered: `Your order #${order.id.substring(0, 8).toUpperCase()} has been delivered! We hope you enjoy your purchase.`,
+      cancelled: `Your order #${order.id.substring(0, 8).toUpperCase()} has been cancelled. If payment was made, a refund will be processed.`,
+    };
+
+    const statusEmojiMap: Record<string, string> = {
+      processing: '🔧',
+      shipped: '🚚',
+      delivered: '✅',
+      cancelled: '❌',
+    };
+
+    const statusColorMap: Record<string, string> = {
+      processing: '#2563eb',
+      shipped: '#7c3aed',
+      delivered: '#16a34a',
+      cancelled: '#dc2626',
+    };
+
+    const orderIdShort = order.id.substring(0, 8).toUpperCase();
+    const addr = order.shippingAddress;
+    const message = statusMessageMap[newStatus];
+    const emoji = statusEmojiMap[newStatus];
+    const statusColor = statusColorMap[newStatus];
+
+    const subject = `Order Update: #${orderIdShort} — ${statusText} — Swami Rupeshwaranand Ashram`;
+
+    const trackingSection =
+      newStatus === 'shipped' && trackingNumber
+        ? `
+              <div style="background-color: #f0fdf4; border-radius: 8px; padding: 16px; margin: 20px 0; border: 1px solid #bbf7d0;">
+                <p style="color: #166534; font-size: 14px; margin: 0;"><strong>📦 Tracking Number:</strong> ${trackingNumber}</p>
+                <p style="color: #166534; font-size: 13px; margin: 8px 0 0;">Expected delivery in 3-7 business days.</p>
+              </div>`
+        : '';
+
+    const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Status Update</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td style="padding: 40px 0;">
+        <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;">${emoji} Order ${statusText}</h1>
+              <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0; font-size: 16px;">Swami Rupeshwaranand Ashram</p>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px 30px;">
+              <h2 style="color: #1f2937; margin: 0 0 20px; font-size: 24px;">Dear ${addr.fullName},</h2>
+
+              <!-- Status Badge -->
+              <div style="text-align: center; margin: 20px 0;">
+                <span style="display: inline-block; background-color: ${statusColor}; color: #ffffff; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; text-transform: uppercase;">${statusText}</span>
+              </div>
+
+              <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 10px; text-align: center;">
+                ${message}
+              </p>
+
+              <!-- Order ID -->
+              <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0; border: 2px solid #f59e0b;">
+                <p style="color: #92400e; font-size: 14px; margin: 0 0 5px;">Order ID</p>
+                <span style="font-size: 18px; font-weight: 700; color: #92400e; font-family: monospace;">${orderIdShort}</span>
+              </div>
+              ${trackingSection}
+
+              <!-- Order Summary -->
+              <div style="background-color: #f9fafb; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                <h3 style="color: #1f2937; font-size: 16px; margin: 0 0 10px;">Order Summary</h3>
+                <p style="color: #4b5563; font-size: 14px; line-height: 1.6; margin: 0;">
+                  Items: ${order.totalItems}<br>
+                  Total: <strong>₹${order.totalAmount}</strong>
+                </p>
+              </div>
+
+              <!-- Shipping Address -->
+              <div style="background-color: #f9fafb; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                <h3 style="color: #1f2937; font-size: 16px; margin: 0 0 10px;">📦 Shipping Address</h3>
+                <p style="color: #4b5563; font-size: 14px; line-height: 1.6; margin: 0;">
+                  ${addr.fullName}<br>
+                  ${addr.addressLine1}${addr.addressLine2 ? '<br>' + addr.addressLine2 : ''}<br>
+                  ${addr.city}, ${addr.state} - ${addr.pincode}<br>
+                  ${addr.country}
+                </p>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="color: #6b7280; font-size: 14px; margin: 0 0 10px;">With divine blessings,</p>
+              <p style="color: #1f2937; font-size: 16px; font-weight: 600; margin: 0;">Swami Rupeshwaranand Ashram</p>
+              <p style="color: #9ca3af; font-size: 12px; margin: 15px 0 0;">
+                © ${new Date().getFullYear()} Swami Rupeshwaranand Ashram. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`.trim();
+
+    const trackingText =
+      newStatus === 'shipped' && trackingNumber
+        ? `\nTracking Number: ${trackingNumber}\nExpected delivery in 3-7 business days.`
+        : '';
+
+    const text = `
+Order ${statusText}
+
+Dear ${addr.fullName},
+
+${message}
+
+Order ID: ${orderIdShort}
+Items: ${order.totalItems}
+Total: ₹${order.totalAmount}
+${trackingText}
+
+Shipping Address:
+${addr.fullName}
+${addr.addressLine1}${addr.addressLine2 ? '\n' + addr.addressLine2 : ''}
+${addr.city}, ${addr.state} - ${addr.pincode}
+${addr.country}
+
+With divine blessings,
+Swami Rupeshwaranand Ashram
+    `.trim();
+
+    await this.emailService.sendEmail({
+      to: order.userEmail,
+      toName: addr.fullName,
+      subject,
+      text,
+      html,
+    });
+
+    this.logger.log(`Order status update email (${newStatus}) sent to ${order.userEmail} for order ${order.id}`);
   }
 
   // ============================================
