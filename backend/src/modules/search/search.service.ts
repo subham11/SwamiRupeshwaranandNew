@@ -108,11 +108,11 @@ export class SearchService {
     const filtered = result.items
       .filter((item) => {
         if (!item.isActive) return false;
-        const title = (isHindi && item.titleHi ? item.titleHi : item.title).toLowerCase();
-        const description = (
-          isHindi && item.descriptionHi ? item.descriptionHi : item.description
+        const title = String(isHindi && item.titleHi ? item.titleHi : item.title || '').toLowerCase();
+        const description = String(
+          isHindi && item.descriptionHi ? item.descriptionHi : item.description || ''
         ).toLowerCase();
-        const subtitle = (
+        const subtitle = String(
           isHindi && item.subtitleHi ? item.subtitleHi : item.subtitle || ''
         ).toLowerCase();
         return (
@@ -153,8 +153,8 @@ export class SearchService {
     const filtered = result.items
       .filter((item) => {
         if (!item.isActive) return false;
-        const title = (isHindi && item.titleHi ? item.titleHi : item.title).toLowerCase();
-        const description = (
+        const title = String(isHindi && item.titleHi ? item.titleHi : item.title || '').toLowerCase();
+        const description = String(
           isHindi && item.descriptionHi ? item.descriptionHi : item.description || ''
         ).toLowerCase();
         return title.includes(query) || description.includes(query);
@@ -190,8 +190,8 @@ export class SearchService {
     const filtered = result.items
       .filter((item) => {
         if (item.status !== 'published') return false;
-        const title = (isHindi && item.titleHi ? item.titleHi : item.title).toLowerCase();
-        const slug = item.slug.toLowerCase();
+        const title = String(isHindi && item.titleHi ? item.titleHi : item.title || '').toLowerCase();
+        const slug = String(item.slug || '').toLowerCase();
         return title.includes(query) || slug.includes(query);
       })
       .slice(0, limit);
