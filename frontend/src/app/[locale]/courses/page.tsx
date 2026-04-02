@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { AppLocale } from "@/i18n/config";
 import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/Decorative";
 import {
   fetchPublicProducts,
   fetchProductCategories,
