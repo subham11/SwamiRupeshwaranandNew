@@ -143,6 +143,16 @@ export class ProductsController {
     return this.productsService.deleteProduct(id);
   }
 
+  @Get('admin/stats')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @AdminOnly()
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get product analytics/stats (Admin only)' })
+  @ApiResponse({ status: 200, description: 'Product stats' })
+  async getStats() {
+    return this.productsService.getStats();
+  }
+
   @Get('admin/list')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminOnly()

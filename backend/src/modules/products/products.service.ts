@@ -647,6 +647,58 @@ export class ProductsService {
   }
 
   // ============================================
+  // Stats / Analytics
+  // ============================================
+
+  async getStats() {
+    const result = await this.databaseService.query<ProductEntity>(this.productEntity, {
+      indexName: 'GSI1',
+      keyConditionExpression: 'GSI1PK = :pk',
+      expressionAttributeValues: {
+        ':pk': this.productEntity,
+      },
+    });
+
+    const products = result.items;
+    const totalProducts = products.length;
+    const activeProducts = products.filter((p) => p.isActive).length;
+    const outOfStockProducts = products.filter(
+      (p) => p.stockStatus === StockStatus.OUT_OF_STOCK,
+    ).length;
+
+    // Products by category
+    const productsByCategory: Record<string, number> = {};
+    for (const product of products) {
+      const catName = product.categoryName || 'Uncategorized';
+      productsByCategory[catName] = (productsByCategory[catName] || 0) + 1;
+    }
+
+    // Average price
+    const averagePrice =
+      totalProducts > 0
+        ? Math.round((products.reduce((sum, p) => sum + p.price, 0) / totalProducts) * 100) / 100
+        : 0;
+
+    const featuredCount = products.filter((p) => p.isFeatured).length;
+
+    // Recent 5 products (most recently created)
+    const recentProducts = products
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 5)
+      .map((p) => this.mapProductToResponse(p));
+
+    return {
+      totalProducts,
+      activeProducts,
+      outOfStockProducts,
+      productsByCategory,
+      averagePrice,
+      featuredCount,
+      recentProducts,
+    };
+  }
+
+  // ============================================
   // Internal helpers
   // ============================================
 

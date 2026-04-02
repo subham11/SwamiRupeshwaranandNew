@@ -36,6 +36,17 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('admin/stats')
+  @AdminOnly()
+  @ApiOperation({ summary: 'Get user analytics/stats (Admin only)' })
+  @ApiResponse({
+    status: 200,
+    description: 'User stats',
+  })
+  async getStats() {
+    return this.usersService.getStats();
+  }
+
   @Get('me')
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({

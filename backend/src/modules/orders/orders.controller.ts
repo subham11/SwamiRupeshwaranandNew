@@ -64,6 +64,16 @@ export class OrdersController {
     return this.ordersService.getOrdersByUser(user.sub);
   }
 
+  @Get('admin/stats')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @AdminOnly()
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Admin: Get order analytics/stats' })
+  @ApiResponse({ status: 200, description: 'Order stats' })
+  async getStats() {
+    return this.ordersService.getStats();
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')

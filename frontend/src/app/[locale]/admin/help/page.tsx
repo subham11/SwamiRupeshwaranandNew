@@ -97,6 +97,27 @@ const DOC_SECTIONS: DocSection[] = [
     ],
   },
   {
+    id: 'reviews',
+    title: 'Reviews Moderation',
+    icon: '\u2B50',
+    subsections: [
+      { id: 'reviews-overview', title: 'How Reviews Work' },
+      { id: 'reviews-moderation', title: 'Approving & Rejecting' },
+      { id: 'reviews-editing', title: 'Editing Reviews' },
+    ],
+  },
+  {
+    id: 'analytics',
+    title: 'Analytics Dashboard',
+    icon: '\uD83D\uDCCA',
+    subsections: [
+      { id: 'analytics-overview', title: 'Dashboard Overview' },
+      { id: 'analytics-revenue', title: 'Revenue & Orders' },
+      { id: 'analytics-users', title: 'User Growth' },
+      { id: 'analytics-products', title: 'Product Insights' },
+    ],
+  },
+  {
     id: 'other',
     title: 'Other Modules',
     icon: '\uD83D\uDCCB',
@@ -1075,6 +1096,103 @@ subscription.pending    → Marks payment pending`}
               { name: 'Audio', type: 'MP3, WAV', required: false, description: 'Max 20MB. For audio content in Content Library.' },
             ]}
           />
+
+          {/* ══════════════════════════════════════════════
+              SECTION: REVIEWS MODERATION
+              ══════════════════════════════════════════════ */}
+          <SectionHeading id="reviews">{'\u2B50'} Reviews Moderation</SectionHeading>
+
+          <SubHeading id="reviews-overview">How Reviews Work</SubHeading>
+          <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+            <code className="text-orange-600 bg-orange-50 dark:bg-orange-900/20 px-1.5 py-0.5 rounded text-sm">/admin/reviews</code> — Product reviews submitted by customers require admin approval before they appear publicly on product pages.
+          </p>
+          <InfoBox type="info" title="Approval Workflow">
+            All new reviews start as <strong>Pending</strong>. Only approved reviews are visible on the public product page and counted toward the product&apos;s average rating and total review count.
+          </InfoBox>
+          <StepList steps={[
+            { title: 'Customer Submits Review', description: 'Customer purchases a product and submits a review (1-5 star rating + optional text)' },
+            { title: 'Review Pending', description: 'Review appears in Admin Reviews page with "Pending" status' },
+            { title: 'Admin Moderates', description: 'Admin reviews the content and decides: Approve, Reject, or Edit & Approve' },
+            { title: 'Rating Updated', description: 'Approved reviews appear on the product detail page; product rating is recalculated' },
+          ]} />
+
+          <SubHeading id="reviews-moderation">Approving & Rejecting</SubHeading>
+          <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-3">
+            Use the filter tabs to quickly find reviews by status:
+          </p>
+          <FieldTable fields={[
+            { name: 'All', type: 'Tab', required: false, description: 'Shows all reviews across all statuses' },
+            { name: 'Pending', type: 'Tab', required: false, description: 'Reviews awaiting moderation (needs your attention)' },
+            { name: 'Approved', type: 'Tab', required: false, description: 'Reviews visible to public on product pages' },
+            { name: 'Rejected', type: 'Tab', required: false, description: 'Reviews that were rejected (hidden from public)' },
+          ]} />
+          <InfoBox type="warning" title="Deleting Reviews">
+            Deleting a review is permanent and cannot be undone. Prefer rejecting a review if you might want to reconsider later. The product&apos;s average rating is automatically recalculated after any approval, rejection, or deletion.
+          </InfoBox>
+
+          <SubHeading id="reviews-editing">Editing Reviews</SubHeading>
+          <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+            Click on any review to open the detail modal. You can edit both the English and Hindi review text before approving. This is useful for:
+          </p>
+          <StepList steps={[
+            { title: 'Fix Content Issues', description: 'Fixing typos or inappropriate language in otherwise valid reviews' },
+            { title: 'Add Translations', description: 'Adding Hindi translations if the customer only wrote in English' },
+            { title: 'Clean Formatting', description: 'Cleaning up formatting while preserving the customer\'s sentiment' },
+          ]} />
+
+          {/* ══════════════════════════════════════════════
+              SECTION: ANALYTICS DASHBOARD
+              ══════════════════════════════════════════════ */}
+          <SectionHeading id="analytics">{'\uD83D\uDCCA'} Analytics Dashboard</SectionHeading>
+
+          <SubHeading id="analytics-overview">Dashboard Overview</SubHeading>
+          <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+            <code className="text-orange-600 bg-orange-50 dark:bg-orange-900/20 px-1.5 py-0.5 rounded text-sm">/admin/analytics</code> — A comprehensive analytics dashboard with interactive charts covering revenue, user growth, product insights, and engagement metrics across all modules.
+          </p>
+          <FieldTable fields={[
+            { name: 'Overview', type: 'Tab', required: false, description: 'KPI cards + monthly revenue chart + order status distribution' },
+            { name: 'Revenue & Orders', type: 'Tab', required: false, description: 'Revenue trends, top products by sales, order status breakdown, recent orders' },
+            { name: 'Users & Growth', type: 'Tab', required: false, description: 'User growth chart, role distribution, support/donation/newsletter metrics' },
+            { name: 'Products & Inventory', type: 'Tab', required: false, description: 'Category distribution, top sellers, stock status, recent additions' },
+          ]} />
+
+          <SubHeading id="analytics-revenue">Revenue & Orders</SubHeading>
+          <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+            The Revenue tab shows your financial performance:
+          </p>
+          <StepList steps={[
+            { title: 'Monthly Revenue Trend', description: 'Line chart showing revenue for the last 6 months' },
+            { title: 'Top Products', description: 'Bar chart of your best-selling products by revenue and units sold' },
+            { title: 'Order Status', description: 'Pie chart showing distribution across payment pending, paid, processing, shipped, delivered, and cancelled' },
+            { title: 'Recent Orders', description: 'Table of the 5 most recent orders with customer, amount, and status' },
+          ]} />
+          <InfoBox type="info" title="Data Refresh">
+            Click the <strong>Refresh Data</strong> button to fetch the latest stats. All data is computed in real-time from your database — there is no caching delay.
+          </InfoBox>
+
+          <SubHeading id="analytics-users">User Growth</SubHeading>
+          <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+            Track how your user base is growing over time. The Users tab includes:
+          </p>
+          <StepList steps={[
+            { title: 'User Growth Chart', description: 'New user registrations per month for the last 6 months' },
+            { title: 'Users by Role', description: 'Pie chart showing distribution of Super Admins, Admins, Content Editors, and regular Users' },
+            { title: 'Engagement Metrics', description: 'Side-by-side cards for Support, Donations, and Newsletter activity' },
+          ]} />
+
+          <SubHeading id="analytics-products">Product Insights</SubHeading>
+          <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+            The Products tab helps you understand your inventory:
+          </p>
+          <StepList steps={[
+            { title: 'Category Distribution', description: 'Pie chart showing how products are distributed across categories' },
+            { title: 'Top Sellers', description: 'Bar chart of best-performing products by quantity and revenue' },
+            { title: 'Category Breakdown Table', description: 'Detailed table with product counts and percentage bars per category' },
+            { title: 'Recently Added', description: 'Table of the 5 newest products with category, price, and stock status' },
+          ]} />
+          <InfoBox type="warning" title="Out of Stock Alert">
+            Keep an eye on the <strong>Out of Stock</strong> KPI card. It turns red when products are unavailable, helping you quickly identify inventory issues.
+          </InfoBox>
 
           {/* ══════════════════════════════════════════════
               SECTION: OTHER MODULES

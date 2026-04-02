@@ -821,6 +821,109 @@ Swami Rupeshwaranand Ashram
   }
 
   // ============================================
+  // Stats / Analytics
+  // ============================================
+
+  async getStats() {
+    const result = await this.db.query<OrderEntity>(this.orderEntityType, {
+      indexName: 'GSI1',
+      keyConditionExpression: 'GSI1PK = :pk',
+      expressionAttributeValues: {
+        ':pk': this.orderEntityType,
+      },
+    });
+
+    const orders = result.items;
+    const now = new Date();
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+
+    const totalOrders = orders.length;
+    const totalRevenue = orders
+      .filter((o) => o.status !== OrderStatus.CANCELLED)
+      .reduce((sum, o) => sum + o.totalAmount, 0);
+
+    const thisMonthOrders = orders.filter(
+      (o) => new Date(o.createdAt) >= thisMonthStart && o.status !== OrderStatus.CANCELLED,
+    );
+    const thisMonthRevenue = thisMonthOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+
+    const lastMonthOrders = orders.filter(
+      (o) => {
+        const d = new Date(o.createdAt);
+        return d >= lastMonthStart && d <= lastMonthEnd && o.status !== OrderStatus.CANCELLED;
+      },
+    );
+    const lastMonthRevenue = lastMonthOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+
+    const nonCancelledOrders = orders.filter((o) => o.status !== OrderStatus.CANCELLED);
+    const averageOrderValue =
+      nonCancelledOrders.length > 0
+        ? Math.round((totalRevenue / nonCancelledOrders.length) * 100) / 100
+        : 0;
+
+    // Orders by status
+    const ordersByStatus: Record<string, number> = {};
+    for (const order of orders) {
+      ordersByStatus[order.status] = (ordersByStatus[order.status] || 0) + 1;
+    }
+
+    // Top 5 products by quantity sold
+    const productQuantities: Record<string, { title: string; quantity: number; revenue: number }> = {};
+    for (const order of nonCancelledOrders) {
+      for (const item of order.items) {
+        if (!productQuantities[item.productId]) {
+          productQuantities[item.productId] = { title: item.title, quantity: 0, revenue: 0 };
+        }
+        productQuantities[item.productId].quantity += item.quantity;
+        productQuantities[item.productId].revenue += item.subtotal;
+      }
+    }
+    const topProducts = Object.entries(productQuantities)
+      .map(([productId, data]) => ({ productId, ...data }))
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 5);
+
+    // Recent 5 orders
+    const recentOrders = orders
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 5)
+      .map((o) => this.toResponseDto(o));
+
+    // Monthly revenue for last 6 months
+    const monthlyRevenue: { month: string; revenue: number; orders: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const mStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const mEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59, 999);
+      const monthLabel = mStart.toLocaleString('en-US', { year: 'numeric', month: 'short' });
+
+      const monthOrders = orders.filter((o) => {
+        const d = new Date(o.createdAt);
+        return d >= mStart && d <= mEnd && o.status !== OrderStatus.CANCELLED;
+      });
+
+      monthlyRevenue.push({
+        month: monthLabel,
+        revenue: monthOrders.reduce((sum, o) => sum + o.totalAmount, 0),
+        orders: monthOrders.length,
+      });
+    }
+
+    return {
+      totalOrders,
+      totalRevenue,
+      thisMonthRevenue,
+      lastMonthRevenue,
+      averageOrderValue,
+      ordersByStatus,
+      topProducts,
+      recentOrders,
+      monthlyRevenue,
+    };
+  }
+
+  // ============================================
   // Helpers
   // ============================================
 

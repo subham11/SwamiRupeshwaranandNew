@@ -2360,6 +2360,59 @@ export async function invalidateSettingsCache(
   });
 }
 
+// ============================================
+// Analytics Stats APIs
+// ============================================
+
+export interface OrderStats {
+  totalOrders: number;
+  totalRevenue: number;
+  thisMonthRevenue: number;
+  lastMonthRevenue: number;
+  averageOrderValue: number;
+  ordersByStatus: Record<string, number>;
+  topProducts: Array<{ productId: string; title: string; quantity: number; revenue: number }>;
+  recentOrders: Array<Record<string, unknown>>;
+  monthlyRevenue: Array<{ month: string; revenue: number; orders: number }>;
+}
+
+export interface ProductStats {
+  totalProducts: number;
+  activeProducts: number;
+  outOfStockProducts: number;
+  productsByCategory: Record<string, number>;
+  averagePrice: number;
+  featuredCount: number;
+  recentProducts: Array<Record<string, unknown>>;
+}
+
+export interface UserStats {
+  totalUsers: number;
+  usersByRole: Record<string, number>;
+  activeUsers: number;
+  newUsersThisMonth: number;
+  newUsersLastMonth: number;
+  monthlyGrowth: Array<{ month: string; count: number }>;
+}
+
+export async function fetchOrderStats(accessToken: string): Promise<OrderStats> {
+  return apiRequest('/orders/admin/stats', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function fetchProductStats(accessToken: string): Promise<ProductStats> {
+  return apiRequest('/products/admin/stats', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function fetchUserStats(accessToken: string): Promise<UserStats> {
+  return apiRequest('/users/admin/stats', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
 export default {
   fetchPageContent,
   fetchPagesList,
@@ -2486,4 +2539,8 @@ export default {
   testRazorpayConnection,
   deleteSetting,
   invalidateSettingsCache,
+  // Analytics Stats
+  fetchOrderStats,
+  fetchProductStats,
+  fetchUserStats,
 };

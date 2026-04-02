@@ -164,6 +164,65 @@ export class UsersService {
     await this.databaseService.delete(`${this.entityType}#${id}`, `${this.entityType}#${id}`);
   }
 
+  async getStats() {
+    const result = await this.databaseService.query<UserEntity>(this.entityType, {
+      indexName: 'GSI1',
+      keyConditionExpression: 'GSI1PK = :pk',
+      expressionAttributeValues: {
+        ':pk': this.entityType,
+      },
+    });
+
+    const users = result.items;
+    const now = new Date();
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+
+    const totalUsers = users.length;
+
+    // Users by role
+    const usersByRole: Record<string, number> = {};
+    for (const user of users) {
+      usersByRole[user.role] = (usersByRole[user.role] || 0) + 1;
+    }
+
+    const activeUsers = users.filter((u) => u.status === 'active').length;
+
+    const newUsersThisMonth = users.filter(
+      (u) => new Date(u.createdAt) >= thisMonthStart,
+    ).length;
+
+    const newUsersLastMonth = users.filter((u) => {
+      const d = new Date(u.createdAt);
+      return d >= lastMonthStart && d <= lastMonthEnd;
+    }).length;
+
+    // Monthly growth for last 6 months
+    const monthlyGrowth: { month: string; count: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const mStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const mEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59, 999);
+      const monthLabel = mStart.toLocaleString('en-US', { year: 'numeric', month: 'short' });
+
+      const count = users.filter((u) => {
+        const d = new Date(u.createdAt);
+        return d >= mStart && d <= mEnd;
+      }).length;
+
+      monthlyGrowth.push({ month: monthLabel, count });
+    }
+
+    return {
+      totalUsers,
+      usersByRole,
+      activeUsers,
+      newUsersThisMonth,
+      newUsersLastMonth,
+      monthlyGrowth,
+    };
+  }
+
   private mapToResponse(user: UserEntity): UserResponseDto {
     return {
       id: user.id,
