@@ -5,7 +5,11 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { AppLocale } from "@/i18n/config";
 import { Container } from "@/components/ui/Container";
-import { fetchProductsByCategory, Product } from "@/lib/api";
+import {
+  fetchPublicProducts,
+  fetchProductCategories,
+  Product,
+} from "@/lib/api";
 
 const CATEGORY_SLUG = "satsang-events";
 const PAGE_SIZE = 12;
@@ -44,6 +48,7 @@ export default function SatsangPage() {
   const txt = TEXTS[locale] || TEXTS.en;
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [categoryId, setCategoryId] = useState<string | null>(null);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -53,8 +58,21 @@ export default function SatsangPage() {
   const getLocaleField = (en: string, hi?: string) =>
     locale === "hi" && hi ? hi : en;
 
+  useEffect(() => {
+    fetchProductCategories()
+      .then((data) => {
+        const cat = (data.items || []).find(
+          (c: { slug: string }) => c.slug === CATEGORY_SLUG,
+        );
+        if (cat) setCategoryId(cat.id);
+        else setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
   const loadProducts = useCallback(
     async (reset = false) => {
+      if (!categoryId) return;
       try {
         if (reset) {
           setLoading(true);
@@ -65,11 +83,12 @@ export default function SatsangPage() {
           setLoadingMore(true);
         }
 
-        const data = await fetchProductsByCategory(
-          CATEGORY_SLUG,
-          PAGE_SIZE,
-          reset ? undefined : cursor,
-        );
+        const data = await fetchPublicProducts({
+          categoryId,
+          limit: PAGE_SIZE,
+          cursor: reset ? undefined : cursor,
+          locale,
+        });
         const items = data.items || [];
 
         if (reset) {
@@ -87,13 +106,13 @@ export default function SatsangPage() {
         setLoadingMore(false);
       }
     },
-    [cursor],
+    [categoryId, cursor, locale],
   );
 
   useEffect(() => {
-    loadProducts(true);
+    if (categoryId) loadProducts(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locale]);
+  }, [categoryId, locale]);
 
   useEffect(() => {
     if (!sentinelRef.current) return;
