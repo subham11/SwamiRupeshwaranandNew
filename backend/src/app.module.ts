@@ -16,6 +16,10 @@ import { PaymentModule } from './modules/payment/payment.module';
 import { ProductsModule } from './modules/products/products.module';
 import { CartModule } from './modules/cart/cart.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { WishlistModule } from './modules/wishlist/wishlist.module';
+import { CouponsModule } from './modules/coupons/coupons.module';
+import { ActivityLogModule } from './modules/activity-log/activity-log.module';
+import { SearchModule } from './modules/search/search.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { DatabaseModule } from './common/database/database.module';
 import { CognitoModule } from './common/cognito/cognito.module';
@@ -34,8 +38,9 @@ import { StorageModule } from './common/storage/storage.module';
     CognitoModule,
     EmailModule,
     StorageModule,
-    // Global settings module (must be before feature modules that depend on it)
+    // Global modules (must be before feature modules that depend on them)
     SettingsModule,
+    ActivityLogModule,
     // Feature modules
     HealthModule,
     AuthModule,
@@ -53,6 +58,9 @@ import { StorageModule } from './common/storage/storage.module';
     ProductsModule,
     CartModule,
     OrdersModule,
+    WishlistModule,
+    CouponsModule,
+    SearchModule,
   ],
 })
 export class AppModule {}

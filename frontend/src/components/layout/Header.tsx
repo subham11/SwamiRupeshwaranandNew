@@ -5,6 +5,8 @@ import MobileMenu from "@/components/layout/MobileMenu";
 import MegaMenu from "@/components/layout/MegaMenu";
 import AuthButton from "@/components/layout/AuthButton";
 import CartIcon from "@/components/layout/CartIcon";
+import SearchTrigger from "@/components/layout/SearchTrigger";
+import CurrencySwitcher from "@/components/layout/CurrencySwitcher";
 import { resolveNavGroups } from "@/config/nav";
 import { getDict } from "@/i18n/dict";
 import { getGlobalComponent, getLocalizedField, getField } from "@/lib/cmsGlobals";
@@ -211,6 +213,12 @@ export default async function Header({ locale }: { locale: AppLocale }) {
 
         {/* CTA Button (Desktop) + Mobile Menu */}
         <div className="flex items-center gap-4">
+          {/* Currency Switcher */}
+          <CurrencySwitcher />
+
+          {/* Search */}
+          <SearchTrigger />
+
           {/* Cart Icon */}
           <CartIcon />
 

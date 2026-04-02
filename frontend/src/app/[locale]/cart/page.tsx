@@ -14,6 +14,7 @@ import {
   initiateProductCheckout,
   OrderCheckoutResponse,
 } from '@/lib/api';
+import { useCurrency } from '@/lib/useCurrency';
 import dynamic from 'next/dynamic';
 
 const RazorpayProductCheckout = dynamic(
@@ -117,6 +118,7 @@ export default function CartPage() {
   const txt = TEXTS[locale] || TEXTS.en;
   const { user, accessToken, isAuthenticated, isLoading } = useAuth();
   const { cart, loading: cartLoading, updateQuantity, removeItem, clearAll } = useCart();
+  const { format } = useCurrency();
 
   const [step, setStep] = useState<Step>('cart');
   const [address, setAddress] = useState<ShippingAddress | null>(null);
@@ -335,10 +337,10 @@ export default function CartPage() {
                         </Link>
                         <div className="flex items-center gap-2 mt-1">
                           <span className="text-lg font-bold" style={{ color: 'var(--color-gold)' }}>
-                            {txt.currency}{item.price}
+                            {format(item.price)}
                           </span>
                           {item.originalPrice && item.originalPrice > item.price && (
-                            <span className="text-sm text-gray-400 line-through">{txt.currency}{item.originalPrice}</span>
+                            <span className="text-sm text-gray-400 line-through">{format(item.originalPrice)}</span>
                           )}
                         </div>
 
@@ -357,7 +359,7 @@ export default function CartPage() {
                           >
                             +
                           </button>
-                          <span className="ml-auto text-sm text-gray-500">{txt.subtotal}: <span className="font-bold" style={{ color: 'var(--color-gold)' }}>{txt.currency}{item.subtotal}</span></span>
+                          <span className="ml-auto text-sm text-gray-500">{txt.subtotal}: <span className="font-bold" style={{ color: 'var(--color-gold)' }}>{format(item.subtotal)}</span></span>
                         </div>
                       </div>
 
@@ -385,11 +387,11 @@ export default function CartPage() {
                     <div className="space-y-3 mb-6">
                       <div className="flex justify-between text-gray-600 dark:text-gray-400">
                         <span>{txt.items} ({cart?.totalItems})</span>
-                        <span className="font-medium">{txt.currency}{cart?.totalAmount}</span>
+                        <span className="font-medium">{format(cart?.totalAmount || 0)}</span>
                       </div>
                       <div className="border-t dark:border-gray-700 pt-3 flex justify-between font-bold text-lg">
                         <span>{txt.total}</span>
-                        <span style={{ color: 'var(--color-gold)' }}>{txt.currency}{cart?.totalAmount}</span>
+                        <span style={{ color: 'var(--color-gold)' }}>{format(cart?.totalAmount || 0)}</span>
                       </div>
                     </div>
                     <button
@@ -586,12 +588,12 @@ export default function CartPage() {
                     <span className="text-gray-600 dark:text-gray-400">
                       {getLocaleField(item.title, item.titleHi)} × {item.quantity}
                     </span>
-                    <span className="font-medium">{txt.currency}{item.subtotal}</span>
+                    <span className="font-medium">{format(item.subtotal)}</span>
                   </div>
                 ))}
                 <div className="border-t dark:border-gray-700 pt-3 flex justify-between font-bold text-lg">
                   <span>{txt.total}</span>
-                  <span style={{ color: 'var(--color-gold)' }}>{txt.currency}{cart?.totalAmount}</span>
+                  <span style={{ color: 'var(--color-gold)' }}>{format(cart?.totalAmount || 0)}</span>
                 </div>
               </div>
             </div>
@@ -622,7 +624,7 @@ export default function CartPage() {
                 className="w-full py-3 rounded-full text-white font-semibold text-lg transition hover:shadow-lg hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
                 style={{ backgroundColor: 'var(--color-gold)' }}
               >
-                {orderPlacing ? txt.placingOrder : `${txt.checkout} — ${txt.currency}${cart?.totalAmount}`}
+                {orderPlacing ? txt.placingOrder : `${txt.checkout} — ${format(cart?.totalAmount || 0)}`}
               </button>
             )}
 

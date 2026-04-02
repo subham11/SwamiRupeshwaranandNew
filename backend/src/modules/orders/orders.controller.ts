@@ -6,6 +6,11 @@ import {
   Body,
   Param,
   UseGuards,
+  Res,
+  NotFoundException,
+  ForbiddenException,
+  InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -13,8 +18,11 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiParam,
+  ApiProduces,
 } from '@nestjs/swagger';
+import { Response } from 'express';
 import { OrdersService } from './orders.service';
+import { InvoiceService } from './invoice.service';
 import {
   VerifyProductOrderPaymentDto,
   UpdateOrderStatusDto,
@@ -28,7 +36,12 @@ import { CurrentUser, CurrentUserData, AdminOnly } from '@/common/decorators';
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  private readonly logger = new Logger(OrdersController.name);
+
+  constructor(
+    private readonly ordersService: OrdersService,
+    private readonly invoiceService: InvoiceService,
+  ) {}
 
   // ============================================
   // Customer Endpoints
@@ -72,6 +85,76 @@ export class OrdersController {
   @ApiResponse({ status: 200, description: 'Order stats' })
   async getStats() {
     return this.ordersService.getStats();
+  }
+
+  @Get('admin/:id/invoice')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @AdminOnly()
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Admin: Download invoice PDF for any order' })
+  @ApiParam({ name: 'id', description: 'Order ID' })
+  @ApiProduces('application/pdf')
+  @ApiResponse({ status: 200, description: 'Invoice PDF' })
+  async getAdminInvoice(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    const order = await this.ordersService.getOrderById(id);
+    if (!order) {
+      throw new NotFoundException(`Order ${id} not found`);
+    }
+
+    try {
+      const pdfBuffer = await this.invoiceService.generateInvoice(order);
+      const invoiceNo = `INV-${order.id.substring(0, 8).toUpperCase()}`;
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename=invoice-${invoiceNo}.pdf`,
+        'Content-Length': pdfBuffer.length.toString(),
+      });
+      res.end(pdfBuffer);
+    } catch (error) {
+      this.logger.error(`Failed to generate admin invoice for order ${id}: ${error.message}`);
+      throw new InternalServerErrorException('Failed to generate invoice');
+    }
+  }
+
+  @Get(':id/invoice')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Download invoice PDF for own order' })
+  @ApiParam({ name: 'id', description: 'Order ID' })
+  @ApiProduces('application/pdf')
+  @ApiResponse({ status: 200, description: 'Invoice PDF' })
+  async getInvoice(
+    @Param('id') id: string,
+    @CurrentUser() user: CurrentUserData,
+    @Res() res: Response,
+  ) {
+    const order = await this.ordersService.getOrderById(id);
+    if (!order) {
+      throw new NotFoundException(`Order ${id} not found`);
+    }
+
+    if (order.userId !== user.sub) {
+      throw new ForbiddenException('You do not have access to this order');
+    }
+
+    try {
+      const pdfBuffer = await this.invoiceService.generateInvoice(order);
+      const invoiceNo = `INV-${order.id.substring(0, 8).toUpperCase()}`;
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename=invoice-${invoiceNo}.pdf`,
+        'Content-Length': pdfBuffer.length.toString(),
+      });
+      res.end(pdfBuffer);
+    } catch (error) {
+      this.logger.error(`Failed to generate invoice for order ${id}: ${error.message}`);
+      throw new InternalServerErrorException('Failed to generate invoice');
+    }
   }
 
   @Get(':id')

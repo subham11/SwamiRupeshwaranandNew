@@ -2263,6 +2263,53 @@ export async function updateOrderStatusAdmin(
 }
 
 // ============================================
+// Wishlist
+// ============================================
+
+export interface WishlistItem {
+  productId: string;
+  productTitle: string;
+  productSlug: string;
+  productPrice: number;
+  productImage?: string;
+  addedAt: string;
+}
+
+export async function fetchWishlist(accessToken: string): Promise<{ items: WishlistItem[] }> {
+  return apiRequest('/wishlist', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function addToWishlist(productId: string, accessToken: string): Promise<void> {
+  return apiRequest(`/wishlist/${productId}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function removeFromWishlist(productId: string, accessToken: string): Promise<void> {
+  return apiRequest(`/wishlist/${productId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function checkWishlistItem(productId: string, accessToken: string): Promise<{ inWishlist: boolean }> {
+  return apiRequest(`/wishlist/check/${productId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+// ============================================
+// Invoice
+// ============================================
+
+export function getInvoiceUrl(orderId: string): string {
+  return `${API_BASE_URL}/orders/${orderId}/invoice`;
+}
+
+// ============================================
 // Settings (Admin - Super Admin only)
 // ============================================
 
@@ -2413,6 +2460,43 @@ export async function fetchUserStats(accessToken: string): Promise<UserStats> {
   });
 }
 
+// ============================================
+// Global Search API
+// ============================================
+
+export interface SearchResults {
+  products: Array<{
+    id: string;
+    title: string;
+    titleHi?: string;
+    slug: string;
+    price: number;
+    categoryName: string;
+    images?: string[];
+  }>;
+  events: Array<{
+    id: string;
+    title: string;
+    titleHi?: string;
+    slug: string;
+    date?: string;
+  }>;
+  pages: Array<{
+    id: string;
+    title: string;
+    titleHi?: string;
+    slug: string;
+  }>;
+  totalResults: number;
+}
+
+export async function globalSearch(query: string, types?: string[], limit?: number): Promise<SearchResults> {
+  const params = new URLSearchParams({ q: query });
+  if (types?.length) params.set('types', types.join(','));
+  if (limit) params.set('limit', String(limit));
+  return apiRequest(`/search?${params.toString()}`);
+}
+
 export default {
   fetchPageContent,
   fetchPagesList,
@@ -2539,8 +2623,17 @@ export default {
   testRazorpayConnection,
   deleteSetting,
   invalidateSettingsCache,
+  // Wishlist
+  fetchWishlist,
+  addToWishlist,
+  removeFromWishlist,
+  checkWishlistItem,
+  // Invoice
+  getInvoiceUrl,
   // Analytics Stats
   fetchOrderStats,
   fetchProductStats,
   fetchUserStats,
+  // Search
+  globalSearch,
 };

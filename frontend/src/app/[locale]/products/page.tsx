@@ -12,6 +12,7 @@ import {
   Product,
   ProductCategory,
 } from "@/lib/api";
+import { useCurrency } from "@/lib/useCurrency";
 
 const TEXTS = {
   en: {
@@ -44,6 +45,7 @@ export default function ProductsPage() {
   const params = useParams();
   const locale = (params?.locale as AppLocale) || "en";
   const txt = TEXTS[locale] || TEXTS.en;
+  const { format } = useCurrency();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
@@ -263,12 +265,12 @@ export default function ProductsPage() {
                             className="text-lg font-bold"
                             style={{ color: "var(--color-gold)" }}
                           >
-                            ₹{product.price}
+                            {format(product.price)}
                           </span>
                           {product.originalPrice &&
                             product.originalPrice > product.price && (
                               <span className="text-sm text-gray-400 line-through">
-                                ₹{product.originalPrice}
+                                {format(product.originalPrice)}
                               </span>
                             )}
                         </div>

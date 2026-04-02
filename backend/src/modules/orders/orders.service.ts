@@ -15,6 +15,7 @@ import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
 import { EmailService } from '@/common/email/email.service';
 import { CartService } from '@/modules/cart/cart.service';
 import { SettingsService } from '@/modules/settings/settings.service';
+import { InvoiceService } from './invoice.service';
 import {
   OrderStatus,
   CheckoutResponseDto,
@@ -94,6 +95,7 @@ export class OrdersService {
     private readonly emailService: EmailService,
     private readonly cartService: CartService,
     private readonly settingsService: SettingsService,
+    private readonly invoiceService: InvoiceService,
   ) {
     // Eager init from env vars for immediate availability (cold start)
     this.keyId = this.configService.get<string>('RAZORPAY_KEY_ID', '');
@@ -343,6 +345,13 @@ export class OrdersService {
       this.logger.warn(`Failed to send order confirmation email: ${err.message}`),
     );
 
+    // 6. Generate and upload invoice PDF (non-blocking)
+    this.invoiceService
+      .generateAndUpload(this.toResponseDto({ ...order, status: OrderStatus.PAID, paymentStatus: 'captured', razorpayPaymentId: dto.razorpayPaymentId }))
+      .catch((err) =>
+        this.logger.warn(`Failed to generate/upload invoice for order ${order.id}: ${err.message}`),
+      );
+
     return {
       success: true,
       message: 'Payment verified. Order confirmed!',
@@ -398,6 +407,13 @@ export class OrdersService {
     this.sendOrderConfirmationEmail(order, razorpayPaymentId).catch((err) =>
       this.logger.warn(`Webhook: Failed to send order email: ${err.message}`),
     );
+
+    // Generate and upload invoice PDF (non-blocking)
+    this.invoiceService
+      .generateAndUpload(this.toResponseDto({ ...order, status: OrderStatus.PAID, paymentStatus: 'captured', razorpayPaymentId }))
+      .catch((err) =>
+        this.logger.warn(`Webhook: Failed to generate/upload invoice for order ${order.id}: ${err.message}`),
+      );
   }
 
   // ============================================
