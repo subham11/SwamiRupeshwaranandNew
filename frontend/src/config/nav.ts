@@ -47,7 +47,23 @@ export const NAV_GROUPS_DEF: NavGroupDef[] = [
       { key: "stotras", href: (l) => `/${l}/stotras` },
       { key: "kavach", href: (l) => `/${l}/kavach` },
       { key: "products", href: (l) => `/${l}/products` },
+      { key: "satsang", href: (l) => `/${l}/satsang` },
       { key: "donation", href: (l) => `/${l}/donation` }
+    ]
+  },
+  {
+    key: "learn",
+    featured: {
+      titleKey: "nav.courses",
+      descriptionKey: "navDesc.courses",
+      href: (l) => `/${l}/courses`,
+      image: "/images/swamiji-blessing.jpg"
+    },
+    links: [
+      { key: "courses", href: (l) => `/${l}/courses` },
+      { key: "classes", href: (l) => `/${l}/classes` },
+      { key: "retreats", href: (l) => `/${l}/retreats` },
+      { key: "astrology", href: (l) => `/${l}/astrology` }
     ]
   },
   {

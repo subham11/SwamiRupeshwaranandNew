@@ -13,7 +13,12 @@
     "kavach": "Kavach",
     "products": "Products",
     "subscriptions": "Subscriptions",
-    "contact": "Contact"
+    "contact": "Contact",
+    "courses": "Meditation Courses",
+    "retreats": "Spiritual Retreats",
+    "astrology": "Astrology Consultation",
+    "classes": "Sanskrit & Vedanta",
+    "satsang": "Satsang Events"
   },
   "hero": {
     "title": "Guidance, Sadhana, and Seva",
@@ -45,7 +50,8 @@
     "about": "About",
     "offerings": "Offerings",
     "initiatives": "Initiatives",
-    "connect": "Connect"
+    "connect": "Connect",
+    "learn": "Learn"
   },
   "navDesc": {
     "swamiji": "Biography and teachings",
@@ -58,7 +64,12 @@
     "stotras": "Sacred hymns and prayers",
     "kavach": "Divine protective chants",
     "subscriptions": "Monthly spiritual content plans",
-    "contact": "Reach us and visit"
+    "contact": "Reach us and visit",
+    "courses": "Online meditation programs with Swamiji",
+    "retreats": "Immersive spiritual retreat programs",
+    "astrology": "Personal astrology consultations",
+    "classes": "Learn Sanskrit and Vedanta philosophy",
+    "satsang": "Spiritual gatherings and kirtan events"
   },
   "cta": {
     "learnMore": "Learn more"
