@@ -38,14 +38,14 @@ provider:
     COGNITO_REGION: ${self:provider.region}
     AWS_S3_BUCKET: !Ref ContentBucket
     # Razorpay (from SSM Parameter Store - SecureString)
-    RAZORPAY_KEY_ID: ${ssm:/swami-rupeshwaranand/${self:provider.stage}/razorpay-key-id}
-    RAZORPAY_KEY_SECRET: ${ssm:/swami-rupeshwaranand/${self:provider.stage}/razorpay-key-secret}
-    RAZORPAY_WEBHOOK_SECRET: ${ssm:/swami-rupeshwaranand/${self:provider.stage}/razorpay-webhook-secret}
+    RAZORPAY_KEY_ID: ${ssm:/swami-rupeshwaranand/${self:provider.stage}/razorpay-key-id, ''}
+    RAZORPAY_KEY_SECRET: ${ssm:/swami-rupeshwaranand/${self:provider.stage}/razorpay-key-secret, ''}
+    RAZORPAY_WEBHOOK_SECRET: ${ssm:/swami-rupeshwaranand/${self:provider.stage}/razorpay-webhook-secret, ''}
     # SMTP Email Configuration
     SMTP_HOST: mail.swamirupeshwaranand.in
     SMTP_PORT: '587'
     SMTP_USERNAME: noreply@swamirupeshwaranand.in
-    SMTP_PASSWORD: ${ssm:/swami-rupeshwaranand/${self:provider.stage}/smtp-password}
+    SMTP_PASSWORD: ${ssm:/swami-rupeshwaranand/${self:provider.stage}/smtp-password, ''}
     SMTP_FROM_EMAIL: noreply@swamirupeshwaranand.in
     SMTP_FROM_NAME: Swami Rupeshwaranand ji
   
@@ -187,7 +187,7 @@ functions:
       SMTP_HOST: ${env:SMTP_HOST, 'mail.swamirupeshwaranand.in'}
       SMTP_PORT: ${env:SMTP_PORT, '587'}
       SMTP_USERNAME: ${env:SMTP_USERNAME, 'noreply@swamirupeshwaranand.in'}
-      SMTP_PASSWORD: ${ssm:/swami-rupeshwaranand/${self:provider.stage}/smtp-password}
+      SMTP_PASSWORD: ${ssm:/swami-rupeshwaranand/${self:provider.stage}/smtp-password, ''}
       SMTP_FROM_EMAIL: ${env:SMTP_FROM_EMAIL, 'noreply@swamirupeshwaranand.in'}
       SMTP_FROM_NAME: ${env:SMTP_FROM_NAME, 'Swami Rupeshwaranand ji'}
 
