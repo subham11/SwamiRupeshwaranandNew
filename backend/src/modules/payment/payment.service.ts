@@ -4,6 +4,7 @@ import {
   Logger,
   BadRequestException,
   InternalServerErrorException,
+  forwardRef,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
@@ -12,6 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 const Razorpay = require('razorpay');
 import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
 import { SubscriptionsService } from '@/modules/subscriptions/subscriptions.service';
+import { OrdersService } from '@/modules/orders/orders.service';
 import { EmailService } from '@/common/email/email.service';
 import {
   InitiateSubscriptionPaymentDto,
@@ -72,6 +74,8 @@ export class PaymentService {
     private readonly db: DatabaseService,
     private readonly configService: ConfigService,
     private readonly subscriptionsService: SubscriptionsService,
+    @Inject(forwardRef(() => OrdersService))
+    private readonly ordersService: OrdersService,
     private readonly emailService: EmailService,
   ) {
     this.keyId = this.configService.get<string>('RAZORPAY_KEY_ID', '');
@@ -554,6 +558,11 @@ export class PaymentService {
         await this.handlePaymentFailed(payload);
         break;
 
+      // ===== Order Events =====
+      case 'order.paid':
+        await this.handleOrderPaid(payload);
+        break;
+
       default:
         this.logger.log(`Unhandled webhook event: ${event}`);
     }
@@ -644,11 +653,16 @@ export class PaymentService {
     const payment = payload.payment?.entity;
     if (!payment) return;
 
-    const { subscriptionId, type } = payment.notes || {};
+    const { subscriptionId, orderId, type } = payment.notes || {};
 
     if (type === 'subscription' && subscriptionId) {
       await this.subscriptionsService.activateSubscription(subscriptionId, payment.id);
       this.logger.log(`Payment captured for subscription: ${subscriptionId}`);
+    } else if (type === 'product_order' && orderId) {
+      await this.ordersService.confirmOrderFromWebhook(orderId, payment.id);
+      this.logger.log(`Payment captured for product order: ${orderId}`);
+    } else {
+      this.logger.log(`Payment captured but no matching handler for type: ${type}`);
     }
   }
 
@@ -656,7 +670,7 @@ export class PaymentService {
     const payment = payload.payment?.entity;
     if (!payment) return;
 
-    const { subscriptionId, type } = payment.notes || {};
+    const { subscriptionId, orderId, type } = payment.notes || {};
     const errorDesc = payment.error_description || 'Payment failed';
     const errorCode = payment.error_code || 'UNKNOWN';
 
@@ -667,7 +681,29 @@ export class PaymentService {
       });
       await this.recordPaymentFailure(subscriptionId, errorDesc, errorCode);
       this.logger.warn(`Payment failed for subscription: ${subscriptionId} - ${errorDesc}`);
+    } else if (type === 'product_order' && orderId) {
+      this.logger.warn(`Payment failed for product order: ${orderId} - ${errorDesc} (${errorCode})`);
+      // Order stays in payment_pending — admin can check and handle
     }
+  }
+
+  private async handleOrderPaid(payload: any): Promise<void> {
+    const order = payload.order?.entity;
+    if (!order) return;
+
+    const { orderId } = order.notes || {};
+    if (!orderId) {
+      this.logger.warn('order.paid webhook: no orderId in notes');
+      return;
+    }
+
+    // Find a captured payment for this order
+    const payments = order.payments?.items || [];
+    const capturedPayment = payments.find((p: any) => p.status === 'captured');
+    const paymentId = capturedPayment?.id || order.id;
+
+    await this.ordersService.confirmOrderFromWebhook(orderId, paymentId);
+    this.logger.log(`Order paid via webhook: ${orderId}`);
   }
 
   // ============================================

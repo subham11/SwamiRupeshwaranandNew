@@ -658,7 +658,9 @@ export class ProductsService {
   }
 
   private async findProductBySlugInternal(slug: string): Promise<ProductEntity | null> {
-    // Scan with slug filter (acceptable for slug lookup which is infrequent)
+    // Query GSI1 for all products, filter by slug.
+    // Do NOT set limit here — DynamoDB applies Limit before FilterExpression,
+    // so limit:1 would read only 1 item and miss the matching slug.
     const result = await this.databaseService.query<ProductEntity>(this.productEntity, {
       indexName: 'GSI1',
       keyConditionExpression: 'GSI1PK = :pk',
@@ -667,7 +669,6 @@ export class ProductsService {
         ':pk': this.productEntity,
         ':slug': slug,
       },
-      limit: 1,
     });
     return result.items[0] || null;
   }
@@ -680,6 +681,7 @@ export class ProductsService {
   }
 
   private async findCategoryBySlugInternal(slug: string): Promise<ProductCategoryEntity | null> {
+    // No limit — DynamoDB applies Limit before FilterExpression
     const result = await this.databaseService.query<ProductCategoryEntity>(this.categoryEntity, {
       indexName: 'GSI1',
       keyConditionExpression: 'GSI1PK = :pk',
@@ -688,7 +690,6 @@ export class ProductsService {
         ':pk': this.categoryEntity,
         ':slug': slug,
       },
-      limit: 1,
     });
     return result.items[0] || null;
   }

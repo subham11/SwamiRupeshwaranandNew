@@ -15,6 +15,7 @@ import { SupportModule } from './modules/support/support.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { ProductsModule } from './modules/products/products.module';
 import { CartModule } from './modules/cart/cart.module';
+import { OrdersModule } from './modules/orders/orders.module';
 import { DatabaseModule } from './common/database/database.module';
 import { CognitoModule } from './common/cognito/cognito.module';
 import { EmailModule } from './common/email/email.module';
@@ -48,6 +49,7 @@ import { StorageModule } from './common/storage/storage.module';
     PaymentModule,
     ProductsModule,
     CartModule,
+    OrdersModule,
   ],
 })
 export class AppModule {}
