@@ -11,7 +11,15 @@ import {
   ShippingAddress,
   fetchShippingAddress,
   updateShippingAddress,
+  initiateProductCheckout,
+  OrderCheckoutResponse,
 } from '@/lib/api';
+import dynamic from 'next/dynamic';
+
+const RazorpayProductCheckout = dynamic(
+  () => import('@/components/payment/RazorpayProductCheckout'),
+  { ssr: false },
+);
 
 const TEXTS = {
   en: {
@@ -49,6 +57,10 @@ const TEXTS = {
     backToCart: '← Back to Cart',
     checkout: 'Place Order',
     comingSoon: 'Payment integration coming soon. Your cart has been saved.',
+    placingOrder: 'Placing Order…',
+    orderSuccess: 'Order placed successfully! You will receive a confirmation email shortly.',
+    orderFailed: 'Failed to place order. Please try again.',
+    paymentDismissed: 'Payment was cancelled. You can try again.',
     home: 'Home',
     cart: 'Cart',
   },
@@ -87,6 +99,10 @@ const TEXTS = {
     backToCart: '← कार्ट पर वापस',
     checkout: 'ऑर्डर दें',
     comingSoon: 'भुगतान एकीकरण जल्द आ रहा है। आपका कार्ट सहेजा गया है।',
+    placingOrder: 'ऑर्डर दिया जा रहा है…',
+    orderSuccess: 'ऑर्डर सफलतापूर्वक दे दिया गया! आपको जल्द ही एक पुष्टिकरण ईमेल प्राप्त होगी।',
+    orderFailed: 'ऑर्डर देने में विफल। कृपया पुनः प्रयास करें।',
+    paymentDismissed: 'भुगतान रद्द कर दिया गया। आप पुनः प्रयास कर सकते हैं।',
     home: 'होम',
     cart: 'कार्ट',
   },
@@ -109,6 +125,9 @@ export default function CartPage() {
   const [savingAddress, setSavingAddress] = useState(false);
   const [addressError, setAddressError] = useState<string | null>(null);
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null);
+  const [paymentData, setPaymentData] = useState<OrderCheckoutResponse | null>(null);
+  const [orderPlacing, setOrderPlacing] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
 
   // Address form fields
   const [formFullName, setFormFullName] = useState('');
@@ -182,8 +201,37 @@ export default function CartPage() {
   };
 
   const handlePlaceOrder = async () => {
-    // For now just show a message, payment integration can be wired later
-    setCheckoutMessage(txt.comingSoon);
+    if (!accessToken) return;
+    setOrderPlacing(true);
+    setCheckoutMessage(null);
+    try {
+      const data = await initiateProductCheckout(accessToken);
+      setPaymentData(data);
+    } catch (err: any) {
+      setCheckoutMessage(err.message || txt.orderFailed);
+      setOrderPlacing(false);
+    }
+  };
+
+  const handlePaymentSuccess = (response: { orderId: string; message: string }) => {
+    setPaymentData(null);
+    setOrderPlacing(false);
+    setOrderSuccess(true);
+    setCheckoutMessage(txt.orderSuccess);
+    // Clear cart in context
+    clearAll();
+  };
+
+  const handlePaymentFailure = (error: { message: string }) => {
+    setPaymentData(null);
+    setOrderPlacing(false);
+    setCheckoutMessage(error.message || txt.orderFailed);
+  };
+
+  const handlePaymentDismiss = () => {
+    setPaymentData(null);
+    setOrderPlacing(false);
+    setCheckoutMessage(txt.paymentDismissed);
   };
 
   // Redirect if not authenticated
@@ -567,13 +615,29 @@ export default function CartPage() {
               </div>
             )}
 
-            <button
-              onClick={handlePlaceOrder}
-              className="w-full py-3 rounded-full text-white font-semibold text-lg transition hover:shadow-lg hover:scale-[1.02]"
-              style={{ backgroundColor: 'var(--color-gold)' }}
-            >
-              {txt.checkout} — {txt.currency}{cart?.totalAmount}
-            </button>
+            {!orderSuccess && (
+              <button
+                onClick={handlePlaceOrder}
+                disabled={orderPlacing}
+                className="w-full py-3 rounded-full text-white font-semibold text-lg transition hover:shadow-lg hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ backgroundColor: 'var(--color-gold)' }}
+              >
+                {orderPlacing ? txt.placingOrder : `${txt.checkout} — ${txt.currency}${cart?.totalAmount}`}
+              </button>
+            )}
+
+            {/* Razorpay Checkout Component */}
+            {paymentData && (
+              <RazorpayProductCheckout
+                paymentData={paymentData}
+                accessToken={accessToken!}
+                user={{ email: user?.email || '', name: user?.name || '' }}
+                onSuccess={handlePaymentSuccess}
+                onFailure={handlePaymentFailure}
+                onDismiss={handlePaymentDismiss}
+                autoOpen
+              />
+            )}
           </div>
         )}
       </Container>

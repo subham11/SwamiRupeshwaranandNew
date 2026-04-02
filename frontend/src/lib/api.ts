@@ -2155,6 +2155,91 @@ export async function updateShippingAddress(
   });
 }
 
+// ============================================
+// Orders
+// ============================================
+
+export interface OrderCheckoutResponse {
+  orderId: string;
+  razorpayOrderId: string;
+  amount: number;       // in paise
+  currency: string;
+  razorpayKeyId: string;
+}
+
+export interface OrderItem {
+  productId: string;
+  title: string;
+  titleHi?: string;
+  slug: string;
+  price: number;
+  quantity: number;
+  imageUrl?: string;
+  subtotal: number;
+}
+
+export interface Order {
+  id: string;
+  userId: string;
+  userEmail: string;
+  status: string;
+  items: OrderItem[];
+  totalItems: number;
+  totalAmount: number;
+  currency: string;
+  shippingAddress: ShippingAddress;
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  paymentStatus: string;
+  trackingNumber?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrderPaymentVerificationResponse {
+  success: boolean;
+  message: string;
+  orderId: string;
+  status: string;
+}
+
+export async function initiateProductCheckout(
+  accessToken: string,
+): Promise<OrderCheckoutResponse> {
+  return apiRequest('/orders/checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function verifyProductOrderPayment(
+  data: {
+    razorpayOrderId: string;
+    razorpayPaymentId: string;
+    razorpaySignature: string;
+    orderId: string;
+  },
+  accessToken: string,
+): Promise<OrderPaymentVerificationResponse> {
+  return apiRequest('/orders/verify-payment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function fetchMyOrders(accessToken: string): Promise<Order[]> {
+  return apiRequest('/orders', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export async function fetchOrderById(orderId: string, accessToken: string): Promise<Order> {
+  return apiRequest(`/orders/${orderId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
 export default {
   fetchPageContent,
   fetchPagesList,
@@ -2266,4 +2351,9 @@ export default {
   clearCart,
   fetchShippingAddress,
   updateShippingAddress,
+  // Orders
+  initiateProductCheckout,
+  verifyProductOrderPayment,
+  fetchMyOrders,
+  fetchOrderById,
 };
