@@ -1,17 +1,15 @@
 /**
  * E2E Test: Razorpay Payment Flow (Test Mode)
  *
- * Uses Razorpay TEST keys to:
+ * Uses Razorpay TEST keys to complete a real payment:
  * 1. Create a test order via Razorpay API
- * 2. Open Razorpay checkout and pay via UPI (success@razorpay)
- * 3. Verify payment captured via Razorpay API
- *
- * Uses UPI test flow (success@razorpay) which is more reliable than
- * card flow for automated testing (no 3DS iframe handling needed).
+ * 2. Open Razorpay checkout in a FRESH browser context (no prior session)
+ * 3. Pay via UPI with success@razorpay
+ * 4. Verify payment captured via Razorpay API
  *
  * Requires RAZORPAY_TEST_KEY_ID and RAZORPAY_TEST_KEY_SECRET in e2e/.env
  */
-import { test, expect } from '@playwright/test';
+import { test, expect, chromium } from '@playwright/test';
 import * as crypto from 'crypto';
 
 const RAZORPAY_TEST_KEY_ID = process.env.RAZORPAY_TEST_KEY_ID || '';
@@ -62,163 +60,157 @@ test.describe.serial('Razorpay Payment Flow (Test Mode)', () => {
   });
 
   // ──────────────────────────────────────────────
-  // Step 2: Complete payment via UPI (success@razorpay)
+  // Step 2: Complete payment in a fresh browser context
   // ──────────────────────────────────────────────
-  test('Step 2: Complete payment via Razorpay UPI test flow', async ({ page }) => {
+  test('Step 2: Complete payment via Razorpay UPI test flow', async () => {
     test.setTimeout(90000);
     expect(razorpayOrderId).toBeTruthy();
 
-    await page.goto('about:blank');
+    // Launch a FRESH browser context — no cookies, no session state
+    const browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext();
+    const page = await context.newPage();
 
-    // Expose function to capture payment result
-    let resolvePayment: (val: any) => void;
-    const paymentPromise = new Promise<any>((resolve) => { resolvePayment = resolve; });
+    try {
+      await page.goto('about:blank');
 
-    await page.exposeFunction('__e2ePaymentSuccess', (data: string) => {
-      resolvePayment(data);
-    });
+      // Expose function to capture payment result
+      let resolvePayment: (val: string) => void;
+      const paymentPromise = new Promise<string>((resolve) => { resolvePayment = resolve; });
 
-    // Open Razorpay checkout
-    await page.evaluate(({ keyId, orderId }) => {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => {
-        const rzp = new (window as any).Razorpay({
-          key: keyId,
-          amount: 29900,
-          currency: 'INR',
-          name: 'Bhairava Path',
-          description: 'E2E Test Payment',
-          order_id: orderId,
-          handler: (response: any) => {
-            (window as any).__e2ePaymentSuccess(JSON.stringify(response));
-          },
-          prefill: {
-            name: 'E2E Test Buyer',
-            email: 'test@bhairavapath.com',
-            contact: '9876543210',
-          },
-        });
-        rzp.open();
-      };
-      document.head.appendChild(script);
-    }, { keyId: RAZORPAY_TEST_KEY_ID, orderId: razorpayOrderId });
+      await page.exposeFunction('__e2ePaymentSuccess', (data: string) => {
+        resolvePayment(data);
+      });
 
-    // Wait for Razorpay checkout to load
-    const rzpFrame = page.frameLocator('.razorpay-checkout-frame').first();
-    await page.waitForTimeout(3000);
+      // Open Razorpay checkout
+      await page.evaluate(({ keyId, orderId }) => {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => {
+          const rzp = new (window as any).Razorpay({
+            key: keyId,
+            amount: 29900,
+            currency: 'INR',
+            name: 'Bhairava Path',
+            description: 'E2E Test Payment',
+            order_id: orderId,
+            handler: (response: any) => {
+              (window as any).__e2ePaymentSuccess(JSON.stringify(response));
+            },
+            prefill: {
+              name: 'E2E Test Buyer',
+              email: 'test@bhairavapath.com',
+              contact: '+919004023156',
+            },
+          });
+          rzp.open();
+        };
+        document.head.appendChild(script);
+      }, { keyId: RAZORPAY_TEST_KEY_ID, orderId: razorpayOrderId });
 
-    // Click on UPI payment method
-    const upiOption = rzpFrame.locator('text=UPI').first();
-    await upiOption.waitFor({ timeout: 10000 });
-    await upiOption.click();
-    await page.waitForTimeout(1500);
-    console.log('  Selected UPI payment method');
+      // Wait for Razorpay checkout iframe to load
+      const rzpFrame = page.frameLocator('.razorpay-checkout-frame').first();
+      await page.waitForTimeout(4000);
 
-    // Look for "Enter UPI ID" or "VPA" input field
-    // Razorpay UPI flow: user enters their VPA (Virtual Payment Address)
-    const upiInput = rzpFrame.locator(
-      'input[name="vpa"], input[placeholder*="UPI"], input[placeholder*="upi"], input[placeholder*="@"], input[type="text"]'
-    ).first();
-    await upiInput.waitFor({ timeout: 10000 });
-    await upiInput.click();
-    await upiInput.fill('success@razorpay');
-    await page.waitForTimeout(500);
-    console.log('  Entered UPI ID: success@razorpay');
+      // Handle "Contact details" dialog if it appears
+      try {
+        const contactText = rzpFrame.locator('text=Contact details').first();
+        const hasContactDialog = await contactText.isVisible({ timeout: 3000 }).catch(() => false);
+        if (hasContactDialog) {
+          // Find and fill the phone input
+          const phoneInput = rzpFrame.locator('input[type="tel"], input[placeholder*="Mobile"]').first();
+          await phoneInput.click({ force: true, clickCount: 3 });
+          await page.waitForTimeout(200);
+          // Type a valid 10-digit Indian number
+          await phoneInput.pressSequentially('9004023156', { delay: 50 });
+          await page.waitForTimeout(300);
+          const continueBtn = rzpFrame.locator('button:has-text("Continue")').first();
+          await continueBtn.click({ force: true });
+          await page.waitForTimeout(2000);
+          console.log('  Filled contact details (9876543210)');
+        }
+      } catch { /* dialog might not appear in fresh context */ }
 
-    // Click "Verify and Pay" button
-    const payBtn = rzpFrame.locator(
-      'button:has-text("Verify and Pay"), button:has-text("Pay ₹"), button:has-text("Pay"), button:has-text("Continue")'
-    ).first();
-    await payBtn.waitFor({ timeout: 5000 });
-    await payBtn.click();
-    console.log('  Clicked Verify and Pay button');
+      // Select UPI payment method
+      const upiOption = rzpFrame.locator('text=UPI').first();
+      await upiOption.waitFor({ timeout: 10000 });
+      await upiOption.click({ force: true });
+      await page.waitForTimeout(2000);
+      console.log('  Selected UPI payment method');
 
-    // In test mode with success@razorpay, payment should auto-succeed
-    // or show a Success button
-    await page.waitForTimeout(3000);
+      // Find UPI ID input — might need to switch from QR to ID view
+      let upiInput = rzpFrame.locator(
+        'input[name="vpa"], input[placeholder*="UPI"], input[placeholder*="@"]'
+      ).first();
+      let hasUpiInput = await upiInput.isVisible({ timeout: 3000 }).catch(() => false);
 
-    // Check for Success button in any frame
-    let clicked = false;
-    for (let attempt = 0; attempt < 20 && !clicked; attempt++) {
-      for (const frame of page.frames()) {
-        try {
-          const successBtn = frame.locator(
-            'button:has-text("Success"), input[value="Success"], a:has-text("Success")'
-          ).first();
-          const isVisible = await successBtn.isVisible({ timeout: 500 }).catch(() => false);
-          if (isVisible) {
-            await successBtn.click();
-            console.log(`  Clicked Success button`);
-            clicked = true;
+      if (!hasUpiInput) {
+        // Try switching from QR to UPI ID view
+        const switchSelectors = [
+          'text=Enter UPI ID',
+          'text=UPI ID',
+          'text=Pay with UPI ID',
+        ];
+        for (const sel of switchSelectors) {
+          const el = rzpFrame.locator(sel).first();
+          const vis = await el.isVisible({ timeout: 1000 }).catch(() => false);
+          if (vis) {
+            await el.click({ force: true });
+            await page.waitForTimeout(1500);
+            console.log(`  Switched to UPI ID via: ${sel}`);
             break;
           }
-        } catch { continue; }
-      }
-
-      if (!clicked) {
-        // Check for popup
-        const pages = page.context().pages();
-        for (const p of pages) {
-          if (p !== page) {
-            try {
-              const successBtn = p.locator(
-                'button:has-text("Success"), input[value="Success"]'
-              ).first();
-              const isVisible = await successBtn.isVisible({ timeout: 500 }).catch(() => false);
-              if (isVisible) {
-                await successBtn.click();
-                console.log(`  Clicked Success in popup`);
-                clicked = true;
-                break;
-              }
-            } catch { continue; }
-          }
         }
+
+        // Try finding input again with broader selector
+        upiInput = rzpFrame.locator('input[type="text"], input[name="vpa"]').first();
+        hasUpiInput = await upiInput.isVisible({ timeout: 5000 }).catch(() => false);
       }
 
-      if (!clicked) await page.waitForTimeout(1000);
+      expect(hasUpiInput).toBeTruthy();
+
+      await upiInput.click({ force: true });
+      await upiInput.fill('success@razorpay');
+      await page.waitForTimeout(500);
+      console.log('  Entered UPI ID: success@razorpay');
+
+      // Click "Verify and Pay"
+      const payBtn = rzpFrame.locator(
+        'button:has-text("Verify and Pay"), button:has-text("Pay")'
+      ).first();
+      await payBtn.waitFor({ timeout: 5000 });
+      await payBtn.click({ force: true });
+      console.log('  Clicked Verify and Pay');
+
+      // Wait for payment to complete
+      const resultStr = await Promise.race([
+        paymentPromise,
+        new Promise<string>((_, reject) => setTimeout(() => reject(new Error(
+          'Payment handler not called within 30s'
+        )), 30000)),
+      ]);
+
+      const result = JSON.parse(resultStr);
+      razorpayPaymentId = result.razorpay_payment_id;
+
+      expect(razorpayPaymentId).toMatch(/^pay_/);
+      expect(result.razorpay_order_id).toBe(razorpayOrderId);
+      expect(result.razorpay_signature).toBeTruthy();
+
+      // Verify signature
+      const expectedSignature = crypto
+        .createHmac('sha256', RAZORPAY_TEST_KEY_SECRET)
+        .update(`${razorpayOrderId}|${razorpayPaymentId}`)
+        .digest('hex');
+      expect(result.razorpay_signature).toBe(expectedSignature);
+
+      console.log(`✅ Payment completed and signature verified!`);
+      console.log(`   Payment ID: ${razorpayPaymentId}`);
+      console.log(`   Order ID:   ${razorpayOrderId}`);
+    } finally {
+      await context.close();
+      await browser.close();
     }
-
-    // Debug if not found
-    if (!clicked) {
-      console.log('  Frames:');
-      for (const frame of page.frames()) {
-        console.log(`    ${frame.url().substring(0, 80)}`);
-        // Try to capture inner HTML of each frame for debug
-        try {
-          const text = await frame.locator('body').innerText({ timeout: 1000 });
-          if (text.length < 500) console.log(`    Content: ${text.substring(0, 200)}`);
-        } catch { /* skip */ }
-      }
-      await page.screenshot({ path: 'test-results/razorpay-upi-debug.png' });
-    }
-
-    // Wait for payment handler
-    const resultStr = await Promise.race([
-      paymentPromise,
-      new Promise<string>((_, reject) => setTimeout(() => reject(new Error(
-        'Payment handler not called within 30s. Success button ' + (clicked ? 'clicked' : 'NOT found')
-      )), 30000)),
-    ]);
-
-    const result = JSON.parse(resultStr);
-    razorpayPaymentId = result.razorpay_payment_id;
-
-    expect(razorpayPaymentId).toMatch(/^pay_/);
-    expect(result.razorpay_order_id).toBe(razorpayOrderId);
-    expect(result.razorpay_signature).toBeTruthy();
-
-    // Verify signature
-    const expectedSignature = crypto
-      .createHmac('sha256', RAZORPAY_TEST_KEY_SECRET)
-      .update(`${razorpayOrderId}|${razorpayPaymentId}`)
-      .digest('hex');
-    expect(result.razorpay_signature).toBe(expectedSignature);
-
-    console.log(`✅ Payment completed and signature verified!`);
-    console.log(`   Payment ID: ${razorpayPaymentId}`);
-    console.log(`   Order ID:   ${razorpayOrderId}`);
   });
 
   // ──────────────────────────────────────────────
