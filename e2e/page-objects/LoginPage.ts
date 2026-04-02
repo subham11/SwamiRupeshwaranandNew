@@ -13,9 +13,9 @@ export class LoginPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    this.emailInput = page.locator('input[name="email"], input[type="email"]');
-    this.passwordInput = page.locator('input[name="password"], input[type="password"]');
-    this.submitButton = page.locator('button[type="submit"]');
+    this.emailInput = page.locator('#email');
+    this.passwordInput = page.locator('input[type="password"]').first();
+    this.submitButton = page.locator('button:has-text("Login")').first();
     this.errorMessage = page.locator('[data-testid="error-message"], .error-message');
     this.forgotPasswordLink = page.locator('[data-testid="forgot-password"]');
     this.registerLink = page.locator('[data-testid="register-link"]');
@@ -27,6 +27,12 @@ export class LoginPage extends BasePage {
   }
 
   async login(email: string, password: string) {
+    // Switch to password login mode (default is OTP)
+    const passwordLink = this.page.locator('text=Login with password instead');
+    if (await passwordLink.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await passwordLink.click();
+      await this.page.waitForTimeout(500);
+    }
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
     await this.submitButton.click();

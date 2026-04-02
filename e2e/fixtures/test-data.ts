@@ -229,6 +229,18 @@ export const TEST_ANNOUNCEMENT = {
 };
 
 // ============================================
+// Product Category IDs (production)
+// ============================================
+export const CATEGORY_IDS = {
+  MEDITATION_COURSES: 'd9e8f5fb-2169-48cb-b878-e628c9bbb4c8',
+  SPIRITUAL_RETREATS: '174a593b-bf80-466d-bf8b-3b66ae2f66d7',
+  ASTROLOGY: '8d2f7af8-6d55-4315-b23c-7c44dc6e85dc',
+  SANSKRIT_VEDANTA: 'd491f5b2-b832-4e4e-9032-d53d75a8ee6b',
+  BOOKS_MERCHANDISE: 'd318b91a-e448-42ce-888f-6c5494e78aca',
+  SATSANG_EVENTS: 'd94f6318-2bc2-4caa-ab8a-c5ecd64713d3',
+} as const;
+
+// ============================================
 // URLs
 // ============================================
 export const LOCALES = ['en', 'hi'] as const;
@@ -243,10 +255,21 @@ export const URLS = {
   donate: (locale: Locale = 'en') => `/${locale}/donate`,
   support: (locale: Locale = 'en') => `/${locale}/support`,
   subscriptions: (locale: Locale = 'en') => `/${locale}/subscriptions`,
+  subscribe: (locale: Locale = 'en') => `/${locale}/subscribe`,
   events: (locale: Locale = 'en') => `/${locale}/events`,
   teachings: (locale: Locale = 'en') => `/${locale}/teachings`,
   about: (locale: Locale = 'en') => `/${locale}/about`,
   contact: (locale: Locale = 'en') => `/${locale}/contact`,
+
+  // Products & Category Pages
+  products: (locale: Locale = 'en') => `/${locale}/products`,
+  productDetail: (locale: Locale = 'en', slug: string) => `/${locale}/products/${slug}`,
+  cart: (locale: Locale = 'en') => `/${locale}/cart`,
+  courses: (locale: Locale = 'en') => `/${locale}/courses`,
+  retreats: (locale: Locale = 'en') => `/${locale}/retreats`,
+  astrology: (locale: Locale = 'en') => `/${locale}/astrology`,
+  classes: (locale: Locale = 'en') => `/${locale}/classes`,
+  satsang: (locale: Locale = 'en') => `/${locale}/satsang`,
 
   // User Dashboard
   userDashboard: (locale: Locale = 'en') => `/${locale}/dashboard`,
@@ -259,6 +282,8 @@ export const URLS = {
   adminUsers: (locale: Locale = 'en') => `/${locale}/admin/users`,
   adminSubscriptions: (locale: Locale = 'en') => `/${locale}/admin/subscriptions`,
   adminContent: (locale: Locale = 'en') => `/${locale}/admin/content`,
+  adminCMS: (locale: Locale = 'en') => `/${locale}/admin/cms`,
+  adminProducts: (locale: Locale = 'en') => `/${locale}/admin/products`,
   adminEvents: (locale: Locale = 'en') => `/${locale}/admin/events`,
   adminNewsletter: (locale: Locale = 'en') => `/${locale}/admin/newsletter`,
   adminDonations: (locale: Locale = 'en') => `/${locale}/admin/donations`,
@@ -293,6 +318,19 @@ export const API_ENDPOINTS = {
   createPayment: '/api/v1/payments/create',
   verifyPayment: '/api/v1/payments/verify',
   paymentFailures: '/api/v1/payments/failures',
+
+  // Products
+  products: '/api/v1/products',
+  publicProducts: '/api/v1/products/public',
+  productCategories: '/api/v1/products/categories',
+
+  // Cart
+  cart: '/api/v1/cart',
+  cartItems: '/api/v1/cart/items',
+
+  // CMS
+  cmsPages: '/api/v1/cms/pages',
+  cmsComponents: '/api/v1/cms/components',
 
   // Events
   events: '/api/v1/events',

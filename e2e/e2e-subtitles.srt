@@ -1,0 +1,184 @@
+1
+00:00:00,000 --> 00:00:08,720
+✓ Test 1/46 — Cart: Show order summary
+
+2
+00:00:08,720 --> 00:00:12,840
+✓ Test 2/46 — Cart: Browse Products link (empty cart)
+
+3
+00:00:12,840 --> 00:00:15,760
+✓ Test 3/46 — Cart: Proceed to Checkout button
+
+4
+00:00:15,760 --> 00:00:24,800
+✓ Test 4/46 — Cart: Add product & see in cart
+
+5
+00:00:24,800 --> 00:00:27,920
+✓ Test 5/46 — Cart: Empty cart state
+
+6
+00:00:27,920 --> 00:00:38,840
+✓ Test 6/46 — Checkout: Payment step after address
+
+7
+00:00:38,840 --> 00:00:48,680
+✓ Test 7/46 — Checkout: Fill address & proceed
+
+8
+00:00:48,680 --> 00:00:59,320
+✓ Test 8/46 — Checkout: Edit saved address
+
+9
+00:00:59,320 --> 00:01:08,840
+✓ Test 9/46 — Checkout: Cart to address step
+
+10
+00:01:08,840 --> 00:01:13,040
+✓ Test 10/46 — CMS: Delete page & verify removal
+
+11
+00:01:13,040 --> 00:01:16,920
+✓ Test 11/46 — CMS: Page renders on frontend
+
+12
+00:01:16,920 --> 00:01:22,040
+✓ Test 12/46 — CMS: Page appears in admin panel
+
+13
+00:01:22,040 --> 00:01:27,080
+✓ Test 13/46 — Payment: Handle network errors
+
+14
+00:01:27,080 --> 00:01:29,760
+✓ Test 14/46 — Payment: Donation amount options
+
+15
+00:01:29,760 --> 00:01:32,640
+✓ Test 15/46 — Payment: All subscription tiers
+
+16
+00:01:32,640 --> 00:01:35,520
+✓ Test 16/46 — Payment: Load donation page
+
+17
+00:01:35,520 --> 00:01:38,320
+✓ Test 17/46 — Payment: Subscription page with plans
+
+18
+00:01:38,320 --> 00:01:43,800
+✓ Test 18/46 — Razorpay: Mock successful payment
+
+19
+00:01:43,800 --> 00:01:48,800
+✓ Test 19/46 — Razorpay: Product in cart after add
+
+20
+00:01:48,800 --> 00:01:53,920
+✓ Test 20/46 — Razorpay: Checkout flow to payment
+
+21
+00:01:53,920 --> 00:01:56,760
+✓ Test 21/46 — Subscription: Mock successful payment
+
+22
+00:01:56,760 --> 00:02:00,120
+✓ Test 22/46 — Subscription: Plans in Hindi locale
+
+23
+00:02:00,120 --> 00:02:05,840
+✓ Test 23/46 — Subscription: Initiate paid plan
+
+24
+00:02:05,840 --> 00:02:11,720
+✓ Test 24/46 — Subscription: Activate free plan
+
+25
+00:02:11,720 --> 00:02:14,520
+✓ Test 25/46 — Subscription: Display all plans
+
+26
+00:02:14,520 --> 00:02:17,400
+✓ Test 26/46 — Subscription: Plan details & features
+
+27
+00:02:17,400 --> 00:02:22,000
+✓ Test 27/46 — Products: Cards with price & title
+
+28
+00:02:22,000 --> 00:02:25,000
+✓ Test 28/46 — Products: Hindi locale rendering
+
+29
+00:02:25,000 --> 00:02:29,600
+✓ Test 29/46 — Products: Navigate to product detail
+
+30
+00:02:29,600 --> 00:02:34,680
+✓ Test 30/46 — Products: Display products page
+
+31
+00:02:34,680 --> 00:02:38,760
+✓ Test 31/46 — Category: Spiritual Retreats (Hindi)
+
+32
+00:02:38,760 --> 00:02:42,720
+✓ Test 32/46 — Category: Satsang Events
+
+33
+00:02:42,720 --> 00:02:46,520
+✓ Test 33/46 — Category: Spiritual Retreats
+
+34
+00:02:46,520 --> 00:02:49,440
+✓ Test 34/46 — Category: Astrology (Hindi)
+
+35
+00:02:49,440 --> 00:02:53,320
+✓ Test 35/46 — Category: Meditation Courses
+
+36
+00:02:53,320 --> 00:02:56,400
+✓ Test 36/46 — Category: Satsang Events (Hindi)
+
+37
+00:02:56,400 --> 00:03:01,560
+✓ Test 37/46 — Category: Navigate to detail page
+
+38
+00:03:01,560 --> 00:03:06,600
+✓ Test 38/46 — Category: Sanskrit & Vedanta Classes
+
+39
+00:03:06,600 --> 00:03:10,440
+✓ Test 39/46 — Category: Astrology Consultation
+
+40
+00:03:10,440 --> 00:03:13,440
+✓ Test 40/46 — Category: Sanskrit & Vedanta (Hindi)
+
+41
+00:03:13,440 --> 00:03:16,280
+✓ Test 41/46 — Category: Meditation Courses (Hindi)
+
+42
+00:03:16,280 --> 00:03:21,120
+✓ Test 42/46 — Detail: Product details correctly
+
+43
+00:03:21,120 --> 00:03:26,480
+✓ Test 43/46 — Detail: Add product to cart
+
+44
+00:03:26,480 --> 00:03:31,320
+✓ Test 44/46 — Detail: Add to Cart button visible
+
+45
+00:03:31,320 --> 00:03:36,360
+✓ Test 45/46 — Detail: 404 for non-existent product
+
+46
+00:03:36,360 --> 00:03:41,080
+✓ Test 46/46 — Detail: Discounted price display
+

@@ -18,6 +18,10 @@ import {
   AdminContentPage,
   UserDashboardPage,
   UserContentPage,
+  ProductsPage,
+  ProductDetailPage,
+  CartPage,
+  AdminCMSPage,
 } from '../page-objects';
 
 // Declare types for fixtures
@@ -42,6 +46,11 @@ type PageFixtures = {
   // User Pages
   userDashboardPage: UserDashboardPage;
   userContentPage: UserContentPage;
+  // Product & Cart Pages
+  productsPage: ProductsPage;
+  productDetailPage: ProductDetailPage;
+  cartPage: CartPage;
+  adminCMSPage: AdminCMSPage;
 };
 
 // Extend base test with page object fixtures
@@ -101,6 +110,19 @@ export const test = base.extend<PageFixtures>({
   },
   userContentPage: async ({ page }, use) => {
     await use(new UserContentPage(page));
+  },
+  // Product & Cart Pages
+  productsPage: async ({ page }, use) => {
+    await use(new ProductsPage(page));
+  },
+  productDetailPage: async ({ page }, use) => {
+    await use(new ProductDetailPage(page));
+  },
+  cartPage: async ({ page }, use) => {
+    await use(new CartPage(page));
+  },
+  adminCMSPage: async ({ page }, use) => {
+    await use(new AdminCMSPage(page));
   },
 });
 

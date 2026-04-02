@@ -21,3 +21,9 @@ export { AdminContentPage } from './AdminContentPage';
 // User Page Objects
 export { UserDashboardPage } from './UserDashboardPage';
 export { UserContentPage } from './UserContentPage';
+
+// Product & Cart Page Objects
+export { ProductsPage } from './ProductsPage';
+export { ProductDetailPage } from './ProductDetailPage';
+export { CartPage } from './CartPage';
+export { AdminCMSPage } from './AdminCMSPage';

@@ -11,6 +11,12 @@
     "test:local": "BASE_URL=http://localhost:3000 playwright test",
     "test:staging": "BASE_URL=https://main.d25c4jn4vz213v.amplifyapp.com playwright test",
     "test:prod": "BASE_URL=https://main.d25c4jn4vz213v.amplifyapp.com playwright test",
+    "test:products": "playwright test tests/products/",
+    "test:cart": "playwright test tests/cart/",
+    "test:payments": "playwright test tests/payments/",
+    "test:cms": "playwright test tests/cms/",
+    "seed:only": "playwright test --project=seed",
+    "cleanup:only": "playwright test --project=teardown",
     "codegen": "playwright codegen"
   },
   "devDependencies": {

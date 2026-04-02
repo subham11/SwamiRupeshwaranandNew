@@ -28,6 +28,13 @@ export default defineConfig({
     {
       name: 'setup',
       testMatch: /.*\.setup\.ts/,
+      testIgnore: /seed/,
+    },
+
+    // Seed test products (API-only, no browser auth needed)
+    {
+      name: 'seed',
+      testMatch: '**/seed/*.setup.ts',
     },
 
     {
@@ -36,7 +43,8 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         storageState: 'fixtures/.auth/user.json',
       },
-      dependencies: ['setup'],
+      dependencies: ['setup', 'seed'],
+      testIgnore: /seed/,
     },
 
     {
@@ -45,7 +53,8 @@ export default defineConfig({
         ...devices['Desktop Firefox'],
         storageState: 'fixtures/.auth/user.json',
       },
-      dependencies: ['setup'],
+      dependencies: ['setup', 'seed'],
+      testIgnore: /seed/,
     },
 
     {
@@ -54,7 +63,8 @@ export default defineConfig({
         ...devices['Desktop Safari'],
         storageState: 'fixtures/.auth/user.json',
       },
-      dependencies: ['setup'],
+      dependencies: ['setup', 'seed'],
+      testIgnore: /seed/,
     },
 
     // Mobile viewports
@@ -64,7 +74,8 @@ export default defineConfig({
         ...devices['Pixel 5'],
         storageState: 'fixtures/.auth/user.json',
       },
-      dependencies: ['setup'],
+      dependencies: ['setup', 'seed'],
+      testIgnore: /seed/,
     },
 
     {
@@ -73,7 +84,8 @@ export default defineConfig({
         ...devices['iPhone 12'],
         storageState: 'fixtures/.auth/user.json',
       },
-      dependencies: ['setup'],
+      dependencies: ['setup', 'seed'],
+      testIgnore: /seed/,
     },
 
     // Unauthenticated tests
@@ -81,6 +93,14 @@ export default defineConfig({
       name: 'chromium-no-auth',
       use: { ...devices['Desktop Chrome'] },
       testMatch: /.*\.noauth\.spec\.ts/,
+      testIgnore: /seed/,
+    },
+
+    // Teardown: cleanup seeded products after all tests
+    {
+      name: 'teardown',
+      testMatch: '**/seed/*.teardown.ts',
+      dependencies: ['chromium'],
     },
   ],
 
