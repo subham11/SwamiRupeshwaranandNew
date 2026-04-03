@@ -10,6 +10,7 @@ import {
   QuoteBlock,
 } from "@/components/ui/Decorative";
 import { t, type BilingualContent } from "@/content/contentProvider";
+import CMSTextBlocks from "@/components/CMSTextBlocks";
 import CountdownTimer from "./_components/CountdownTimer";
 import LeadForm from "./_components/LeadForm";
 
@@ -17,7 +18,7 @@ import LeadForm from "./_components/LeadForm";
 const EVENT_DATE = "2026-11-15T06:00:00+05:30"; // Update when confirmed
 const WHATSAPP_NUMBER = "919876543210"; // Update with actual number
 const PHONE_NUMBER = "+91-9876543210";
-const EMAIL_ADDRESS = "yagya@swamirupeshwaranand.in";
+const EMAIL_ADDRESS = "yagya@bhairavapath.com";
 
 // ─── Bilingual Content ──────────────────────────────────────
 
@@ -180,6 +181,27 @@ const trust = {
   quoteAuthor: { en: "Swami Rupeshwaranand Ji Maharaj", hi: "स्वामी रूपेश्वरानंद जी महाराज" },
 };
 
+// CMS fallback sections — editors can override these from the content editor
+// by creating a page with slug "maha-yagya" in the CMS
+const cmsFallbackSections = [
+  {
+    id: "about-event",
+    title: { en: "About the Event", hi: "कार्यक्रम के बारे में" },
+    content: {
+      en: "The 108 Kundiya World Peace Maha Yagya is a grand spiritual ceremony performed with 108 sacred fire pits (kunds) simultaneously. This rare and auspicious event brings together thousands of devotees, spiritual leaders, and wellness practitioners for 7 days of prayers, rituals, health expo, and cultural programs in the holy city of Varanasi.",
+      hi: "108 कुंडीय विश्व शांति महायज्ञ एक भव्य आध्यात्मिक समारोह है जो एक साथ 108 पवित्र अग्नि कुंडों के साथ किया जाता है। यह दुर्लभ और शुभ आयोजन हजारों भक्तों, आध्यात्मिक नेताओं और कल्याण साधकों को पवित्र वाराणसी में 7 दिनों की प्रार्थना, अनुष्ठान, स्वास्थ्य एक्सपो और सांस्कृतिक कार्यक्रमों के लिए एक साथ लाता है।",
+    },
+  },
+  {
+    id: "venue-info",
+    title: { en: "Venue & Location", hi: "स्थान और लोकेशन" },
+    content: {
+      en: "📍 Varanasi, Uttar Pradesh, India\n🕐 November 2026 (exact dates to be announced)\n🏛️ A sprawling venue with dedicated zones for yagya, exhibition stalls, cultural stage, food court, and VIP seating.",
+      hi: "📍 वाराणसी, उत्तर प्रदेश, भारत\n🕐 नवंबर 2026 (सटीक तिथियां शीघ्र घोषित होंगी)\n🏛️ यज्ञ, प्रदर्शनी स्टॉल, सांस्कृतिक मंच, फूड कोर्ट और VIP बैठक के लिए समर्पित क्षेत्रों के साथ विशाल स्थान।",
+    },
+  },
+];
+
 const finalCTA = {
   title: { en: "Don't Miss This Opportunity!", hi: "इस अवसर को न चूकें!" },
   subtitle: {
@@ -281,7 +303,7 @@ export default async function MahaYagyaPage({
             organizer: {
               "@type": "Organization",
               name: "Swami Rupeshwaranand Ji Maharaj Ashram",
-              url: "https://swamirupeshwaranand.in",
+              url: "https://bhairavapath.com",
             },
             offers: stallOptions.tiers.map((tier) => ({
               "@type": "Offer",
@@ -630,6 +652,18 @@ export default async function MahaYagyaPage({
               author={t(trust.quoteAuthor, locale)}
             />
           </div>
+        </Container>
+      </section>
+
+      {/* ═══ CMS EDITABLE CONTENT ═══ */}
+      {/* Editors can add/edit content blocks via CMS with page slug "maha-yagya" */}
+      <section className="py-16 sm:py-20 md:py-24" style={{ backgroundColor: "var(--color-secondary)" }}>
+        <Container>
+          <CMSTextBlocks
+            pageSlug="maha-yagya"
+            locale={locale}
+            fallbackSections={cmsFallbackSections}
+          />
         </Container>
       </section>
 

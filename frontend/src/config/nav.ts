@@ -41,6 +41,7 @@ export const NAV_GROUPS_DEF: NavGroupDef[] = [
       image: "/images/swamiji-blessing.jpg"
     },
     links: [
+      { key: "mahayagya", href: (l) => `/${l}/maha-yagya` },
       { key: "services", href: (l) => `/${l}/services` },
       { key: "events", href: (l) => `/${l}/events` },
       { key: "teachings", href: (l) => `/${l}/teachings` },
