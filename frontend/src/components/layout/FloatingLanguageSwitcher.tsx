@@ -79,11 +79,12 @@ export default function FloatingLanguageSwitcher({ locale }: { locale: AppLocale
       <Link
         href={`/${nextLocale}${rest}`}
         className="w-14 h-14 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all duration-300 hover:scale-105 shadow-sacred bg-white font-body"
-        style={{ 
-          borderColor: 'var(--color-primary)', 
-          color: 'var(--color-primary)' 
+        style={{
+          borderColor: 'var(--color-primary)',
+          color: 'var(--color-primary)'
         }}
         title={locale === "en" ? "हिंदी में देखें" : "View in English"}
+        data-testid="lang-switcher"
       >
         {/* Show the opposite language - what user will switch TO */}
         {locale === "en" ? "हिन्दी" : "EN"}

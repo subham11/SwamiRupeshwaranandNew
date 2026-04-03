@@ -18,6 +18,7 @@ export default function CartIcon() {
       href={`/${locale}/cart`}
       className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
       aria-label="Cart"
+      data-testid="cart-icon"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -37,6 +38,7 @@ export default function CartIcon() {
       </svg>
       {totalItems > 0 && (
         <span className="absolute -top-1 -right-1 min-w-[20px] h-5 flex items-center justify-center rounded-full text-xs font-bold text-white px-1"
+          data-testid="cart-badge"
           style={{ backgroundColor: 'var(--color-gold, #F97316)' }}
         >
           {totalItems > 99 ? '99+' : totalItems}

@@ -71,6 +71,7 @@ export default function LoginForm({ onOtpSent, onLoginSuccess, onForgotPassword 
             <input
               id="email"
               type="email"
+              data-testid="auth-email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t('auth.emailPlaceholder')}
@@ -90,6 +91,7 @@ export default function LoginForm({ onOtpSent, onLoginSuccess, onForgotPassword 
               <input
                 id="password"
                 type="password"
+                data-testid="auth-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t('auth.passwordPlaceholder')}
@@ -104,7 +106,7 @@ export default function LoginForm({ onOtpSent, onLoginSuccess, onForgotPassword 
           )}
 
           {error && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div data-testid="auth-error" className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
               <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
             </div>
           )}
@@ -113,6 +115,7 @@ export default function LoginForm({ onOtpSent, onLoginSuccess, onForgotPassword 
             type="submit"
             disabled={isLoading || !email}
             className="w-full py-3"
+            data-testid={loginMode === 'otp' ? 'send-otp-btn' : 'login-btn'}
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
@@ -132,9 +135,10 @@ export default function LoginForm({ onOtpSent, onLoginSuccess, onForgotPassword 
           <button
             type="button"
             onClick={toggleMode}
+            data-testid={loginMode === 'otp' ? 'tab-password' : 'tab-otp'}
             className="w-full text-center text-sm text-amber-600 dark:text-amber-400 hover:underline"
           >
-            {loginMode === 'otp' 
+            {loginMode === 'otp'
               ? t('auth.loginWithPasswordInstead')
               : t('auth.loginWithOtpInstead')
             }

@@ -1,0 +1,39 @@
+{
+  "name": "bhairavapath-e2e",
+  "version": "1.0.0",
+  "description": "End-to-end sanity test suite for bhairavapath.com (39 stories, 18 epics)",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:chrome": "playwright test --project=chromium:user --project=chromium:admin",
+    "test:mobile": "playwright test --project=mobile:chrome --project=mobile:safari",
+    "test:firefox": "playwright test --project=firefox:user",
+    "test:webkit": "playwright test --project=webkit:user",
+    "test:admin": "playwright test --project=chromium:admin",
+    "test:public": "playwright test --project=public:noauth",
+    "test:payments": "playwright test tests/payments",
+    "test:performance": "playwright test tests/performance",
+    "test:content": "playwright test tests/admin/content tests/admin/emails",
+    "test:auth": "playwright test tests/auth",
+    "test:products": "playwright test tests/products",
+    "test:cart": "playwright test tests/cart tests/checkout",
+    "test:search": "playwright test tests/search",
+    "test:i18n": "playwright test tests/i18n",
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report reports/html",
+    "install:browsers": "playwright install chromium firefox webkit",
+    "clean": "rm -rf .auth reports test-results"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.0"
+  }
+}

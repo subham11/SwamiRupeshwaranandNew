@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import type { AppLocale } from '@/i18n/config';
@@ -38,7 +38,7 @@ const TEXTS = {
   },
 };
 
-export default function SearchPage() {
+function SearchPageInner() {
   const params = useParams();
   const searchParams = useSearchParams();
   const locale = (params?.locale as AppLocale) || 'en';
@@ -328,5 +328,13 @@ export default function SearchPage() {
         </Container>
       </section>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-3 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>}>
+      <SearchPageInner />
+    </Suspense>
   );
 }

@@ -438,6 +438,7 @@ export default function DashboardPage() {
                 {TABS.map((tab) => (
                   <button
                     key={tab.key}
+                    data-testid={`dash-tab-${tab.key}`}
                     onClick={() => setActiveTab(tab.key)}
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
                       activeTab === tab.key
@@ -456,6 +457,7 @@ export default function DashboardPage() {
               {TABS.map((tab) => (
                 <button
                   key={tab.key}
+                  data-testid={`dash-tab-${tab.key}`}
                   onClick={() => setActiveTab(tab.key)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-left ${
                     activeTab === tab.key
@@ -491,7 +493,7 @@ export default function DashboardPage() {
 
               {/* ===== PROFILE TAB ===== */}
               {activeTab === 'profile' && (
-                <div className="p-6 sm:p-8">
+                <div data-testid="profile-section" className="p-6 sm:p-8">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
                       Profile Information
@@ -575,7 +577,7 @@ export default function DashboardPage() {
 
               {/* ===== ORDERS TAB ===== */}
               {activeTab === 'orders' && (
-                <div className="p-6 sm:p-8">
+                <div data-testid="orders-section" className="p-6 sm:p-8">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
                       Order History
@@ -891,7 +893,7 @@ export default function DashboardPage() {
 
               {/* ===== WISHLIST TAB ===== */}
               {activeTab === 'wishlist' && (
-                <div className="p-6 sm:p-8">
+                <div data-testid="wishlist-section" className="p-6 sm:p-8">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
                       Wishlist
@@ -948,6 +950,7 @@ export default function DashboardPage() {
                               )}
                               {/* Remove button */}
                               <button
+                                data-testid="remove-wishlist-btn"
                                 onClick={(e) => {
                                   e.preventDefault();
                                   handleRemoveFromWishlist(item.productId);

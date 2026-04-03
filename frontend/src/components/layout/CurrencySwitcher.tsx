@@ -37,6 +37,7 @@ export default function CurrencySwitcher() {
         style={{ borderColor: 'var(--color-border, #e5e7eb)' }}
         aria-label="Switch currency"
         title="Switch currency"
+        data-testid="currency-switcher"
       >
         <span className="text-sm leading-none">{current.flag}</span>
         <span style={{ color: 'var(--color-text-secondary, #6b7280)' }}>{current.code}</span>

@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Playwright output
+.auth/
+test-results/
+reports/
+playwright-report/
+
+# Environment
+.env
+.env.local
+
+# TypeScript build
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Playwright cache (keep in CI via actions/cache, ignore locally)
+# ~/.cache/ms-playwright  ← don't add this here, it's outside the repo

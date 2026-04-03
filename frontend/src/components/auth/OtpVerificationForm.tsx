@@ -121,7 +121,7 @@ export default function OtpVerificationForm({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="flex justify-center gap-2" onPaste={handlePaste}>
+          <div className="flex justify-center gap-2" data-testid="auth-otp" onPaste={handlePaste}>
             {otp.map((digit, index) => (
               <input
                 key={index}
@@ -142,7 +142,7 @@ export default function OtpVerificationForm({
           </div>
 
           {error && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div data-testid="auth-error" className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
               <p className="text-sm text-red-600 dark:text-red-400 text-center">{error}</p>
             </div>
           )}

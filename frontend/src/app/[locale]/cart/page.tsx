@@ -292,6 +292,7 @@ export default function CartPage() {
               {items.length > 0 && (
                 <button
                   onClick={clearAll}
+                  data-testid="clear-cart-btn"
                   className="text-red-500 hover:text-red-700 text-sm font-medium transition"
                 >
                   {txt.clearCart}
@@ -300,7 +301,7 @@ export default function CartPage() {
             </div>
 
             {items.length === 0 ? (
-              <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700">
+              <div data-testid="empty-cart" className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700">
                 <p className="text-5xl mb-4">🛒</p>
                 <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-2">{txt.empty}</h2>
                 <p className="text-gray-500 dark:text-gray-400 mb-6">{txt.emptyDesc}</p>
@@ -319,6 +320,7 @@ export default function CartPage() {
                   {items.map((item) => (
                     <div
                       key={item.productId}
+                      data-testid="cart-item"
                       className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4 sm:p-6 flex gap-4"
                     >
                       {/* Image */}
@@ -348,13 +350,15 @@ export default function CartPage() {
                         <div className="flex items-center gap-3 mt-3">
                           <button
                             onClick={() => item.quantity > 1 ? updateQuantity(item.productId, item.quantity - 1) : removeItem(item.productId)}
+                            data-testid="qty-decrease"
                             className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm font-bold"
                           >
                             −
                           </button>
-                          <span className="w-8 text-center font-medium text-gray-900 dark:text-white">{item.quantity}</span>
+                          <span data-testid="item-qty" className="w-8 text-center font-medium text-gray-900 dark:text-white">{item.quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                            data-testid="qty-increase"
                             className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm font-bold"
                           >
                             +
@@ -391,11 +395,12 @@ export default function CartPage() {
                       </div>
                       <div className="border-t dark:border-gray-700 pt-3 flex justify-between font-bold text-lg">
                         <span>{txt.total}</span>
-                        <span style={{ color: 'var(--color-gold)' }}>{format(cart?.totalAmount || 0)}</span>
+                        <span data-testid="cart-total" style={{ color: 'var(--color-gold)' }}>{format(cart?.totalAmount || 0)}</span>
                       </div>
                     </div>
                     <button
                       onClick={handleProceedToCheckout}
+                      data-testid="checkout-btn"
                       className="w-full py-3 rounded-full text-white font-semibold text-lg transition hover:shadow-lg hover:scale-[1.02]"
                       style={{ backgroundColor: 'var(--color-gold)' }}
                     >

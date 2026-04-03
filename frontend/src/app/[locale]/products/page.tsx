@@ -144,6 +144,7 @@ export default function ProductsPage() {
           {categories.length > 0 && (
             <div className="flex justify-center gap-2 mb-10 flex-wrap">
               <button
+                data-testid="category-tab"
                 onClick={() => setActiveCategory("all")}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                   activeCategory === "all"
@@ -162,6 +163,7 @@ export default function ProductsPage() {
                 .filter((c) => c.isActive)
                 .map((cat) => (
                   <button
+                    data-testid="category-tab"
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition ${
@@ -186,6 +188,7 @@ export default function ProductsPage() {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {[...Array(8)].map((_, i) => (
                 <div
+                  data-testid="product-skeleton"
                   key={i}
                   className="rounded-2xl overflow-hidden bg-white dark:bg-gray-800 animate-pulse"
                 >
@@ -209,7 +212,7 @@ export default function ProductsPage() {
                   href={`/${locale}/products/${product.slug}`}
                   className="group"
                 >
-                  <div className="rounded-2xl overflow-hidden bg-white border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 dark:bg-gray-800 dark:border-gray-700 h-full flex flex-col">
+                  <div data-testid="product-card" className="rounded-2xl overflow-hidden bg-white border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 dark:bg-gray-800 dark:border-gray-700 h-full flex flex-col">
                     {/* Image */}
                     <div className="relative h-48 sm:h-56 bg-gray-50 dark:bg-gray-700 overflow-hidden">
                       {product.imageUrls?.[0] ? (
@@ -247,6 +250,7 @@ export default function ProductsPage() {
                     {/* Content */}
                     <div className="p-4 flex flex-col flex-1">
                       <h3
+                        data-testid="card-title"
                         className="font-semibold text-sm sm:text-base line-clamp-2 mb-1"
                         style={{ color: "var(--color-primary)" }}
                       >
@@ -257,11 +261,20 @@ export default function ProductsPage() {
                           {getLocaleField(product.subtitle || "", product.subtitleHi)}
                         </p>
                       )}
+                      {product.categoryName && (
+                        <span
+                          data-testid="card-category"
+                          className="inline-block text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 mb-2"
+                        >
+                          {getLocaleField(product.categoryName, product.categoryNameHi)}
+                        </span>
+                      )}
 
                       <div className="mt-auto">
                         {/* Price */}
                         <div className="flex items-center gap-2">
                           <span
+                            data-testid="card-price"
                             className="text-lg font-bold"
                             style={{ color: "var(--color-gold)" }}
                           >
@@ -312,7 +325,7 @@ export default function ProductsPage() {
           )}
 
           {/* Intersection Observer Sentinel */}
-          <div ref={sentinelRef} className="h-4" />
+          <div data-testid="load-more" ref={sentinelRef} className="h-4" />
         </Container>
       </section>
     </div>

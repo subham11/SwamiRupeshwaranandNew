@@ -185,6 +185,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       role="dialog"
       aria-modal="true"
       aria-label="Search"
+      data-testid="search-modal"
     >
       <div
         className="w-full max-w-2xl bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden"
@@ -218,9 +219,10 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             className="flex-1 bg-transparent text-lg outline-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
             autoComplete="off"
             spellCheck={false}
+            data-testid="search-input"
           />
           {loading && (
-            <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin flex-shrink-0" />
+            <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin flex-shrink-0" data-testid="search-loading" />
           )}
           <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
             {txt.shortcut}
@@ -231,7 +233,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         <div className="max-h-[60vh] overflow-y-auto">
           {/* Empty / Start state */}
           {!hasQuery && !results && (
-            <div className="px-5 py-12 text-center text-gray-400 dark:text-gray-500">
+            <div className="px-5 py-12 text-center text-gray-400 dark:text-gray-500" data-testid="search-empty">
               <svg
                 className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600"
                 fill="none"
@@ -251,7 +253,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
           {/* No results */}
           {noResults && (
-            <div className="px-5 py-12 text-center text-gray-400 dark:text-gray-500">
+            <div className="px-5 py-12 text-center text-gray-400 dark:text-gray-500" data-testid="search-no-results">
               <p className="text-lg mb-1">{txt.noResults(query)}</p>
             </div>
           )}
@@ -261,7 +263,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             <div className="py-2">
               {/* Products Section */}
               {results.products.length > 0 && (
-                <div>
+                <div data-testid="result-group result-group-products">
                   <div className="px-5 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
                     {txt.products}
                   </div>
@@ -272,6 +274,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                         key={product.id}
                         onClick={() => navigateTo(`/${locale}/products/${product.slug}`)}
                         onMouseEnter={() => setActiveIndex(idx)}
+                        data-testid="search-result"
                         className={`w-full flex items-center gap-3 px-5 py-3 text-left transition-colors ${
                           activeIndex === idx
                             ? 'bg-orange-50 dark:bg-orange-950/30'
@@ -311,7 +314,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
               {/* Events Section */}
               {results.events.length > 0 && (
-                <div>
+                <div data-testid="result-group result-group-events">
                   <div className="px-5 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-1">
                     {txt.events}
                   </div>
@@ -322,6 +325,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                         key={event.id}
                         onClick={() => navigateTo(`/${locale}/events/${event.slug}`)}
                         onMouseEnter={() => setActiveIndex(idx)}
+                        data-testid="search-result"
                         className={`w-full flex items-center gap-3 px-5 py-3 text-left transition-colors ${
                           activeIndex === idx
                             ? 'bg-orange-50 dark:bg-orange-950/30'
@@ -364,7 +368,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
               {/* Pages Section */}
               {results.pages.length > 0 && (
-                <div>
+                <div data-testid="result-group result-group-pages">
                   <div className="px-5 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-1">
                     {txt.pages}
                   </div>
@@ -375,6 +379,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                         key={page.id}
                         onClick={() => navigateTo(`/${locale}/${page.slug}`)}
                         onMouseEnter={() => setActiveIndex(idx)}
+                        data-testid="search-result"
                         className={`w-full flex items-center gap-3 px-5 py-3 text-left transition-colors ${
                           activeIndex === idx
                             ? 'bg-orange-50 dark:bg-orange-950/30'

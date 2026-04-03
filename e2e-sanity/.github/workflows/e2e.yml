@@ -1,0 +1,336 @@
+# .github/workflows/e2e.yml
+# Bhairavapath.com — Playwright E2E Sanity Suite
+# Triggers: push to main/develop, PRs, and manual dispatch
+
+name: E2E Sanity Tests
+
+on:
+  push:
+    branches: [main, develop, staging]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options: [staging, production]
+      suite:
+        description: 'Test suite to run'
+        required: false
+        default: 'all'
+        type: choice
+        options: [all, admin, public, auth, payments, performance]
+
+# Cancel in-progress runs on new pushes
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Install & cache
+  # ─────────────────────────────────────────────────────────────────────────────
+  install:
+    name: Install Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium firefox webkit
+
+      - name: Install system deps for cached browsers
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Public / unauthenticated tests (fastest, no setup needed)
+  # ─────────────────────────────────────────────────────────────────────────────
+  test-public:
+    name: Public Tests (Chrome)
+    runs-on: ubuntu-latest
+    needs: install
+    if: ${{ github.event.inputs.suite == 'all' || github.event.inputs.suite == 'public' || github.event.inputs.suite == '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - run: npm ci
+      - name: Restore Playwright cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - run: npx playwright install-deps
+
+      - name: Run public tests
+        run: npx playwright test --project=public:noauth
+        env:
+          BASE_URL:  ${{ secrets.STAGING_BASE_URL }}
+          API_URL:   ${{ secrets.STAGING_API_URL }}
+          CI:        'true'
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: public-test-results
+          path: |
+            reports/
+            test-results/
+          retention-days: 14
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # User-authenticated tests across 4 browsers
+  # ─────────────────────────────────────────────────────────────────────────────
+  test-user:
+    name: User Tests (${{ matrix.project }})
+    runs-on: ubuntu-latest
+    needs: install
+    if: ${{ github.event.inputs.suite == 'all' || github.event.inputs.suite == '' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium:user, firefox:user, webkit:user, mobile:chrome]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - run: npm ci
+      - name: Restore Playwright cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - run: npx playwright install-deps
+
+      - name: Run user tests — ${{ matrix.project }}
+        run: npx playwright test --project=setup:seed --project=setup:auth-user --project="${{ matrix.project }}"
+        env:
+          BASE_URL:       ${{ secrets.STAGING_BASE_URL }}
+          API_URL:        ${{ secrets.STAGING_API_URL }}
+          USER_EMAIL:     ${{ secrets.USER_EMAIL }}
+          USER_PASSWORD:  ${{ secrets.USER_PASSWORD }}
+          ADMIN_EMAIL:    ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          CI:             'true'
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: user-${{ matrix.project }}-results
+          path: |
+            reports/
+            test-results/
+          retention-days: 14
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Admin tests
+  # ─────────────────────────────────────────────────────────────────────────────
+  test-admin:
+    name: Admin Tests (Chrome)
+    runs-on: ubuntu-latest
+    needs: install
+    if: ${{ github.event.inputs.suite == 'all' || github.event.inputs.suite == 'admin' || github.event.inputs.suite == '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - run: npm ci
+      - name: Restore Playwright cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - run: npx playwright install-deps
+
+      - name: Run admin tests
+        run: npx playwright test --project=setup:seed --project=setup:auth-admin --project=chromium:admin
+        env:
+          BASE_URL:       ${{ secrets.STAGING_BASE_URL }}
+          API_URL:        ${{ secrets.STAGING_API_URL }}
+          ADMIN_EMAIL:    ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          CI:             'true'
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: admin-test-results
+          path: |
+            reports/
+            test-results/
+          retention-days: 14
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Payment tests
+  # ─────────────────────────────────────────────────────────────────────────────
+  test-payments:
+    name: Payment Tests
+    runs-on: ubuntu-latest
+    needs: install
+    if: ${{ github.event.inputs.suite == 'all' || github.event.inputs.suite == 'payments' || github.event.inputs.suite == '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - run: npm ci
+      - name: Restore Playwright cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - run: npx playwright install-deps
+
+      - name: Run payment tests
+        run: npx playwright test tests/payments/ --project=setup:seed --project=setup:auth-user --project=chromium:user
+        env:
+          BASE_URL:       ${{ secrets.STAGING_BASE_URL }}
+          API_URL:        ${{ secrets.STAGING_API_URL }}
+          USER_EMAIL:     ${{ secrets.USER_EMAIL }}
+          USER_PASSWORD:  ${{ secrets.USER_PASSWORD }}
+          ADMIN_EMAIL:    ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          CI:             'true'
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: payment-test-results
+          path: reports/
+          retention-days: 14
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Performance tests
+  # ─────────────────────────────────────────────────────────────────────────────
+  test-performance:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: install
+    if: ${{ github.event.inputs.suite == 'all' || github.event.inputs.suite == 'performance' || github.event.inputs.suite == '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - run: npm ci
+      - name: Restore Playwright cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - run: npx playwright install-deps
+
+      - name: Run performance tests
+        run: npx playwright test tests/performance/ --project=setup:seed --project=setup:auth-user --project=chromium:user
+        env:
+          BASE_URL:       ${{ secrets.STAGING_BASE_URL }}
+          API_URL:        ${{ secrets.STAGING_API_URL }}
+          USER_EMAIL:     ${{ secrets.USER_EMAIL }}
+          USER_PASSWORD:  ${{ secrets.USER_PASSWORD }}
+          ADMIN_EMAIL:    ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          CI:             'true'
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-test-results
+          path: reports/
+          retention-days: 14
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Teardown after all jobs
+  # ─────────────────────────────────────────────────────────────────────────────
+  teardown:
+    name: Cleanup Test Data
+    runs-on: ubuntu-latest
+    needs: [test-public, test-user, test-admin, test-payments, test-performance]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - run: npm ci
+      - name: Restore Playwright cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - run: npx playwright install-deps
+
+      - name: Run teardown
+        run: npx playwright test --project=teardown
+        env:
+          BASE_URL:       ${{ secrets.STAGING_BASE_URL }}
+          API_URL:        ${{ secrets.STAGING_API_URL }}
+          ADMIN_EMAIL:    ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          CI:             'true'
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Merge all reports and post PR comment
+  # ─────────────────────────────────────────────────────────────────────────────
+  report:
+    name: Publish Report
+    runs-on: ubuntu-latest
+    needs: teardown
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all test artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-reports
+
+      - name: Merge reports
+        run: |
+          mkdir -p merged-report
+          find all-reports -name '*.xml' -exec cp {} merged-report/ \; 2>/dev/null || true
+          find all-reports -name 'index.html' | head -1 | xargs -I{} cp -r $(dirname {}) merged-report/html || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: merged-e2e-report
+          path: merged-report/
+          retention-days: 30
+
+      - name: Post summary to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: checks } = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              ref:   context.sha,
+            });
+            const e2eCheck = checks.check_runs.find(c => c.name.includes('E2E'));
+            const status   = e2eCheck?.conclusion ?? 'in_progress';
+            await github.rest.issues.createComment({
+              owner:      context.repo.owner,
+              repo:       context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## 🎭 E2E Sanity Results\n\n**Status:** ${status}\n\nDownload the HTML report from the workflow artifacts above.`,
+            });

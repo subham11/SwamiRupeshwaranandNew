@@ -40,6 +40,7 @@ export default function SearchTrigger() {
         className="relative p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
         aria-label="Search"
         title="Search (Ctrl+K)"
+        data-testid="search-trigger"
       >
         <svg
           className="w-5 h-5"
