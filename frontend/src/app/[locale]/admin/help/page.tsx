@@ -51,6 +51,7 @@ const DOC_SECTIONS: DocSection[] = [
       { id: 'cms-component-types', title: 'Component Types Reference' },
       { id: 'cms-global', title: 'Global Components' },
       { id: 'cms-publishing', title: 'Publishing & Preview' },
+      { id: 'cms-revalidation', title: 'Content Update Speed' },
     ],
   },
   {
@@ -122,6 +123,7 @@ const DOC_SECTIONS: DocSection[] = [
     title: 'Other Modules',
     icon: '\uD83D\uDCCB',
     subsections: [
+      { id: 'maha-yagya', title: 'Maha Yagya Landing Page' },
       { id: 'newsletter', title: 'Newsletter & Campaigns' },
       { id: 'donations', title: 'Donations Configuration' },
       { id: 'events', title: 'Events Management' },
@@ -732,6 +734,33 @@ export default function AdminHelpPage() {
             <p><strong>Preview:</strong> To preview a page before publishing, set it to &quot;published&quot; briefly, check the URL, then switch back to &quot;draft&quot; if needed. Pages at direct URLs are accessible immediately upon publishing.</p>
           </InfoBox>
 
+          <SubHeading id="cms-revalidation">Content Update Speed</SubHeading>
+          <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+            When you edit content in the CMS, updates reflect on the live site through two mechanisms:
+          </p>
+          <div className="my-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+              <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">{'\u26A1'} Instant Revalidation</h4>
+              <p className="text-sm text-green-700 dark:text-green-300">
+                When you save a page or component, the backend automatically notifies the frontend to purge its cache for that page.
+                Both English and Hindi versions are refreshed <strong>instantly</strong>.
+              </p>
+            </div>
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">{'\u23F0'} Fallback (60 seconds)</h4>
+              <p className="text-sm text-blue-700 dark:text-blue-300">
+                If instant revalidation fails (e.g., network issue), the site automatically refreshes content every <strong>60 seconds</strong>.
+                Worst case, your changes appear within 1 minute.
+              </p>
+            </div>
+          </div>
+          <InfoBox type="success" title="How It Works">
+            <p>1. You save content in CMS → 2. Backend saves to database → 3. Backend calls <code>POST /api/revalidate</code> on the frontend → 4. Frontend purges cache for <code>/en/&#123;slug&#125;</code> and <code>/hi/&#123;slug&#125;</code> → 5. Next visitor sees fresh content.</p>
+          </InfoBox>
+          <InfoBox type="info" title="Tip: Hard Refresh">
+            <p>If you don&apos;t see changes immediately, your <strong>browser</strong> may have cached the old page. Press <code>Ctrl+Shift+R</code> (Windows) or <code>Cmd+Shift+R</code> (Mac) to force a hard refresh.</p>
+          </InfoBox>
+
           {/* ══════════════════════════════════════════════
               SECTION: RAZORPAY & PAYMENTS
               ══════════════════════════════════════════════ */}
@@ -1199,6 +1228,40 @@ subscription.pending    → Marks payment pending`}
               ══════════════════════════════════════════════ */}
           <SectionHeading id="other">{'\uD83D\uDCCB'} Other Modules</SectionHeading>
 
+          <SubHeading id="maha-yagya">Maha Yagya Landing Page</SubHeading>
+          <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+            The <strong>108 Kundiya World Peace Maha Yagya & Health Expo 2026</strong> landing page is a dedicated marketing page for stall bookings at the upcoming event in Varanasi.
+          </p>
+          <div className="my-4 p-5 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-3">Page Details</h4>
+            <FieldTable
+              fields={[
+                { name: 'English URL', type: 'URL', required: false, description: 'bhairavapath.com/en/maha-yagya' },
+                { name: 'Hindi URL', type: 'URL', required: false, description: 'bhairavapath.com/hi/maha-yagya' },
+                { name: 'Navigation', type: 'Location', required: false, description: 'Appears under "Offerings" dropdown as "Maha Yagya 2026"' },
+                { name: 'Lead Form', type: 'Action', required: false, description: 'Stall booking enquiries → submitted as support tickets with category "yagya-stall-booking"' },
+                { name: 'CMS Slug', type: 'CMS', required: false, description: 'Create a CMS page with slug "maha-yagya" to add/edit content blocks on this page' },
+              ]}
+            />
+          </div>
+          <InfoBox type="info" title="Stall Pricing Tiers">
+            <p><strong>Standard:</strong> {'\u20B9'}50,000 (10{'\u00D7'}10 ft) &middot; <strong>Premium:</strong> {'\u20B9'}1,00,000 (15{'\u00D7'}15 ft) &middot; <strong>Prime:</strong> {'\u20B9'}2,00,000 (20{'\u00D7'}20 ft)</p>
+            <p className="mt-1">To update pricing, event dates, or contact numbers, edit the constants at the top of <code>frontend/src/app/[locale]/maha-yagya/page.tsx</code>.</p>
+          </InfoBox>
+          <InfoBox type="success" title="Editing Page Content via CMS">
+            <p>To add editable content blocks (about the event, venue info, sponsor details, etc.):</p>
+            <ol className="list-decimal list-inside mt-2 space-y-1">
+              <li>Go to Admin &gt; Content Editor (<code>/admin/cms</code>)</li>
+              <li>Create a new page with slug <code>maha-yagya</code></li>
+              <li>Add text_block components with your content (English & Hindi)</li>
+              <li>The blocks appear between the Trust section and Final CTA on the live page</li>
+            </ol>
+          </InfoBox>
+          <InfoBox type="warning" title="Stall Enquiry Leads">
+            <p>All stall booking enquiries from the lead form are saved as <strong>support tickets</strong> with category <code>yagya-stall-booking</code>.
+            Check Admin &gt; Support Tickets and filter by this category to see all leads.</p>
+          </InfoBox>
+
           <SubHeading id="newsletter">Newsletter & Campaigns</SubHeading>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
             <code className="text-orange-600 bg-orange-50 dark:bg-orange-900/20 px-1.5 py-0.5 rounded text-sm">/admin/newsletter</code> — Manage email subscribers and send campaigns.
@@ -1231,6 +1294,11 @@ subscription.pending    → Marks payment pending`}
             <code className="text-orange-600 bg-orange-50 dark:bg-orange-900/20 px-1.5 py-0.5 rounded text-sm">/admin/support</code> — Handle user support tickets.
             View open/closed tickets, reply to users, change priority (low/medium/high/urgent), and update status (open/in_progress/resolved/closed).
           </p>
+          <InfoBox type="info" title="Maha Yagya Stall Enquiries">
+            <p>Stall booking enquiries from the Maha Yagya landing page are submitted as tickets with category <code>yagya-stall-booking</code>.
+            These contain company name, contact person, mobile, email, preferred stall type, and any additional message.
+            Filter by this category to manage all exhibition leads in one place.</p>
+          </InfoBox>
 
           <SubHeading id="users">User Management</SubHeading>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
@@ -1284,14 +1352,22 @@ subscription.pending    → Marks payment pending`}
             Backend environment variables are stored in AWS SSM Parameter Store and injected at deploy time:
           </p>
           <CodeBlock
-            title="Backend Environment Variables (serverless.yml)"
+            title="Backend Environment Variables (Lambda)"
             code={`RAZORPAY_KEY_ID      → SSM: /swami-rupeshwaranand/prod/razorpay-key-id
 RAZORPAY_KEY_SECRET  → SSM: /swami-rupeshwaranand/prod/razorpay-key-secret
 RAZORPAY_WEBHOOK_SECRET → SSM: /swami-rupeshwaranand/prod/razorpay-webhook-secret
 COGNITO_USER_POOL_ID → SSM: /swami-rupeshwaranand/prod/cognito-user-pool-id
 COGNITO_CLIENT_ID    → SSM: /swami-rupeshwaranand/prod/cognito-client-id
 SES_FROM_EMAIL       → SSM: /swami-rupeshwaranand/prod/ses-from-email
-S3_BUCKET            → swami-rupeshwaranand-uploads-prod`}
+S3_BUCKET            → swami-rupeshwaranand-uploads-prod
+FRONTEND_URL         → https://bhairavapath.com (for CMS revalidation webhook)
+REVALIDATE_SECRET    → Shared secret for on-demand cache purge`}
+          />
+          <CodeBlock
+            title="Frontend Environment Variables (amplify.yml)"
+            code={`NEXT_PUBLIC_API_URL                  → Backend API endpoint
+NEXT_PUBLIC_CMS_REVALIDATE_SECONDS   → 60 (ISR fallback TTL in seconds)
+REVALIDATE_SECRET                    → Must match backend REVALIDATE_SECRET`}
           />
 
           <InfoBox type="warning">
