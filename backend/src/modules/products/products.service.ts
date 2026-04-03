@@ -443,6 +443,9 @@ export class ProductsService {
       ? JSON.parse(Buffer.from(cursor, 'base64').toString())
       : undefined;
 
+    // Ensure limit is always a proper number for DynamoDB Limit field
+    const numericLimit = typeof limit === 'number' && !isNaN(limit) ? limit : 10;
+
     const result = await this.databaseService.query<ProductEntity>(this.productEntity, {
       indexName: 'GSI2',
       keyConditionExpression: 'GSI2PK = :pk',
@@ -452,7 +455,7 @@ export class ProductsService {
         ':active': true,
       },
       scanIndexForward: true,
-      limit,
+      limit: numericLimit,
       exclusiveStartKey,
     });
 
@@ -476,7 +479,9 @@ export class ProductsService {
     if (!category) {
       throw new NotFoundException(`Category with slug "${categorySlug}" not found`);
     }
-    return this.listProductsByCategory(category.id, limit, cursor);
+    // Ensure limit is numeric (query params come as strings from HTTP)
+    const safeLimit = Number(limit) || 10;
+    return this.listProductsByCategory(category.id, safeLimit, cursor);
   }
 
   // ============================================

@@ -70,11 +70,11 @@ test.describe('API Sanity — Products (Public)', () => {
     if (!slug) { test.skip(); return; }
 
     const res = await request.get(`${api}/products/public/category/${slug}`);
-    // Known issue: category-by-slug endpoint returns 500 — log for investigation
-    if (!res.ok()) {
-      console.log(`  ⚠ Category slug endpoint returned ${res.status()} for "${slug}" — needs backend fix`);
-    }
-    expect(res.status()).toBeLessThan(501); // accept 500 as known issue, fail on worse
+    expect(res.ok()).toBeTruthy();
+    const body = await res.json();
+    expect(body.items).toBeDefined();
+    expect(body.items.length).toBeGreaterThan(0);
+    console.log(`  → Category "${slug}": ${body.count} products`);
   });
 
   test('GET /products/public/:slug returns product detail', async ({ request }) => {

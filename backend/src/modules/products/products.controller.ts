@@ -298,10 +298,15 @@ export class ProductsController {
   @ApiResponse({ status: 200, type: ProductListResponseDto })
   async listProductsByCategorySlug(
     @Param('categorySlug') categorySlug: string,
-    @Query('limit') limit?: number,
+    @Query('limit') limit?: string,
     @Query('cursor') cursor?: string,
   ): Promise<ProductListResponseDto> {
-    return this.productsService.listProductsByCategorySlug(categorySlug, limit, cursor);
+    const parsedLimit = limit ? parseInt(limit, 10) : undefined;
+    return this.productsService.listProductsByCategorySlug(
+      categorySlug,
+      parsedLimit && !isNaN(parsedLimit) ? parsedLimit : undefined,
+      cursor,
+    );
   }
 
   @Get('public/:slug')
