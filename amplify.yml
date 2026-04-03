@@ -15,7 +15,9 @@ applications:
             - export NEXT_PUBLIC_USE_API=true
             - export AMPLIFY_BUILD=true
             # CMS ISR revalidation: 300s (launch phase), bump to 3600 once content is stable
-            - export NEXT_PUBLIC_CMS_REVALIDATE_SECONDS=300
+            - export NEXT_PUBLIC_CMS_REVALIDATE_SECONDS=60
+            # Secret for on-demand revalidation webhook from backend
+            - export REVALIDATE_SECRET=srw-cms-revalidate-2026
             # Build the Next.js application
             - npm run build
       artifacts:

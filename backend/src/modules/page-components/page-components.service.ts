@@ -1,4 +1,5 @@
-import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
 import {
@@ -509,11 +510,46 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
 export class PageComponentsService {
   private readonly pageEntityType = 'CMS_PAGE';
   private readonly componentEntityType = 'CMS_COMPONENT';
+  private readonly logger = new Logger(PageComponentsService.name);
 
   constructor(
     @Inject(DATABASE_SERVICE)
     private readonly databaseService: DatabaseService,
+    private readonly configService: ConfigService,
   ) {}
+
+  /**
+   * Trigger on-demand revalidation on the frontend after CMS content changes.
+   * Fire-and-forget — never blocks the API response.
+   */
+  private triggerRevalidation(slugs?: string[]): void {
+    const frontendUrl = this.configService.get<string>(
+      'FRONTEND_URL',
+      'https://bhairavapath.com',
+    );
+    const secret = this.configService.get<string>(
+      'REVALIDATE_SECRET',
+      'srw-cms-revalidate-2026',
+    );
+
+    const body = JSON.stringify({ secret, slugs: slugs || [] });
+
+    fetch(`${frontendUrl}/api/revalidate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    })
+      .then((res) => {
+        if (res.ok) {
+          this.logger.log(`Revalidation triggered for slugs: ${slugs?.join(', ') || 'layout'}`);
+        } else {
+          this.logger.warn(`Revalidation returned ${res.status}`);
+        }
+      })
+      .catch((err) => {
+        this.logger.warn(`Revalidation failed (non-blocking): ${err.message}`);
+      });
+  }
 
   // ============================================
   // Page Methods
@@ -678,6 +714,12 @@ export class PageComponentsService {
       expressionAttributeValues,
     });
 
+    // Trigger frontend revalidation for the updated page slug
+    const slug = dto.slug || existing.slug;
+    if (slug) {
+      this.triggerRevalidation([slug]);
+    }
+
     return this.mapPageToResponse(updated);
   }
 
@@ -812,6 +854,17 @@ export class PageComponentsService {
         expressionAttributeValues,
       },
     );
+
+    // Trigger frontend revalidation for the parent page
+    try {
+      const page = await this.findPageById(existing.pageId);
+      if (page?.slug) {
+        this.triggerRevalidation([page.slug]);
+      }
+    } catch {
+      // Non-blocking — page lookup may fail for global components
+      this.triggerRevalidation();
+    }
 
     return this.mapComponentToResponse(updated);
   }
