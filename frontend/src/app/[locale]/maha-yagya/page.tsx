@@ -15,7 +15,7 @@ import CountdownTimer from "./_components/CountdownTimer";
 import LeadForm from "./_components/LeadForm";
 
 // ─── Constants ───────────────────────────────────────────────
-const EVENT_DATE = "2026-11-15T06:00:00+05:30"; // Update when confirmed
+const EVENT_DATE = "2026-06-10T06:00:00+05:30"; // June 10, 2026
 const WHATSAPP_NUMBER = "919876543210"; // Update with actual number
 const PHONE_NUMBER = "+91-9876543210";
 const EMAIL_ADDRESS = "yagya@bhairavapath.com";
@@ -29,8 +29,8 @@ const hero = {
     hi: "108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो",
   },
   subtitle: {
-    en: "The Holy City of Varanasi, Uttar Pradesh • November 2026",
-    hi: "पवित्र नगरी वाराणसी, उत्तर प्रदेश • नवंबर 2026",
+    en: "The Holy City of Varanasi, Uttar Pradesh • June 10, 2026",
+    hi: "पवित्र नगरी वाराणसी, उत्तर प्रदेश • 10 जून 2026",
   },
   cta: { en: "Book Your Stall Now", hi: "अभी अपना स्टॉल बुक करें" },
   ctaCall: { en: "Call Now", hi: "अभी कॉल करें" },
@@ -194,8 +194,8 @@ const cmsFallbackSections = [
     id: "venue-info",
     title: { en: "Venue & Location", hi: "स्थान और लोकेशन" },
     content: {
-      en: "📍 Varanasi, Uttar Pradesh, India\n🕐 November 2026 (exact dates to be announced)\n🏛️ A sprawling venue with dedicated zones for yagya, exhibition stalls, cultural stage, food court, and VIP seating.",
-      hi: "📍 वाराणसी, उत्तर प्रदेश, भारत\n🕐 नवंबर 2026 (सटीक तिथियां शीघ्र घोषित होंगी)\n🏛️ यज्ञ, प्रदर्शनी स्टॉल, सांस्कृतिक मंच, फूड कोर्ट और VIP बैठक के लिए समर्पित क्षेत्रों के साथ विशाल स्थान।",
+      en: "📍 Varanasi, Uttar Pradesh, India\n🕐 June 10–14, 2026\n🏛️ A sprawling venue with dedicated zones for yagya, exhibition stalls, cultural stage, food court, and VIP seating.",
+      hi: "📍 वाराणसी, उत्तर प्रदेश, भारत\n🕐 10–14 जून 2026\n🏛️ यज्ञ, प्रदर्शनी स्टॉल, सांस्कृतिक मंच, फूड कोर्ट और VIP बैठक के लिए समर्पित क्षेत्रों के साथ विशाल स्थान।",
     },
   },
 ];
@@ -285,7 +285,7 @@ export default async function MahaYagyaPage({
             name: "108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo",
             description: t(hero.tagline, "en"),
             startDate: EVENT_DATE,
-            endDate: "2026-11-19T20:00:00+05:30",
+            endDate: "2026-06-14T20:00:00+05:30",
             eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
             eventStatus: "https://schema.org/EventScheduled",
             location: {
