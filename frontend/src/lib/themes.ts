@@ -163,6 +163,6 @@ export const themes: Record<ThemeName, Theme> = {
 };
 
 // Default theme
-export const defaultTheme: ThemeName = "sacredGold";
+export const defaultTheme: ThemeName = "saffronEarth";
 
 export const themeList = Object.values(themes);

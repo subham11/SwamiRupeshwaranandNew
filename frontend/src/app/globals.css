@@ -11,15 +11,15 @@
   --font-heading: 'Cormorant Garamond', 'Noto Sans Devanagari', Georgia, serif;
   --font-body: 'Inter', 'Noto Sans Devanagari', system-ui, sans-serif;
   
-  /* Sacred Gold Theme (Default) */
-  --color-primary: #B8860B;
-  --color-secondary: #FEF9EF;
-  --color-accent: #DAA520;
-  --color-background: #FFFBF0;
-  --color-foreground: #3D2914;
-  --color-muted: #8B7355;
-  --color-gold: #FFD700;
-  --color-border: #EED9A4;
+  /* Saffron Earth Theme (Default) */
+  --color-primary: #E65100;
+  --color-secondary: #FFF8F0;
+  --color-accent: #FF9800;
+  --color-background: #FFFAF5;
+  --color-foreground: #3E2723;
+  --color-muted: #795548;
+  --color-gold: #FFB74D;
+  --color-border: #FFE0B2;
   
   /* Spacing - Responsive */
   --section-spacing: 3rem;
