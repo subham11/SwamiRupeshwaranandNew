@@ -25,18 +25,18 @@ const EMAIL_ADDRESS = "yagya@bhairavapath.com";
 const hero = {
   badge: { en: "Limited Stalls Available", hi: "सीमित स्टॉल उपलब्ध" },
   title: {
-    en: "108 Kundiya World Peace Maha Yagya & Health Expo 2026",
-    hi: "108 कुंडीय विश्व शांति महायज्ञ एवं स्वास्थ्य एक्सपो 2026",
+    en: "108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo",
+    hi: "108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो",
   },
   subtitle: {
-    en: "Varanasi, Uttar Pradesh • November 2026",
-    hi: "वाराणसी, उत्तर प्रदेश • नवंबर 2026",
+    en: "The Holy City of Varanasi, Uttar Pradesh • November 2026",
+    hi: "पवित्र नगरी वाराणसी, उत्तर प्रदेश • नवंबर 2026",
   },
   cta: { en: "Book Your Stall Now", hi: "अभी अपना स्टॉल बुक करें" },
   ctaCall: { en: "Call Now", hi: "अभी कॉल करें" },
   tagline: {
-    en: "A sacred confluence of spirituality, wellness & commerce — 50,000+ devotees, 7 divine days",
-    hi: "अध्यात्म, स्वास्थ्य और व्यापार का पवित्र संगम — 50,000+ श्रद्धालु, 7 दिव्य दिन",
+    en: "A sacred confluence of spirituality, wellness & commerce — 25,000+ daily footfall, 5 divine days",
+    hi: "अध्यात्म, स्वास्थ्य और व्यापार का पवित्र संगम — 25,000+ दैनिक उपस्थिति, 5 दिव्य दिन",
   },
 };
 
@@ -47,12 +47,12 @@ const whyParticipate = {
     hi: "आध्यात्मिक और स्वास्थ्य-जागरूक दर्शकों के बीच ब्रांड की अद्वितीय पहचान का अवसर",
   },
   benefits: [
-    { icon: "🏪", title: { en: "Brand Visibility", hi: "ब्रांड दृश्यता" }, desc: { en: "Showcase your products to 50,000+ visitors over 7 days", hi: "7 दिनों में 50,000+ आगंतुकों को अपने उत्पाद प्रदर्शित करें" } },
+    { icon: "🏪", title: { en: "Brand Visibility", hi: "ब्रांड दृश्यता" }, desc: { en: "Showcase your products to 25,000+ visitors per day over 5 days", hi: "5 दिनों में प्रतिदिन 25,000+ आगंतुकों को अपने उत्पाद प्रदर्शित करें" } },
     { icon: "👥", title: { en: "Targeted Audience", hi: "लक्षित दर्शक" }, desc: { en: "Health-conscious families, spiritual seekers & wellness enthusiasts", hi: "स्वास्थ्य-जागरूक परिवार, आध्यात्मिक साधक और कल्याण प्रेमी" } },
     { icon: "📺", title: { en: "Media Coverage", hi: "मीडिया कवरेज" }, desc: { en: "National & regional media, live streaming, social media promotion", hi: "राष्ट्रीय और क्षेत्रीय मीडिया, लाइव स्ट्रीमिंग, सोशल मीडिया प्रचार" } },
     { icon: "🤝", title: { en: "Networking", hi: "नेटवर्किंग" }, desc: { en: "Connect with VIPs, government officials & industry leaders", hi: "VIP, सरकारी अधिकारियों और उद्योग जगत से जुड़ें" } },
     { icon: "🙏", title: { en: "Spiritual Merit", hi: "आध्यात्मिक लाभ" }, desc: { en: "Be part of a sacred 108 Kundiya Yagya — a rare spiritual event", hi: "108 कुंडीय महायज्ञ का हिस्सा बनें — एक दुर्लभ आध्यात्मिक आयोजन" } },
-    { icon: "🏛️", title: { en: "Govt. Support", hi: "सरकारी सहयोग" }, desc: { en: "Supported by local administration and cultural bodies", hi: "स्थानीय प्रशासन और सांस्कृतिक संस्थाओं द्वारा समर्थित" } },
+    { icon: "💊", title: { en: "Pharma & Startup Showcase", hi: "फार्मा और स्टार्टअप प्रदर्शन" }, desc: { en: "Ideal platform for medical, pharma companies, startups & other business sectors", hi: "मेडिकल, फार्मा कंपनियों, स्टार्टअप और अन्य व्यापार क्षेत्रों के लिए आदर्श मंच" } },
     { icon: "💚", title: { en: "CSR Opportunity", hi: "CSR अवसर" }, desc: { en: "Align your brand with wellness, peace & community service", hi: "अपने ब्रांड को कल्याण, शांति और समाज सेवा से जोड़ें" } },
     { icon: "🌍", title: { en: "Cultural Significance", hi: "सांस्कृतिक महत्व" }, desc: { en: "Varanasi — the spiritual capital of India, global recognition", hi: "वाराणसी — भारत की आध्यात्मिक राजधानी, वैश्विक पहचान" } },
   ],
@@ -117,11 +117,11 @@ const highlights = {
   title: { en: "Event Highlights", hi: "कार्यक्रम की मुख्य विशेषताएं" },
   stats: [
     { value: "108", label: { en: "Sacred Kunds", hi: "पवित्र कुंड" } },
-    { value: "50,000+", label: { en: "Expected Footfall", hi: "अनुमानित उपस्थिति" } },
-    { value: "7", label: { en: "Divine Days", hi: "दिव्य दिन" } },
-    { value: "200+", label: { en: "Exhibition Stalls", hi: "प्रदर्शनी स्टॉल" } },
-    { value: "100+", label: { en: "VIP Guests", hi: "VIP अतिथि" } },
-    { value: "50+", label: { en: "Media Partners", hi: "मीडिया पार्टनर" } },
+    { value: "25,000+", label: { en: "Daily Footfall", hi: "दैनिक उपस्थिति" } },
+    { value: "5", label: { en: "Divine Days", hi: "दिव्य दिन" } },
+    { value: "300+", label: { en: "Exhibition Stalls", hi: "प्रदर्शनी स्टॉल" } },
+    { value: "2 Cr+", label: { en: "Digital Reach", hi: "डिजिटल पहुंच" } },
+    { value: "Free", label: { en: "Health Checkup", hi: "स्वास्थ्य जांच" } },
   ],
 };
 
@@ -132,12 +132,10 @@ const audience = {
     hi: "आपके स्टॉल पर विविध और सक्रिय दर्शक आएंगे",
   },
   segments: [
-    { icon: "👨‍👩‍👧‍👦", title: { en: "Health-Conscious Families", hi: "स्वास्थ्य-जागरूक परिवार" }, desc: { en: "Families seeking wellness products & Ayurvedic solutions", hi: "कल्याण उत्पाद और आयुर्वेदिक समाधान खोजने वाले परिवार" } },
-    { icon: "🙏", title: { en: "Spiritual Seekers", hi: "आध्यात्मिक साधक" }, desc: { en: "Devotees and spiritual practitioners from across India", hi: "पूरे भारत से भक्त और आध्यात्मिक साधक" } },
-    { icon: "🧘", title: { en: "Yoga & Ayurveda Enthusiasts", hi: "योग और आयुर्वेद प्रेमी" }, desc: { en: "Practitioners interested in holistic health", hi: "समग्र स्वास्थ्य में रुचि रखने वाले साधक" } },
-    { icon: "🏢", title: { en: "Business & FMCG Brands", hi: "व्यवसाय और FMCG ब्रांड" }, desc: { en: "Companies looking for high-visibility promotion", hi: "उच्च दृश्यता प्रचार खोजने वाली कंपनियां" } },
-    { icon: "✈️", title: { en: "Tourists & NRIs", hi: "पर्यटक और NRI" }, desc: { en: "Domestic & international visitors to Varanasi", hi: "वाराणसी के घरेलू और अंतरराष्ट्रीय पर्यटक" } },
-    { icon: "🏛️", title: { en: "Govt. Officials & Dignitaries", hi: "सरकारी अधिकारी और गणमान्य" }, desc: { en: "Local administration and cultural leaders", hi: "स्थानीय प्रशासन और सांस्कृतिक नेता" } },
+    { icon: "🏢", title: { en: "Corporate Attendees", hi: "कॉर्पोरेट प्रतिभागी" }, desc: { en: "Medical & Pharma companies, business sector leaders, and industry professionals", hi: "मेडिकल और फार्मा कंपनियां, व्यापार क्षेत्र के नेता और उद्योग पेशेवर" } },
+    { icon: "🙏", title: { en: "Spiritual Participants", hi: "आध्यात्मिक प्रतिभागी" }, desc: { en: "Devotees participating in the sacred 108 hawan kunds rituals and spiritual ceremonies", hi: "पवित्र 108 हवन कुंड अनुष्ठानों और आध्यात्मिक समारोहों में भाग लेने वाले भक्त" } },
+    { icon: "🚀", title: { en: "Business & Startup Stall Holders", hi: "व्यवसाय और स्टार्टअप स्टॉलधारक" }, desc: { en: "Startups, medical/pharma companies, and other business sectors showcasing products & services", hi: "स्टार्टअप, मेडिकल/फार्मा कंपनियां और अन्य व्यापार क्षेत्र जो उत्पाद और सेवाएं प्रदर्शित कर रहे हैं" } },
+    { icon: "👨‍👩‍👧‍👦", title: { en: "General Visitors", hi: "सामान्य आगंतुक" }, desc: { en: "Health-conscious families, spiritual seekers, and wellness enthusiasts from across India", hi: "पूरे भारत से स्वास्थ्य-जागरूक परिवार, आध्यात्मिक साधक और कल्याण प्रेमी" } },
   ],
 };
 
@@ -188,8 +186,8 @@ const cmsFallbackSections = [
     id: "about-event",
     title: { en: "About the Event", hi: "कार्यक्रम के बारे में" },
     content: {
-      en: "The 108 Kundiya World Peace Maha Yagya is a grand spiritual ceremony performed with 108 sacred fire pits (kunds) simultaneously. This rare and auspicious event brings together thousands of devotees, spiritual leaders, and wellness practitioners for 7 days of prayers, rituals, health expo, and cultural programs in the holy city of Varanasi.",
-      hi: "108 कुंडीय विश्व शांति महायज्ञ एक भव्य आध्यात्मिक समारोह है जो एक साथ 108 पवित्र अग्नि कुंडों के साथ किया जाता है। यह दुर्लभ और शुभ आयोजन हजारों भक्तों, आध्यात्मिक नेताओं और कल्याण साधकों को पवित्र वाराणसी में 7 दिनों की प्रार्थना, अनुष्ठान, स्वास्थ्य एक्सपो और सांस्कृतिक कार्यक्रमों के लिए एक साथ लाता है।",
+      en: "The 108 Kund World Peace Mahayagya is a grand spiritual ceremony performed with 108 sacred fire pits (kunds) simultaneously. This rare and auspicious event brings together thousands of devotees, spiritual leaders, and wellness practitioners for 5 days of prayers, rituals, health expo, and cultural programs in the holy city of Varanasi.",
+      hi: "108 कुंड विश्व शांति महायज्ञ एक भव्य आध्यात्मिक समारोह है जो एक साथ 108 पवित्र अग्नि कुंडों के साथ किया जाता है। यह दुर्लभ और शुभ आयोजन हजारों भक्तों, आध्यात्मिक नेताओं और कल्याण साधकों को पवित्र वाराणसी में 5 दिनों की प्रार्थना, अनुष्ठान, स्वास्थ्य एक्सपो और सांस्कृतिक कार्यक्रमों के लिए एक साथ लाता है।",
     },
   },
   {
@@ -205,8 +203,8 @@ const cmsFallbackSections = [
 const finalCTA = {
   title: { en: "Don't Miss This Opportunity!", hi: "इस अवसर को न चूकें!" },
   subtitle: {
-    en: "Join 200+ exhibitors at India's largest spiritual & wellness expo in the holy city of Varanasi",
-    hi: "पवित्र वाराणसी में भारत के सबसे बड़े आध्यात्मिक और स्वास्थ्य एक्सपो में 200+ प्रदर्शकों से जुड़ें",
+    en: "Join 300+ exhibitors at India's largest spiritual & wellness expo in the holy city of Varanasi",
+    hi: "पवित्र वाराणसी में भारत के सबसे बड़े आध्यात्मिक और स्वास्थ्य एक्सपो में 300+ प्रदर्शकों से जुड़ें",
   },
   callLabel: { en: "Call Us", hi: "कॉल करें" },
   emailLabel: { en: "Email Us", hi: "ईमेल करें" },
@@ -215,8 +213,8 @@ const finalCTA = {
 
 const floating = {
   whatsappMsg: {
-    en: "Hi, I'm interested in booking a stall at the 108 Kundiya Maha Yagya & Health Expo 2026 in Varanasi. Please share details.",
-    hi: "नमस्ते, मैं वाराणसी में 108 कुंडीय महायज्ञ एवं स्वास्थ्य एक्सपो 2026 में स्टॉल बुक करने में रुचि रखता/रखती हूं। कृपया विवरण साझा करें।",
+    en: "Hi, I'm interested in booking a stall at the 108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo in Varanasi. Please share details.",
+    hi: "नमस्ते, मैं वाराणसी में 108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो में स्टॉल बुक करने में रुचि रखता/रखती हूं। कृपया विवरण साझा करें।",
   },
 };
 
@@ -230,13 +228,13 @@ export async function generateMetadata({
   const { locale } = await params;
 
   const titles: Record<AppLocale, string> = {
-    en: "108 Kundiya World Peace Maha Yagya & Health Expo 2026 — Book Your Stall",
-    hi: "108 कुंडीय विश्व शांति महायज्ञ एवं स्वास्थ्य एक्सपो 2026 — अपना स्टॉल बुक करें",
+    en: "108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo — Book Your Stall",
+    hi: "108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो — अपना स्टॉल बुक करें",
   };
 
   const descriptions: Record<AppLocale, string> = {
-    en: "Book your exhibition stall at the 108 Kundiya World Peace Maha Yagya & Health Expo 2026 in Varanasi. 50,000+ visitors, 7 days, 200+ stalls. Standard ₹50K, Premium ₹1L, Prime ₹2L.",
-    hi: "वाराणसी में 108 कुंडीय विश्व शांति महायज्ञ एवं स्वास्थ्य एक्सपो 2026 में अपना प्रदर्शनी स्टॉल बुक करें। 50,000+ आगंतुक, 7 दिन, 200+ स्टॉल।",
+    en: "Book your exhibition stall at the 108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo in Varanasi. 25,000+ daily visitors, 5 days, 300+ stalls. Standard ₹50K, Premium ₹1L, Prime ₹2L.",
+    hi: "वाराणसी में 108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो में अपना प्रदर्शनी स्टॉल बुक करें। 25,000+ दैनिक आगंतुक, 5 दिन, 300+ स्टॉल।",
   };
 
   return {
@@ -284,10 +282,10 @@ export default async function MahaYagyaPage({
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Event",
-            name: "108 Kundiya World Peace Maha Yagya & Health Expo 2026",
+            name: "108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo",
             description: t(hero.tagline, "en"),
             startDate: EVENT_DATE,
-            endDate: "2026-11-21T20:00:00+05:30",
+            endDate: "2026-11-19T20:00:00+05:30",
             eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
             eventStatus: "https://schema.org/EventScheduled",
             location: {
@@ -341,7 +339,7 @@ export default async function MahaYagyaPage({
             {t(hero.title, locale)}
           </h1>
 
-          <p className="text-lg sm:text-xl text-white/80 mb-3 font-medium">
+          <p className="text-xl sm:text-2xl text-white mb-3 font-bold">
             {t(hero.subtitle, locale)}
           </p>
 
@@ -448,17 +446,10 @@ export default async function MahaYagyaPage({
                   </ul>
                   <a
                     href="#book-stall"
-                    onClick={undefined}
-                    className={`block w-full py-3 rounded-lg font-medium text-center transition-colors ${
-                      tier.popular
-                        ? "text-white hover:brightness-110"
-                        : "border-2 hover:bg-orange-50 dark:hover:bg-orange-900/20"
-                    }`}
-                    style={
-                      tier.popular
-                        ? { background: "linear-gradient(135deg, var(--color-gold), var(--color-accent))" }
-                        : { borderColor: "var(--color-accent)", color: "var(--color-accent)" }
-                    }
+                    className="block w-full py-4 rounded-lg font-semibold text-center text-lg text-white transition-all hover:brightness-110 hover:shadow-lg"
+                    style={{
+                      background: "linear-gradient(135deg, var(--color-gold), var(--color-accent))",
+                    }}
                     data-stall={tier.id}
                   >
                     {t(hero.cta, locale)}
@@ -516,7 +507,7 @@ export default async function MahaYagyaPage({
             title={t(audience.title, locale)}
             subtitle={t(audience.subtitle, locale)}
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
             {audience.segments.map((seg, i) => (
               <SacredCard key={i}>
                 <div className="text-center">
