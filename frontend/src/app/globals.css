@@ -142,6 +142,24 @@ a.btn-outline:hover {
 
 /* Decorative Elements */
 @layer components {
+  /* Maha Yagya CTA buttons */
+  .yagya-cta-btn {
+    background: linear-gradient(135deg, var(--color-gold), var(--color-accent));
+    color: #fff;
+  }
+  .yagya-cta-btn:hover {
+    background: rgb(255, 246, 236);
+    color: rgb(221, 59, 5);
+  }
+  .yagya-cta-btn-grey {
+    background: linear-gradient(135deg, #9ca3af, #6b7280);
+    color: #fff;
+  }
+  .yagya-cta-btn-grey:hover {
+    background: rgb(229, 231, 235);
+    color: rgb(75, 85, 99);
+  }
+
   /* Sacred Divider - inspired by omswami.org */
   .sacred-divider {
     display: flex;

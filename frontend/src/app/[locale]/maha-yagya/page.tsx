@@ -13,6 +13,15 @@ import { t, type BilingualContent } from "@/content/contentProvider";
 import CMSTextBlocks from "@/components/CMSTextBlocks";
 import CountdownTimer from "./_components/CountdownTimer";
 import LeadForm from "./_components/LeadForm";
+import {
+  FadeUp,
+  StaggerContainer,
+  StaggerCard,
+  ScalePop,
+  IconPop,
+  SlideRight,
+  TierCard,
+} from "./_components/ScrollAnimations";
 
 // ─── Constants ───────────────────────────────────────────────
 const EVENT_DATE = "2026-06-10T06:00:00+05:30"; // June 10, 2026
@@ -173,87 +182,104 @@ const participationOptions = {
     {
       id: "yajaman",
       name: { en: "Yajaman", hi: "यज्ञमान" },
-      icon: "🔥",
+      icon: "🔱",
       desc: { en: "Become a Yajaman and earn the sacred merit of performing the Maha Yagya", hi: "यज्ञमान बनें और महायज्ञ करने का पवित्र पुण्य अर्जित करें" },
       tiers: [
         {
           id: "vishisht-yajaman",
           name: { en: "Vishisht Yajaman", hi: "विशिष्ट यज्ञमान" },
           price: "₹5,51,000",
-          priceLabel: { en: "₹5,51,000", hi: "₹5,51,000" },
+          priceLabel: { en: "VVIP Category", hi: "VVIP श्रेणी" },
           popular: true,
           features: [
-            { en: "Lead Yajaman status with VIP seating at main kund", hi: "मुख्य कुंड पर VIP बैठक सहित प्रमुख यज्ञमान का दर्जा" },
-            { en: "Personalised puja & hawan in your name", hi: "आपके नाम से व्यक्तिगत पूजा और हवन" },
-            { en: "Special blessings from Swamiji", hi: "स्वामीजी से विशेष आशीर्वाद" },
-            { en: "VIP passes for family + VIP dinner", hi: "परिवार के लिए VIP पास + VIP डिनर" },
+            { en: "VVIP Category", hi: "VVIP श्रेणी" },
+            { en: "Yagya Participation", hi: "यज्ञ सहभागिता" },
+            { en: "Divine Meet with Saints", hi: "संतों से दिव्य भेंट" },
+            { en: "Sankalp for Family Wellness", hi: "परिवार कल्याण हेतु संकल्प" },
+            { en: "Shri Pitambara Yantra (Gold)", hi: "श्री पीताम्बरा यंत्र (स्वर्ण)" },
           ],
         },
         {
           id: "mukhya-yajaman",
           name: { en: "Mukhya Yajaman", hi: "मुख्य यज्ञमान" },
           price: "₹2,51,000",
-          priceLabel: { en: "₹2,51,000", hi: "₹2,51,000" },
+          priceLabel: { en: "VIP Category", hi: "VIP श्रेणी" },
           popular: false,
           features: [
-            { en: "Dedicated kund for hawan in your name", hi: "आपके नाम से हवन के लिए समर्पित कुंड" },
-            { en: "Reserved seating at yagya venue", hi: "यज्ञ स्थल पर आरक्षित बैठक" },
-            { en: "Blessings & prasad from the ceremony", hi: "समारोह से आशीर्वाद और प्रसाद" },
-            { en: "VIP passes for family", hi: "परिवार के लिए VIP पास" },
+            { en: "VIP Category", hi: "VIP श्रेणी" },
+            { en: "Yagya Participation", hi: "यज्ञ सहभागिता" },
+            { en: "Divine Meet with Saints", hi: "संतों से दिव्य भेंट" },
+            { en: "Sankalp for Family Wellness", hi: "परिवार कल्याण हेतु संकल्प" },
+            { en: "Shri Pitambara Yantra (Silver)", hi: "श्री पीताम्बरा यंत्र (रजत)" },
           ],
         },
         {
           id: "sahyogi-yajaman",
-          name: { en: "Sahyogi Yajaman", hi: "सहयोगी यज्ञमान" },
+          name: { en: "Sahayogi Yajaman", hi: "सहयोगी यज्ञमान" },
           price: "₹1,51,000",
-          priceLabel: { en: "₹1,51,000", hi: "₹1,51,000" },
+          priceLabel: { en: "VIP Category", hi: "VIP श्रेणी" },
           popular: false,
           features: [
-            { en: "Participation in group hawan ceremony", hi: "सामूहिक हवन समारोह में भागीदारी" },
-            { en: "Reserved seating", hi: "आरक्षित बैठक" },
-            { en: "Prasad & blessings", hi: "प्रसाद और आशीर्वाद" },
-            { en: "Event passes for 2", hi: "2 के लिए इवेंट पास" },
+            { en: "VIP Category", hi: "VIP श्रेणी" },
+            { en: "Yagya Participation", hi: "यज्ञ सहभागिता" },
+            { en: "Divine Meet with Saints", hi: "संतों से दिव्य भेंट" },
+            { en: "Sankalp for Family Wellness", hi: "परिवार कल्याण हेतु संकल्प" },
+            { en: "Shri Pitambara Yantra (Copper)", hi: "श्री पीताम्बरा यंत्र (ताम्र)" },
           ],
         },
       ],
     },
     {
       id: "shivirarthi",
-      name: { en: "Shivirarthi", hi: "शिविरार्थी" },
-      icon: "🙏",
-      desc: { en: "Attend the Maha Yagya as a Shivirarthi and immerse yourself in spiritual bliss", hi: "शिविरार्थी के रूप में महायज्ञ में भाग लें और आध्यात्मिक आनंद में डूबें" },
+      name: { en: "Camps & Programs", hi: "शिविर और कार्यक्रम" },
+      icon: "🗓️",
+      desc: { en: "Participate in camps and programs — yoga, wellness, and spiritual experiences", hi: "शिविरों और कार्यक्रमों में भाग लें — योग, कल्याण और आध्यात्मिक अनुभव" },
       tiers: [
         {
           id: "shivirarthi-1day",
-          name: { en: "1-Day Pass", hi: "एक दिवसीय पास" },
-          price: "",
-          priceLabel: { en: "Coming Soon", hi: "जल्द आ रहा है" },
+          name: { en: "One Day Camp", hi: "एक दिवसीय शिविर" },
+          price: "₹11,000",
+          priceLabel: { en: "₹11,000", hi: "₹11,000" },
           popular: false,
           features: [
-            { en: "Full day access to yagya & expo", hi: "यज्ञ और एक्सपो में पूरे दिन की पहुंच" },
-            { en: "Prasad & meals included", hi: "प्रसाद और भोजन शामिल" },
+            { en: "Yoga Camp", hi: "योग शिविर" },
+            { en: "Free Health Checkup", hi: "निःशुल्क स्वास्थ्य जांच" },
+            { en: "Ayurveda Consultation", hi: "आयुर्वेद परामर्श" },
           ],
         },
         {
           id: "shivirarthi-3day",
-          name: { en: "3-Day Pass", hi: "3 दिवसीय पास" },
-          price: "",
-          priceLabel: { en: "Coming Soon", hi: "जल्द आ रहा है" },
+          name: { en: "Three Days Camp", hi: "3 दिवसीय शिविर" },
+          price: "₹21,000",
+          priceLabel: { en: "₹21,000", hi: "₹21,000" },
           popular: true,
           features: [
-            { en: "3-day access to all events & sessions", hi: "सभी कार्यक्रमों और सत्रों में 3 दिन की पहुंच" },
-            { en: "Prasad, meals & accommodation", hi: "प्रसाद, भोजन और आवास" },
+            { en: "Yoga Sessions", hi: "योग सत्र" },
+            { en: "Medical & Ayurveda Interaction", hi: "चिकित्सा और आयुर्वेद परामर्श" },
           ],
         },
         {
           id: "shivirarthi-5day",
-          name: { en: "5-Day Pass", hi: "5 दिवसीय पास" },
-          price: "",
-          priceLabel: { en: "Coming Soon", hi: "जल्द आ रहा है" },
+          name: { en: "Five Days Camp", hi: "5 दिवसीय शिविर" },
+          price: "₹51,000",
+          priceLabel: { en: "₹51,000", hi: "₹51,000" },
           popular: false,
           features: [
-            { en: "Complete 5-day immersive experience", hi: "पूर्ण 5 दिवसीय गहन अनुभव" },
-            { en: "All meals, accommodation & special sessions", hi: "सभी भोजन, आवास और विशेष सत्र" },
+            { en: "Full Wellness Program", hi: "पूर्ण कल्याण कार्यक्रम" },
+            { en: "Accommodation & Meals", hi: "आवास और भोजन" },
+            { en: "Pitra Shanti Puja", hi: "पितृ शांति पूजा" },
+          ],
+        },
+        {
+          id: "divine-meet",
+          name: { en: "Divine Meet with Swamiji", hi: "स्वामीजी से दिव्य भेंट" },
+          price: "₹51,000",
+          priceLabel: { en: "₹51,000", hi: "₹51,000" },
+          popular: false,
+          features: [
+            { en: "Personal Horoscope Analysis", hi: "व्यक्तिगत कुंडली विश्लेषण" },
+            { en: "Divine Guidance", hi: "दिव्य मार्गदर्शन" },
+            { en: "Yagya Participation", hi: "यज्ञ सहभागिता" },
           ],
         },
       ],
@@ -518,38 +544,46 @@ export default async function MahaYagyaPage({
       >
         <LotusPattern />
         <Container className="relative z-10">
-          <SectionHeading
-            title={t(keyBenefits.title, locale)}
-            subtitle={t(keyBenefits.subtitle, locale)}
-            className="text-white [&_p]:text-white/70"
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          <FadeUp>
+            <div className="flex flex-col text-center items-center mb-12">
+              <h2 className="font-heading text-3xl sm:text-4xl md:text-heading font-semibold mb-3 text-white">
+                {t(keyBenefits.title, locale)}
+              </h2>
+              <p className="text-lg max-w-2xl text-white/70">
+                {t(keyBenefits.subtitle, locale)}
+              </p>
+            </div>
+          </FadeUp>
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-5xl mx-auto" stagger={0.15}>
             {keyBenefits.items.map((item, i) => (
-              <div
-                key={i}
-                className="relative rounded-2xl p-6 sm:p-8 border border-white/10 backdrop-blur-sm"
-                style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))" }}
-              >
-                <div className="flex items-start gap-4">
-                  <span className="text-4xl sm:text-5xl shrink-0">{item.icon}</span>
-                  <div>
-                    <div
-                      className="font-heading text-2xl sm:text-3xl font-bold mb-1"
-                      style={{ color: "var(--color-gold)" }}
-                    >
-                      {t(item.value, locale)}
+              <StaggerCard key={i}>
+                <div
+                  className="relative rounded-2xl p-6 sm:p-8 border border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/25 hover:shadow-[0_8px_30px_rgba(234,179,8,0.15)]"
+                  style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))" }}
+                >
+                  <div className="flex items-start gap-4">
+                    <IconPop delay={i * 0.08} className="text-4xl sm:text-5xl shrink-0">{item.icon}</IconPop>
+                    <div>
+                      <ScalePop delay={0.1 + i * 0.08}>
+                        <div
+                          className="font-heading text-2xl sm:text-3xl font-bold mb-1"
+                          style={{ color: "var(--color-gold)" }}
+                        >
+                          {t(item.value, locale)}
+                        </div>
+                      </ScalePop>
+                      <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
+                        {t(item.title, locale)}
+                      </h3>
+                      <p className="text-sm sm:text-base text-white/60">
+                        {t(item.desc, locale)}
+                      </p>
                     </div>
-                    <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
-                      {t(item.title, locale)}
-                    </h3>
-                    <p className="text-sm sm:text-base text-white/60">
-                      {t(item.desc, locale)}
-                    </p>
                   </div>
                 </div>
-              </div>
+              </StaggerCard>
             ))}
-          </div>
+          </StaggerContainer>
         </Container>
       </section>
 
@@ -558,28 +592,32 @@ export default async function MahaYagyaPage({
       {/* ═══ SECTION 2: WHY PARTICIPATE ═══ */}
       <section className="py-16 sm:py-20 md:py-24">
         <Container>
-          <SectionHeading
-            title={t(whyParticipate.title, locale)}
-            subtitle={t(whyParticipate.subtitle, locale)}
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <FadeUp>
+            <SectionHeading
+              title={t(whyParticipate.title, locale)}
+              subtitle={t(whyParticipate.subtitle, locale)}
+            />
+          </FadeUp>
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6" stagger={0.12}>
             {whyParticipate.benefits.map((b, i) => (
-              <SacredCard key={i}>
-                <div className="text-center">
-                  <span className="text-4xl mb-4 block">{b.icon}</span>
-                  <h3
-                    className="font-heading text-lg font-semibold mb-2"
-                    style={{ color: "var(--color-primary)" }}
-                  >
-                    {t(b.title, locale)}
-                  </h3>
-                  <p className="text-sm" style={{ color: "var(--color-muted)" }}>
-                    {t(b.desc, locale)}
-                  </p>
-                </div>
-              </SacredCard>
+              <StaggerCard key={i}>
+                <SacredCard>
+                  <div className="text-center">
+                    <IconPop className="text-4xl mb-4 block">{b.icon}</IconPop>
+                    <h3
+                      className="font-heading text-lg font-semibold mb-2"
+                      style={{ color: "var(--color-primary)" }}
+                    >
+                      {t(b.title, locale)}
+                    </h3>
+                    <p className="text-sm" style={{ color: "var(--color-muted)" }}>
+                      {t(b.desc, locale)}
+                    </p>
+                  </div>
+                </SacredCard>
+              </StaggerCard>
             ))}
-          </div>
+          </StaggerContainer>
         </Container>
       </section>
 
@@ -592,37 +630,45 @@ export default async function MahaYagyaPage({
         style={{ backgroundColor: "var(--color-secondary)" }}
       >
         <Container>
-          <SectionHeading
-            title={t(participationOptions.title, locale)}
-            subtitle={t(participationOptions.subtitle, locale)}
-          />
+          <FadeUp>
+            <SectionHeading
+              title={t(participationOptions.title, locale)}
+              subtitle={t(participationOptions.subtitle, locale)}
+            />
+          </FadeUp>
 
           {participationOptions.categories.map((cat) => (
             <div key={cat.id} className="mb-16 last:mb-0">
               {/* Category Header */}
-              <div className="text-center mb-8">
-                <span className="text-4xl mb-2 block">{cat.icon}</span>
-                <h3
-                  className="font-heading text-2xl sm:text-3xl font-bold mb-2"
-                  style={{ color: "var(--color-primary)" }}
-                >
-                  {t(cat.name, locale)}
-                </h3>
-                <p className="text-sm sm:text-base max-w-2xl mx-auto" style={{ color: "var(--color-muted)" }}>
-                  {t(cat.desc, locale)}
-                </p>
-              </div>
+              <FadeUp y={40}>
+                <div className="text-center mb-8">
+                  <span className="text-4xl mb-2 block">{cat.icon}</span>
+                  <h3
+                    className="font-heading text-2xl sm:text-3xl font-bold mb-2"
+                    style={{ color: "var(--color-primary)" }}
+                  >
+                    {t(cat.name, locale)}
+                  </h3>
+                  <p className="text-sm sm:text-base max-w-2xl mx-auto" style={{ color: "var(--color-muted)" }}>
+                    {t(cat.desc, locale)}
+                  </p>
+                </div>
+              </FadeUp>
 
               {/* Tier Cards */}
-              <div className={`grid grid-cols-1 gap-6 ${
-                cat.tiers.length === 4 ? "sm:grid-cols-2 lg:grid-cols-4" :
-                cat.tiers.length === 3 ? "md:grid-cols-3" :
-                "md:grid-cols-2"
-              }`}>
+              <StaggerContainer
+                className={`grid grid-cols-1 gap-6 ${
+                  cat.tiers.length === 4 ? "sm:grid-cols-2 lg:grid-cols-4" :
+                  cat.tiers.length === 3 ? "md:grid-cols-3" :
+                  "md:grid-cols-2"
+                }`}
+                stagger={0.15}
+              >
                 {cat.tiers.map((tier) => (
-                  <div
+                  <TierCard
                     key={tier.id}
-                    className={`relative bg-white dark:bg-zinc-800 rounded-xl shadow-sm border overflow-hidden transition-all duration-200 hover:shadow-md ${
+                    popular={tier.popular}
+                    className={`relative bg-white dark:bg-zinc-800 rounded-xl shadow-sm border overflow-hidden ${
                       tier.popular
                         ? "border-orange-300 dark:border-orange-700 ring-2 ring-orange-200 dark:ring-orange-800"
                         : "border-zinc-200 dark:border-zinc-700"
@@ -641,9 +687,11 @@ export default async function MahaYagyaPage({
                         {t(tier.name, locale)}
                       </h4>
                       <div className="mb-1">
-                        <span className="text-2xl sm:text-3xl font-bold" style={{ color: "var(--color-primary)" }}>
-                          {tier.price || t(tier.priceLabel, locale)}
-                        </span>
+                        <ScalePop>
+                          <span className="text-2xl sm:text-3xl font-bold" style={{ color: "var(--color-primary)" }}>
+                            {tier.price || t(tier.priceLabel, locale)}
+                          </span>
+                        </ScalePop>
                       </div>
                       {tier.price && (
                         <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
@@ -664,12 +712,9 @@ export default async function MahaYagyaPage({
                       </ul>
                       <a
                         href="#book-stall"
-                        className="block w-full py-3 rounded-lg font-semibold text-center text-white transition-all hover:brightness-110 hover:shadow-lg"
-                        style={{
-                          background: tier.price
-                            ? "linear-gradient(135deg, var(--color-gold), var(--color-accent))"
-                            : "linear-gradient(135deg, #9ca3af, #6b7280)",
-                        }}
+                        className={`group/btn block w-full py-3 rounded-lg font-semibold text-center transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.15)] ${
+                          tier.price ? "yagya-cta-btn" : "yagya-cta-btn-grey"
+                        }`}
                         data-category={cat.id}
                         data-stall={tier.id}
                       >
@@ -678,9 +723,9 @@ export default async function MahaYagyaPage({
                           : (locale === "en" ? "Register Interest" : "रुचि दर्ज करें")}
                       </a>
                     </div>
-                  </div>
+                  </TierCard>
                 ))}
-              </div>
+              </StaggerContainer>
             </div>
           ))}
         </Container>
@@ -691,32 +736,37 @@ export default async function MahaYagyaPage({
       {/* ═══ SECTION 4: EVENT HIGHLIGHTS ═══ */}
       <section className="py-16 sm:py-20 md:py-24">
         <Container>
-          <SectionHeading title={t(highlights.title, locale)} />
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+          <FadeUp>
+            <SectionHeading title={t(highlights.title, locale)} />
+          </FadeUp>
+          <StaggerContainer className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6" stagger={0.1}>
             {highlights.stats.map((stat, i) => (
-              <div
-                key={i}
-                className="text-center p-4 sm:p-6 rounded-xl"
-                style={{
-                  backgroundColor: "var(--color-secondary)",
-                  border: "1px solid var(--color-border)",
-                }}
-              >
+              <StaggerCard key={i} hoverLift>
                 <div
-                  className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold mb-1"
-                  style={{ color: "var(--color-primary)" }}
+                  className="text-center p-4 sm:p-6 rounded-xl transition-colors duration-300 hover:border-[var(--color-gold)]"
+                  style={{
+                    backgroundColor: "var(--color-secondary)",
+                    border: "1px solid var(--color-border)",
+                  }}
                 >
-                  {stat.value}
+                  <ScalePop delay={i * 0.06}>
+                    <div
+                      className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold mb-1"
+                      style={{ color: "var(--color-primary)" }}
+                    >
+                      {stat.value}
+                    </div>
+                  </ScalePop>
+                  <div
+                    className="text-xs sm:text-sm font-medium uppercase tracking-wide"
+                    style={{ color: "var(--color-muted)" }}
+                  >
+                    {t(stat.label, locale)}
+                  </div>
                 </div>
-                <div
-                  className="text-xs sm:text-sm font-medium uppercase tracking-wide"
-                  style={{ color: "var(--color-muted)" }}
-                >
-                  {t(stat.label, locale)}
-                </div>
-              </div>
+              </StaggerCard>
             ))}
-          </div>
+          </StaggerContainer>
         </Container>
       </section>
 
@@ -728,28 +778,32 @@ export default async function MahaYagyaPage({
         style={{ backgroundColor: "var(--color-secondary)" }}
       >
         <Container>
-          <SectionHeading
-            title={t(audience.title, locale)}
-            subtitle={t(audience.subtitle, locale)}
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+          <FadeUp>
+            <SectionHeading
+              title={t(audience.title, locale)}
+              subtitle={t(audience.subtitle, locale)}
+            />
+          </FadeUp>
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6" stagger={0.12}>
             {audience.segments.map((seg, i) => (
-              <SacredCard key={i}>
-                <div className="text-center">
-                  <span className="text-3xl mb-3 block">{seg.icon}</span>
-                  <h3
-                    className="font-heading text-lg font-semibold mb-2"
-                    style={{ color: "var(--color-primary)" }}
-                  >
-                    {t(seg.title, locale)}
-                  </h3>
-                  <p className="text-sm" style={{ color: "var(--color-muted)" }}>
-                    {t(seg.desc, locale)}
-                  </p>
-                </div>
-              </SacredCard>
+              <StaggerCard key={i}>
+                <SacredCard>
+                  <div className="text-center">
+                    <IconPop className="text-3xl mb-3 block">{seg.icon}</IconPop>
+                    <h3
+                      className="font-heading text-lg font-semibold mb-2"
+                      style={{ color: "var(--color-primary)" }}
+                    >
+                      {t(seg.title, locale)}
+                    </h3>
+                    <p className="text-sm" style={{ color: "var(--color-muted)" }}>
+                      {t(seg.desc, locale)}
+                    </p>
+                  </div>
+                </SacredCard>
+              </StaggerCard>
             ))}
-          </div>
+          </StaggerContainer>
         </Container>
       </section>
 
@@ -758,20 +812,26 @@ export default async function MahaYagyaPage({
       {/* ═══ SECTION 6: COUNTDOWN & URGENCY ═══ */}
       <section className="py-16 sm:py-20 md:py-24">
         <Container className="text-center">
-          <SectionHeading
-            title={t(urgency.title, locale)}
-            subtitle={t(urgency.subtitle, locale)}
-          />
-          <CountdownTimer eventDate={EVENT_DATE} locale={locale} />
-          <p
-            className="mt-8 text-lg font-semibold animate-pulse"
-            style={{ color: "var(--color-accent)" }}
-          >
-            {t(urgency.stallsRemaining, locale)}
-          </p>
-          <p className="mt-2 text-sm" style={{ color: "var(--color-muted)" }}>
-            {t(urgency.earlyBird, locale)}
-          </p>
+          <FadeUp>
+            <SectionHeading
+              title={t(urgency.title, locale)}
+              subtitle={t(urgency.subtitle, locale)}
+            />
+          </FadeUp>
+          <ScalePop>
+            <CountdownTimer eventDate={EVENT_DATE} locale={locale} />
+          </ScalePop>
+          <FadeUp delay={0.3}>
+            <p
+              className="mt-8 text-lg font-semibold animate-pulse"
+              style={{ color: "var(--color-accent)" }}
+            >
+              {t(urgency.stallsRemaining, locale)}
+            </p>
+            <p className="mt-2 text-sm" style={{ color: "var(--color-muted)" }}>
+              {t(urgency.earlyBird, locale)}
+            </p>
+          </FadeUp>
         </Container>
       </section>
 
@@ -784,13 +844,15 @@ export default async function MahaYagyaPage({
         style={{ backgroundColor: "var(--color-secondary)" }}
       >
         <Container>
-          <SectionHeading
-            title={t(formSection.title, locale)}
-            subtitle={t(formSection.subtitle, locale)}
-          />
+          <FadeUp>
+            <SectionHeading
+              title={t(formSection.title, locale)}
+              subtitle={t(formSection.subtitle, locale)}
+            />
+          </FadeUp>
           <div className="grid gap-8 lg:gap-12 lg:grid-cols-2">
             {/* Left: Why Book Now */}
-            <div className="space-y-6">
+            <FadeUp delay={0.1} className="space-y-6">
               <h3
                 className="font-heading text-xl sm:text-2xl font-semibold"
                 style={{ color: "var(--color-primary)" }}
@@ -833,14 +895,16 @@ export default async function MahaYagyaPage({
                   </a>
                 </p>
               </div>
-            </div>
+            </FadeUp>
 
             {/* Right: Lead Form */}
-            <div
-              className="bg-white dark:bg-zinc-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-sm border border-zinc-100 dark:border-zinc-700"
-            >
-              <LeadForm locale={locale} />
-            </div>
+            <SlideRight delay={0.2}>
+              <div
+                className="bg-white dark:bg-zinc-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-sm border border-zinc-100 dark:border-zinc-700"
+              >
+                <LeadForm locale={locale} />
+              </div>
+            </SlideRight>
           </div>
         </Container>
       </section>
@@ -850,24 +914,30 @@ export default async function MahaYagyaPage({
       {/* ═══ SECTION 8: TRUST SIGNALS ═══ */}
       <section className="py-16 sm:py-20 md:py-24">
         <Container>
-          <SectionHeading title={t(trust.title, locale)} />
-          <div className="max-w-3xl mx-auto text-center mb-10">
-            <h3
-              className="font-heading text-2xl font-semibold mb-4"
-              style={{ color: "var(--color-primary)" }}
-            >
-              {t(trust.orgName, locale)}
-            </h3>
-            <p className="text-base leading-relaxed" style={{ color: "var(--color-muted)" }}>
-              {t(trust.orgDesc, locale)}
-            </p>
-          </div>
-          <div className="max-w-2xl mx-auto">
-            <QuoteBlock
-              quote={t(trust.quote, locale)}
-              author={t(trust.quoteAuthor, locale)}
-            />
-          </div>
+          <FadeUp>
+            <SectionHeading title={t(trust.title, locale)} />
+          </FadeUp>
+          <FadeUp delay={0.15}>
+            <div className="max-w-3xl mx-auto text-center mb-10">
+              <h3
+                className="font-heading text-2xl font-semibold mb-4"
+                style={{ color: "var(--color-primary)" }}
+              >
+                {t(trust.orgName, locale)}
+              </h3>
+              <p className="text-base leading-relaxed" style={{ color: "var(--color-muted)" }}>
+                {t(trust.orgDesc, locale)}
+              </p>
+            </div>
+          </FadeUp>
+          <FadeUp delay={0.3}>
+            <div className="max-w-2xl mx-auto">
+              <QuoteBlock
+                quote={t(trust.quote, locale)}
+                author={t(trust.quoteAuthor, locale)}
+              />
+            </div>
+          </FadeUp>
         </Container>
       </section>
 
@@ -892,20 +962,25 @@ export default async function MahaYagyaPage({
       >
         <LotusPattern />
         <Container className="relative z-10 text-center">
-          <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-            {t(finalCTA.title, locale)}
-          </h2>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
-            {t(finalCTA.subtitle, locale)}
-          </p>
+          <FadeUp>
+            <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+              {t(finalCTA.title, locale)}
+            </h2>
+            <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
+              {t(finalCTA.subtitle, locale)}
+            </p>
+          </FadeUp>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-            <GoldenButton href="#stall-options" className="text-lg px-8 py-4">
-              {t(hero.cta, locale)}
-            </GoldenButton>
-          </div>
+          <ScalePop delay={0.2}>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+              <GoldenButton href="#stall-options" className="text-lg px-8 py-4">
+                {t(hero.cta, locale)}
+              </GoldenButton>
+            </div>
+          </ScalePop>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 text-white/80 text-sm sm:text-base">
+          <FadeUp delay={0.35}>
+            <div className="flex flex-wrap items-center justify-center gap-6 text-white/80 text-sm sm:text-base">
             <a href={`tel:${PHONE_NUMBER}`} className="hover:text-white transition-colors">
               📞 {t(finalCTA.callLabel, locale)}: {PHONE_NUMBER}
             </a>
@@ -921,6 +996,7 @@ export default async function MahaYagyaPage({
               💬 {t(finalCTA.whatsappLabel, locale)}
             </a>
           </div>
+          </FadeUp>
         </Container>
       </section>
 

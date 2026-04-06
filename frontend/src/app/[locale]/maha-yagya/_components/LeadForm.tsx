@@ -12,7 +12,7 @@ interface LeadFormProps {
 const categories = [
   { value: "sponsor", en: "Sponsor (स्पॉन्सर)", hi: "स्पॉन्सर" },
   { value: "yajaman", en: "Yajaman (यज्ञमान)", hi: "यज्ञमान" },
-  { value: "shivirarthi", en: "Shivirarthi (शिविरार्थी)", hi: "शिविरार्थी" },
+  { value: "shivirarthi", en: "Camps & Programs (शिविर और कार्यक्रम)", hi: "शिविर और कार्यक्रम" },
 ];
 
 const tiersByCategory: Record<string, { value: string; en: string; hi: string }[]> = {
@@ -23,14 +23,15 @@ const tiersByCategory: Record<string, { value: string; en: string; hi: string }[
     { value: "prime-stall-partner", en: "Prime Stall Partner — ₹5,00,000", hi: "प्राइम स्टॉल पार्टनर — ₹5,00,000" },
   ],
   yajaman: [
-    { value: "vishisht-yajaman", en: "Vishisht Yajaman — ₹5,51,000", hi: "विशिष्ट यज्ञमान — ₹5,51,000" },
-    { value: "mukhya-yajaman", en: "Mukhya Yajaman — ₹2,51,000", hi: "मुख्य यज्ञमान — ₹2,51,000" },
-    { value: "sahyogi-yajaman", en: "Sahyogi Yajaman — ₹1,51,000", hi: "सहयोगी यज्ञमान — ₹1,51,000" },
+    { value: "vishisht-yajaman", en: "Vishisht Yajaman (VVIP) — ₹5,51,000", hi: "विशिष्ट यज्ञमान (VVIP) — ₹5,51,000" },
+    { value: "mukhya-yajaman", en: "Mukhya Yajaman (VIP) — ₹2,51,000", hi: "मुख्य यज्ञमान (VIP) — ₹2,51,000" },
+    { value: "sahyogi-yajaman", en: "Sahayogi Yajaman (VIP) — ₹1,51,000", hi: "सहयोगी यज्ञमान (VIP) — ₹1,51,000" },
   ],
   shivirarthi: [
-    { value: "shivirarthi-1day", en: "1-Day Pass", hi: "एक दिवसीय पास" },
-    { value: "shivirarthi-3day", en: "3-Day Pass", hi: "3 दिवसीय पास" },
-    { value: "shivirarthi-5day", en: "5-Day Pass", hi: "5 दिवसीय पास" },
+    { value: "shivirarthi-1day", en: "One Day Camp — ₹11,000", hi: "एक दिवसीय शिविर — ₹11,000" },
+    { value: "shivirarthi-3day", en: "Three Days Camp — ₹21,000", hi: "3 दिवसीय शिविर — ₹21,000" },
+    { value: "shivirarthi-5day", en: "Five Days Camp — ₹51,000", hi: "5 दिवसीय शिविर — ₹51,000" },
+    { value: "divine-meet", en: "Divine Meet with Swamiji — ₹51,000", hi: "स्वामीजी से दिव्य भेंट — ₹51,000" },
   ],
 };
 
