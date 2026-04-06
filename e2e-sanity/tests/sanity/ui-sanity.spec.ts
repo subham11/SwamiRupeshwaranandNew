@@ -254,12 +254,61 @@ test.describe('UI Sanity — Maha Yagya Page', () => {
     expect(bodyText).toContain('यज्ञमान');
   });
 
+  test('Speakers carousel section is visible with placeholder cards', async ({ page }) => {
+    await page.goto('/en/maha-yagya');
+    const bodyText = await page.textContent('body');
+    expect(bodyText).toContain('Our Speakers');
+    expect(bodyText).toContain('Speaker 1');
+    expect(bodyText).toContain('Full speaker lineup coming soon');
+    // Swiper container should exist
+    const swiper = page.locator('.speakers-swiper');
+    await expect(swiper).toBeVisible({ timeout: 10_000 });
+  });
+
+  test('All tiers show free accommodation and health checkup', async ({ page }) => {
+    await page.goto('/en/maha-yagya');
+    const bodyText = await page.textContent('body');
+    // "Free Accommodation & Meals" should appear in all Yajaman (3) + Camp (4) tiers = 7
+    const accommodationCount = (bodyText!.match(/Free Accommodation & Meals/g) || []).length;
+    expect(accommodationCount).toBeGreaterThanOrEqual(7);
+    const healthCount = (bodyText!.match(/Free Health Checkup/g) || []).length;
+    expect(healthCount).toBeGreaterThanOrEqual(7);
+    console.log(`  → Free Accommodation mentions: ${accommodationCount}, Free Health: ${healthCount}`);
+  });
+
   test('Maha Yagya page loads within 12 seconds', async ({ page }) => {
     const start = Date.now();
     await page.goto('/en/maha-yagya', { waitUntil: 'domcontentloaded' });
     const elapsed = Date.now() - start;
     console.log(`  → Maha Yagya DOMContentLoaded in ${elapsed}ms`);
     expect(elapsed).toBeLessThan(12_000);
+  });
+});
+
+test.describe('UI Sanity — Homepage Popup', () => {
+
+  test('Maha Yagya popup appears on homepage after delay', async ({ page }) => {
+    // Clear any previous dismissal
+    await page.goto('/en');
+    await page.evaluate(() => sessionStorage.removeItem('mahayagya_popup_dismissed'));
+    await page.reload();
+    // Wait for popup (3s delay + render)
+    const popup = page.locator('text=108 Kund World Peace Mahayagya');
+    await expect(popup).toBeVisible({ timeout: 10_000 });
+    // Verify CTA link
+    const cta = page.locator('a:has-text("Learn More & Participate")');
+    await expect(cta).toBeVisible();
+  });
+
+  test('Popup can be dismissed', async ({ page }) => {
+    await page.goto('/en');
+    await page.evaluate(() => sessionStorage.removeItem('mahayagya_popup_dismissed'));
+    await page.reload();
+    const popup = page.locator('text=108 Kund World Peace Mahayagya');
+    await expect(popup).toBeVisible({ timeout: 10_000 });
+    // Click "Maybe Later"
+    await page.locator('button:has-text("Maybe Later")').click();
+    await expect(popup).not.toBeVisible({ timeout: 3_000 });
   });
 });
 
