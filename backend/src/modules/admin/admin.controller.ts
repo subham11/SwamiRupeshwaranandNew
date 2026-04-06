@@ -13,8 +13,8 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Post('invite')
-  @AdminOnly()
-  @ApiOperation({ summary: 'Invite a new admin or content editor' })
+  @SuperAdminOnly()
+  @ApiOperation({ summary: 'Invite a new admin or content editor (Super Admin only)' })
   @ApiResponse({
     status: 201,
     description: 'Invitation sent successfully',

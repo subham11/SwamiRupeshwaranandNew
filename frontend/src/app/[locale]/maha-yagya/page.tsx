@@ -40,6 +40,52 @@ const hero = {
   },
 };
 
+const keyBenefits = {
+  title: { en: "Why This Mahayagya Is Unmissable", hi: "यह महायज्ञ क्यों अनूठा है" },
+  subtitle: {
+    en: "Four compelling reasons to be a part of this grand event",
+    hi: "इस भव्य आयोजन का हिस्सा बनने के चार प्रमुख कारण",
+  },
+  items: [
+    {
+      icon: "👥",
+      value: { en: "25,000+", hi: "25,000+" },
+      title: { en: "Per Day Gathering", hi: "प्रतिदिन उपस्थिति" },
+      desc: {
+        en: "Over 25,000 visitors per day across 5 divine days — a massive, engaged audience for your brand",
+        hi: "5 दिव्य दिनों में प्रतिदिन 25,000+ आगंतुक — आपके ब्रांड के लिए विशाल, सक्रिय दर्शक",
+      },
+    },
+    {
+      icon: "📱",
+      value: { en: "1 Cr+", hi: "1 करोड़+" },
+      title: { en: "Digital Reach", hi: "डिजिटल पहुंच" },
+      desc: {
+        en: "Over 1 crore digital impressions through social media, live streaming, and national media coverage",
+        hi: "सोशल मीडिया, लाइव स्ट्रीमिंग और राष्ट्रीय मीडिया कवरेज के माध्यम से 1 करोड़+ डिजिटल इम्प्रेशन",
+      },
+    },
+    {
+      icon: "📈",
+      value: { en: "Business", hi: "व्यापार" },
+      title: { en: "Business Growth Platform", hi: "व्यापार विकास मंच" },
+      desc: {
+        en: "An ideal platform for startups, pharma, medical, and all business sectors to showcase products and grow",
+        hi: "स्टार्टअप, फार्मा, मेडिकल और सभी व्यापार क्षेत्रों के लिए उत्पाद प्रदर्शित करने और बढ़ने का आदर्श मंच",
+      },
+    },
+    {
+      icon: "🤝",
+      value: { en: "Invest", hi: "निवेश" },
+      title: { en: "Investment & Coordination Opportunity", hi: "निवेश और समन्वय का अवसर" },
+      desc: {
+        en: "Unique opportunity to invest in a sacred event and coordinate with VIPs, government officials & industry leaders",
+        hi: "एक पवित्र आयोजन में निवेश और VIP, सरकारी अधिकारियों व उद्योग जगत के नेताओं के साथ समन्वय का अनूठा अवसर",
+      },
+    },
+  ],
+};
+
 const whyParticipate = {
   title: { en: "Why Participate?", hi: "क्यों भाग लें?" },
   subtitle: {
@@ -58,56 +104,158 @@ const whyParticipate = {
   ],
 };
 
-const stallOptions = {
-  title: { en: "Stall Options", hi: "स्टॉल विकल्प" },
+const participationOptions = {
+  title: { en: "How to Participate", hi: "कैसे भाग लें" },
   subtitle: {
-    en: "Choose the perfect stall for your brand and budget",
-    hi: "अपने ब्रांड और बजट के लिए सही स्टॉल चुनें",
+    en: "Choose the participation category that suits you best",
+    hi: "अपने लिए सबसे उपयुक्त भागीदारी श्रेणी चुनें",
   },
-  tiers: [
+  categories: [
     {
-      id: "standard",
-      name: { en: "Standard", hi: "स्टैंडर्ड" },
-      price: "₹50,000",
-      size: "10×10 ft",
-      popular: false,
-      features: [
-        { en: "10×10 ft stall space", hi: "10×10 फ़ीट स्टॉल स्पेस" },
-        { en: "Basic setup (table, chairs, backdrop)", hi: "बेसिक सेटअप (टेबल, कुर्सियां, बैकड्रॉप)" },
-        { en: "Shared branding on event banner", hi: "इवेंट बैनर पर साझा ब्रांडिंग" },
-        { en: "Event pass for 2 representatives", hi: "2 प्रतिनिधियों के लिए इवेंट पास" },
-        { en: "Listing in event directory", hi: "इवेंट डायरेक्टरी में सूचीबद्ध" },
+      id: "sponsor",
+      name: { en: "Sponsor", hi: "स्पॉन्सर" },
+      icon: "🏆",
+      desc: { en: "Partner with us to amplify your brand at India's grandest spiritual & wellness event", hi: "भारत के सबसे भव्य आध्यात्मिक और कल्याण आयोजन में अपने ब्रांड को बढ़ाने के लिए हमारे साथ जुड़ें" },
+      tiers: [
+        {
+          id: "title-partner",
+          name: { en: "Title Partner", hi: "टाइटल पार्टनर" },
+          price: "₹50,00,000",
+          priceLabel: { en: "50 Lakh", hi: "50 लाख" },
+          popular: true,
+          features: [
+            { en: "Title sponsorship branding across all event material", hi: "सभी इवेंट सामग्री पर टाइटल स्पॉन्सरशिप ब्रांडिंग" },
+            { en: "Prime stall location (20×20 ft VIP zone)", hi: "प्राइम स्टॉल लोकेशन (20×20 फ़ीट VIP ज़ोन)" },
+            { en: "Full media coverage, press mentions & social media promotion", hi: "पूर्ण मीडिया कवरेज, प्रेस उल्लेख और सोशल मीडिया प्रमोशन" },
+            { en: "VIP passes for 10 representatives + VIP dinner invitation", hi: "10 प्रतिनिधियों के लिए VIP पास + VIP डिनर निमंत्रण" },
+          ],
+        },
+        {
+          id: "co-partner",
+          name: { en: "Co Partner", hi: "को-पार्टनर" },
+          price: "₹25,00,000",
+          priceLabel: { en: "25 Lakh", hi: "25 लाख" },
+          popular: false,
+          features: [
+            { en: "Co-branding on event banners & digital media", hi: "इवेंट बैनर और डिजिटल मीडिया पर को-ब्रांडिंग" },
+            { en: "Premium stall (15×15 ft) with custom design", hi: "कस्टम डिज़ाइन सहित प्रीमियम स्टॉल (15×15 फ़ीट)" },
+            { en: "Media coverage & social media promotion", hi: "मीडिया कवरेज और सोशल मीडिया प्रमोशन" },
+            { en: "VIP passes for 6 representatives", hi: "6 प्रतिनिधियों के लिए VIP पास" },
+          ],
+        },
+        {
+          id: "associate-partner",
+          name: { en: "Associate Partner", hi: "एसोसिएट पार्टनर" },
+          price: "₹10,00,000",
+          priceLabel: { en: "10 Lakh", hi: "10 लाख" },
+          popular: false,
+          features: [
+            { en: "Branding on select event banners", hi: "चुनिंदा इवेंट बैनर पर ब्रांडिंग" },
+            { en: "Standard stall (10×10 ft) with setup", hi: "सेटअप सहित स्टैंडर्ड स्टॉल (10×10 फ़ीट)" },
+            { en: "Social media mentions", hi: "सोशल मीडिया उल्लेख" },
+            { en: "Event passes for 4 representatives", hi: "4 प्रतिनिधियों के लिए इवेंट पास" },
+          ],
+        },
+        {
+          id: "prime-stall-partner",
+          name: { en: "Prime Stall Partner", hi: "प्राइम स्टॉल पार्टनर" },
+          price: "₹5,00,000",
+          priceLabel: { en: "5 Lakh", hi: "5 लाख" },
+          popular: false,
+          features: [
+            { en: "Prime stall location with branding", hi: "ब्रांडिंग सहित प्राइम स्टॉल लोकेशन" },
+            { en: "Listing in event directory & website", hi: "इवेंट डायरेक्टरी और वेबसाइट पर सूचीबद्ध" },
+            { en: "Event passes for 2 representatives", hi: "2 प्रतिनिधियों के लिए इवेंट पास" },
+          ],
+        },
       ],
     },
     {
-      id: "premium",
-      name: { en: "Premium", hi: "प्रीमियम" },
-      price: "₹1,00,000",
-      size: "15×15 ft",
-      popular: true,
-      features: [
-        { en: "15×15 ft premium location", hi: "15×15 फ़ीट प्रीमियम लोकेशन" },
-        { en: "Custom-designed stall with branding", hi: "ब्रांडिंग सहित कस्टम-डिज़ाइन स्टॉल" },
-        { en: "Individual banner & standee", hi: "व्यक्तिगत बैनर और स्टैंडी" },
-        { en: "Electricity & lighting included", hi: "बिजली और लाइटिंग शामिल" },
-        { en: "Event pass for 4 representatives", hi: "4 प्रतिनिधियों के लिए इवेंट पास" },
-        { en: "Social media promotion", hi: "सोशल मीडिया प्रमोशन" },
+      id: "yajaman",
+      name: { en: "Yajaman", hi: "यज्ञमान" },
+      icon: "🔥",
+      desc: { en: "Become a Yajaman and earn the sacred merit of performing the Maha Yagya", hi: "यज्ञमान बनें और महायज्ञ करने का पवित्र पुण्य अर्जित करें" },
+      tiers: [
+        {
+          id: "vishisht-yajaman",
+          name: { en: "Vishisht Yajaman", hi: "विशिष्ट यज्ञमान" },
+          price: "₹5,51,000",
+          priceLabel: { en: "₹5,51,000", hi: "₹5,51,000" },
+          popular: true,
+          features: [
+            { en: "Lead Yajaman status with VIP seating at main kund", hi: "मुख्य कुंड पर VIP बैठक सहित प्रमुख यज्ञमान का दर्जा" },
+            { en: "Personalised puja & hawan in your name", hi: "आपके नाम से व्यक्तिगत पूजा और हवन" },
+            { en: "Special blessings from Swamiji", hi: "स्वामीजी से विशेष आशीर्वाद" },
+            { en: "VIP passes for family + VIP dinner", hi: "परिवार के लिए VIP पास + VIP डिनर" },
+          ],
+        },
+        {
+          id: "mukhya-yajaman",
+          name: { en: "Mukhya Yajaman", hi: "मुख्य यज्ञमान" },
+          price: "₹2,51,000",
+          priceLabel: { en: "₹2,51,000", hi: "₹2,51,000" },
+          popular: false,
+          features: [
+            { en: "Dedicated kund for hawan in your name", hi: "आपके नाम से हवन के लिए समर्पित कुंड" },
+            { en: "Reserved seating at yagya venue", hi: "यज्ञ स्थल पर आरक्षित बैठक" },
+            { en: "Blessings & prasad from the ceremony", hi: "समारोह से आशीर्वाद और प्रसाद" },
+            { en: "VIP passes for family", hi: "परिवार के लिए VIP पास" },
+          ],
+        },
+        {
+          id: "sahyogi-yajaman",
+          name: { en: "Sahyogi Yajaman", hi: "सहयोगी यज्ञमान" },
+          price: "₹1,51,000",
+          priceLabel: { en: "₹1,51,000", hi: "₹1,51,000" },
+          popular: false,
+          features: [
+            { en: "Participation in group hawan ceremony", hi: "सामूहिक हवन समारोह में भागीदारी" },
+            { en: "Reserved seating", hi: "आरक्षित बैठक" },
+            { en: "Prasad & blessings", hi: "प्रसाद और आशीर्वाद" },
+            { en: "Event passes for 2", hi: "2 के लिए इवेंट पास" },
+          ],
+        },
       ],
     },
     {
-      id: "prime",
-      name: { en: "Prime", hi: "प्राइम" },
-      price: "₹2,00,000",
-      size: "20×20 ft",
-      popular: false,
-      features: [
-        { en: "20×20 ft VIP zone placement", hi: "20×20 फ़ीट VIP ज़ोन प्लेसमेंट" },
-        { en: "Fully customized stall with AC", hi: "AC सहित पूर्ण अनुकूलित स्टॉल" },
-        { en: "Dedicated branding across venue", hi: "पूरे वेन्यू पर समर्पित ब्रांडिंग" },
-        { en: "Priority placement near main stage", hi: "मुख्य मंच के पास प्राथमिकता प्लेसमेंट" },
-        { en: "Event pass for 6 representatives", hi: "6 प्रतिनिधियों के लिए इवेंट पास" },
-        { en: "Full media coverage & press mentions", hi: "पूर्ण मीडिया कवरेज और प्रेस उल्लेख" },
-        { en: "VIP dinner invitation", hi: "VIP डिनर निमंत्रण" },
+      id: "shivirarthi",
+      name: { en: "Shivirarthi", hi: "शिविरार्थी" },
+      icon: "🙏",
+      desc: { en: "Attend the Maha Yagya as a Shivirarthi and immerse yourself in spiritual bliss", hi: "शिविरार्थी के रूप में महायज्ञ में भाग लें और आध्यात्मिक आनंद में डूबें" },
+      tiers: [
+        {
+          id: "shivirarthi-1day",
+          name: { en: "1-Day Pass", hi: "एक दिवसीय पास" },
+          price: "",
+          priceLabel: { en: "Coming Soon", hi: "जल्द आ रहा है" },
+          popular: false,
+          features: [
+            { en: "Full day access to yagya & expo", hi: "यज्ञ और एक्सपो में पूरे दिन की पहुंच" },
+            { en: "Prasad & meals included", hi: "प्रसाद और भोजन शामिल" },
+          ],
+        },
+        {
+          id: "shivirarthi-3day",
+          name: { en: "3-Day Pass", hi: "3 दिवसीय पास" },
+          price: "",
+          priceLabel: { en: "Coming Soon", hi: "जल्द आ रहा है" },
+          popular: true,
+          features: [
+            { en: "3-day access to all events & sessions", hi: "सभी कार्यक्रमों और सत्रों में 3 दिन की पहुंच" },
+            { en: "Prasad, meals & accommodation", hi: "प्रसाद, भोजन और आवास" },
+          ],
+        },
+        {
+          id: "shivirarthi-5day",
+          name: { en: "5-Day Pass", hi: "5 दिवसीय पास" },
+          price: "",
+          priceLabel: { en: "Coming Soon", hi: "जल्द आ रहा है" },
+          popular: false,
+          features: [
+            { en: "Complete 5-day immersive experience", hi: "पूर्ण 5 दिवसीय गहन अनुभव" },
+            { en: "All meals, accommodation & special sessions", hi: "सभी भोजन, आवास और विशेष सत्र" },
+          ],
+        },
       ],
     },
   ],
@@ -120,7 +268,7 @@ const highlights = {
     { value: "25,000+", label: { en: "Daily Footfall", hi: "दैनिक उपस्थिति" } },
     { value: "5", label: { en: "Divine Days", hi: "दिव्य दिन" } },
     { value: "300+", label: { en: "Exhibition Stalls", hi: "प्रदर्शनी स्टॉल" } },
-    { value: "2 Cr+", label: { en: "Digital Reach", hi: "डिजिटल पहुंच" } },
+    { value: "1 Cr+", label: { en: "Digital Reach", hi: "डिजिटल पहुंच" } },
     { value: "Free", label: { en: "Health Checkup", hi: "स्वास्थ्य जांच" } },
   ],
 };
@@ -303,13 +451,15 @@ export default async function MahaYagyaPage({
               name: "Swami Rupeshwaranand Ji Maharaj Ashram",
               url: "https://bhairavapath.com",
             },
-            offers: stallOptions.tiers.map((tier) => ({
-              "@type": "Offer",
-              name: tier.name.en,
-              price: tier.price.replace(/[₹,]/g, ""),
-              priceCurrency: "INR",
-              availability: "https://schema.org/InStock",
-            })),
+            offers: participationOptions.categories.flatMap((cat) =>
+              cat.tiers.filter((tier) => tier.price).map((tier) => ({
+                "@type": "Offer",
+                name: `${cat.name.en} — ${tier.name.en}`,
+                price: tier.price.replace(/[₹,]/g, ""),
+                priceCurrency: "INR",
+                availability: "https://schema.org/InStock",
+              }))
+            ),
           }),
         }}
       />
@@ -348,7 +498,7 @@ export default async function MahaYagyaPage({
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <GoldenButton href="#book-stall" className="text-lg px-8 py-4">
+            <GoldenButton href="#stall-options" className="text-lg px-8 py-4">
               {t(hero.cta, locale)}
             </GoldenButton>
             <a
@@ -357,6 +507,48 @@ export default async function MahaYagyaPage({
             >
               📞 {t(hero.ctaCall, locale)}
             </a>
+          </div>
+        </Container>
+      </section>
+
+      {/* ═══ KEY BENEFITS (USPs) ═══ */}
+      <section
+        className="py-16 sm:py-20 md:py-24 relative overflow-hidden"
+        style={{ background: "linear-gradient(135deg, var(--color-primary), #1a0a00)" }}
+      >
+        <LotusPattern />
+        <Container className="relative z-10">
+          <SectionHeading
+            title={t(keyBenefits.title, locale)}
+            subtitle={t(keyBenefits.subtitle, locale)}
+            className="text-white [&_p]:text-white/70"
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {keyBenefits.items.map((item, i) => (
+              <div
+                key={i}
+                className="relative rounded-2xl p-6 sm:p-8 border border-white/10 backdrop-blur-sm"
+                style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))" }}
+              >
+                <div className="flex items-start gap-4">
+                  <span className="text-4xl sm:text-5xl shrink-0">{item.icon}</span>
+                  <div>
+                    <div
+                      className="font-heading text-2xl sm:text-3xl font-bold mb-1"
+                      style={{ color: "var(--color-gold)" }}
+                    >
+                      {t(item.value, locale)}
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
+                      {t(item.title, locale)}
+                    </h3>
+                    <p className="text-sm sm:text-base text-white/60">
+                      {t(item.desc, locale)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </Container>
       </section>
@@ -393,71 +585,104 @@ export default async function MahaYagyaPage({
 
       <SacredDivider icon="✦" />
 
-      {/* ═══ SECTION 3: STALL OPTIONS ═══ */}
+      {/* ═══ SECTION 3: PARTICIPATION OPTIONS ═══ */}
       <section
-        className="py-16 sm:py-20 md:py-24 relative"
+        id="stall-options"
+        className="py-16 sm:py-20 md:py-24 relative scroll-mt-20"
         style={{ backgroundColor: "var(--color-secondary)" }}
       >
         <Container>
           <SectionHeading
-            title={t(stallOptions.title, locale)}
-            subtitle={t(stallOptions.subtitle, locale)}
+            title={t(participationOptions.title, locale)}
+            subtitle={t(participationOptions.subtitle, locale)}
           />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {stallOptions.tiers.map((tier) => (
-              <div
-                key={tier.id}
-                className={`relative bg-white dark:bg-zinc-800 rounded-xl shadow-sm border overflow-hidden transition-all duration-200 hover:shadow-md ${
-                  tier.popular
-                    ? "border-orange-300 dark:border-orange-700 md:scale-105 md:-my-2 z-10"
-                    : "border-zinc-200 dark:border-zinc-700"
-                }`}
-              >
-                {tier.popular && (
-                  <div
-                    className="text-white text-center py-1.5 text-sm font-medium"
-                    style={{ background: "linear-gradient(135deg, var(--color-gold), var(--color-accent))" }}
-                  >
-                    {locale === "en" ? "⭐ Most Popular" : "⭐ सबसे लोकप्रिय"}
-                  </div>
-                )}
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-1">
-                    {t(tier.name, locale)}
-                  </h3>
-                  <div className="mb-1">
-                    <span className="text-3xl font-bold text-zinc-900 dark:text-white">
-                      {tier.price}
-                    </span>
-                  </div>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
-                    {tier.size}
-                  </p>
-                  <ul className="space-y-2 mb-6">
-                    {tier.features.map((f, j) => (
-                      <li
-                        key={j}
-                        className="flex items-start gap-2 text-sm text-zinc-600 dark:text-zinc-300"
-                      >
-                        <span className="text-green-500 mt-0.5 shrink-0">✓</span>
-                        {t(f, locale)}
-                      </li>
-                    ))}
-                  </ul>
-                  <a
-                    href="#book-stall"
-                    className="block w-full py-4 rounded-lg font-semibold text-center text-lg text-white transition-all hover:brightness-110 hover:shadow-lg"
-                    style={{
-                      background: "linear-gradient(135deg, var(--color-gold), var(--color-accent))",
-                    }}
-                    data-stall={tier.id}
-                  >
-                    {t(hero.cta, locale)}
-                  </a>
-                </div>
+
+          {participationOptions.categories.map((cat) => (
+            <div key={cat.id} className="mb-16 last:mb-0">
+              {/* Category Header */}
+              <div className="text-center mb-8">
+                <span className="text-4xl mb-2 block">{cat.icon}</span>
+                <h3
+                  className="font-heading text-2xl sm:text-3xl font-bold mb-2"
+                  style={{ color: "var(--color-primary)" }}
+                >
+                  {t(cat.name, locale)}
+                </h3>
+                <p className="text-sm sm:text-base max-w-2xl mx-auto" style={{ color: "var(--color-muted)" }}>
+                  {t(cat.desc, locale)}
+                </p>
               </div>
-            ))}
-          </div>
+
+              {/* Tier Cards */}
+              <div className={`grid grid-cols-1 gap-6 ${
+                cat.tiers.length === 4 ? "sm:grid-cols-2 lg:grid-cols-4" :
+                cat.tiers.length === 3 ? "md:grid-cols-3" :
+                "md:grid-cols-2"
+              }`}>
+                {cat.tiers.map((tier) => (
+                  <div
+                    key={tier.id}
+                    className={`relative bg-white dark:bg-zinc-800 rounded-xl shadow-sm border overflow-hidden transition-all duration-200 hover:shadow-md ${
+                      tier.popular
+                        ? "border-orange-300 dark:border-orange-700 ring-2 ring-orange-200 dark:ring-orange-800"
+                        : "border-zinc-200 dark:border-zinc-700"
+                    }`}
+                  >
+                    {tier.popular && (
+                      <div
+                        className="text-white text-center py-1.5 text-sm font-medium"
+                        style={{ background: "linear-gradient(135deg, var(--color-gold), var(--color-accent))" }}
+                      >
+                        {locale === "en" ? "⭐ Recommended" : "⭐ अनुशंसित"}
+                      </div>
+                    )}
+                    <div className="p-5 sm:p-6">
+                      <h4 className="text-lg font-bold text-zinc-900 dark:text-white mb-1">
+                        {t(tier.name, locale)}
+                      </h4>
+                      <div className="mb-1">
+                        <span className="text-2xl sm:text-3xl font-bold" style={{ color: "var(--color-primary)" }}>
+                          {tier.price || t(tier.priceLabel, locale)}
+                        </span>
+                      </div>
+                      {tier.price && (
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+                          {t(tier.priceLabel, locale)}
+                        </p>
+                      )}
+                      {!tier.price && <div className="mb-4" />}
+                      <ul className="space-y-2 mb-6">
+                        {tier.features.map((f, j) => (
+                          <li
+                            key={j}
+                            className="flex items-start gap-2 text-sm text-zinc-600 dark:text-zinc-300"
+                          >
+                            <span className="text-green-500 mt-0.5 shrink-0">✓</span>
+                            {t(f, locale)}
+                          </li>
+                        ))}
+                      </ul>
+                      <a
+                        href="#book-stall"
+                        className="block w-full py-3 rounded-lg font-semibold text-center text-white transition-all hover:brightness-110 hover:shadow-lg"
+                        style={{
+                          background: tier.price
+                            ? "linear-gradient(135deg, var(--color-gold), var(--color-accent))"
+                            : "linear-gradient(135deg, #9ca3af, #6b7280)",
+                        }}
+                        data-category={cat.id}
+                        data-stall={tier.id}
+                      >
+                        {tier.price
+                          ? (locale === "en" ? "Enquire Now" : "अभी पूछें")
+                          : (locale === "en" ? "Register Interest" : "रुचि दर्ज करें")}
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </Container>
       </section>
 
@@ -675,7 +900,7 @@ export default async function MahaYagyaPage({
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-            <GoldenButton href="#book-stall" className="text-lg px-8 py-4">
+            <GoldenButton href="#stall-options" className="text-lg px-8 py-4">
               {t(hero.cta, locale)}
             </GoldenButton>
           </div>

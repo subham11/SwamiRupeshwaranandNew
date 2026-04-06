@@ -24,8 +24,11 @@ import {
   VerifySubscriptionPaymentDto,
   InitiateDonationPaymentDto,
   VerifyDonationPaymentDto,
+  InitiateYagyaPaymentDto,
+  VerifyYagyaPaymentDto,
   SubscriptionPaymentResponseDto,
   DonationPaymentResponseDto,
+  YagyaPaymentResponseDto,
   PaymentVerificationResponseDto,
 } from './dto';
 import { JwtAuthGuard, RolesGuard } from '@/common/guards';
@@ -139,6 +142,45 @@ export class PaymentController {
     @Body() dto: VerifyDonationPaymentDto,
   ): Promise<PaymentVerificationResponseDto> {
     return this.paymentService.verifyDonationPayment(dto);
+  }
+
+  // ============================================
+  // Yagya Payment Endpoints (Sponsor / Yajaman / Shivirarthi)
+  // ============================================
+
+  @Post('yagya/initiate')
+  @Public()
+  @ApiOperation({
+    summary: 'Initiate yagya booking payment',
+    description:
+      'Creates a Razorpay Order for yagya participation (sponsor/yajaman/shivirarthi). Routes to appropriate Razorpay account based on category. No auth required.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Yagya payment initiated',
+    type: YagyaPaymentResponseDto,
+  })
+  async initiateYagyaPayment(
+    @Body() dto: InitiateYagyaPaymentDto,
+  ): Promise<YagyaPaymentResponseDto> {
+    return this.paymentService.initiateYagyaPayment(dto);
+  }
+
+  @Post('yagya/verify')
+  @Public()
+  @ApiOperation({
+    summary: 'Verify yagya booking payment',
+    description: 'Verifies Razorpay signature for yagya payment using the correct account credentials.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Yagya payment verified',
+    type: PaymentVerificationResponseDto,
+  })
+  async verifyYagyaPayment(
+    @Body() dto: VerifyYagyaPaymentDto,
+  ): Promise<PaymentVerificationResponseDto> {
+    return this.paymentService.verifyYagyaPayment(dto);
   }
 
   // ============================================

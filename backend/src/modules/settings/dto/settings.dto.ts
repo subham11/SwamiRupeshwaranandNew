@@ -9,6 +9,7 @@ import { IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
  */
 export enum SettingCategory {
   RAZORPAY = 'razorpay',
+  RAZORPAY_FOUNDATION = 'razorpay_foundation',
   SMTP = 'smtp',
   GENERAL = 'general',
 }

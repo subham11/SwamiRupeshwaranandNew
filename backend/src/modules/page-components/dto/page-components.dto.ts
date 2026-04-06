@@ -38,6 +38,9 @@ export enum ComponentType {
   VIDEO_BLOCK = 'video_block',
   FAQ_SECTION = 'faq_section',
   TESTIMONIALS = 'testimonials',
+  BANNER_CAROUSEL = 'banner_carousel',
+  IMAGE_TEXT_STRIP = 'image_text_strip',
+  PAGE_POPUP = 'page_popup',
   CUSTOM = 'custom',
 }
 

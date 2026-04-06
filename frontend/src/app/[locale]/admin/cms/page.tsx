@@ -59,6 +59,9 @@ const COMPONENT_TYPE_ICONS: Record<string, string> = {
   newsletter_signup: '✉️',
   faq_section: '❓',
   testimonials: '⭐',
+  banner_carousel: '🎠',
+  image_text_strip: '🎞️',
+  page_popup: '💬',
   custom: '⚙️',
 };
 

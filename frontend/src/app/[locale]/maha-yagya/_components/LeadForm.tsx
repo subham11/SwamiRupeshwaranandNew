@@ -9,19 +9,40 @@ interface LeadFormProps {
   locale: AppLocale;
 }
 
-const stallTypes = [
-  { value: "standard", en: "Standard — ₹50,000", hi: "स्टैंडर्ड — ₹50,000" },
-  { value: "premium", en: "Premium — ₹1,00,000", hi: "प्रीमियम — ₹1,00,000" },
-  { value: "prime", en: "Prime — ₹2,00,000", hi: "प्राइम — ₹2,00,000" },
+const categories = [
+  { value: "sponsor", en: "Sponsor (स्पॉन्सर)", hi: "स्पॉन्सर" },
+  { value: "yajaman", en: "Yajaman (यज्ञमान)", hi: "यज्ञमान" },
+  { value: "shivirarthi", en: "Shivirarthi (शिविरार्थी)", hi: "शिविरार्थी" },
 ];
 
+const tiersByCategory: Record<string, { value: string; en: string; hi: string }[]> = {
+  sponsor: [
+    { value: "title-partner", en: "Title Partner — ₹50,00,000", hi: "टाइटल पार्टनर — ₹50,00,000" },
+    { value: "co-partner", en: "Co Partner — ₹25,00,000", hi: "को-पार्टनर — ₹25,00,000" },
+    { value: "associate-partner", en: "Associate Partner — ₹10,00,000", hi: "एसोसिएट पार्टनर — ₹10,00,000" },
+    { value: "prime-stall-partner", en: "Prime Stall Partner — ₹5,00,000", hi: "प्राइम स्टॉल पार्टनर — ₹5,00,000" },
+  ],
+  yajaman: [
+    { value: "vishisht-yajaman", en: "Vishisht Yajaman — ₹5,51,000", hi: "विशिष्ट यज्ञमान — ₹5,51,000" },
+    { value: "mukhya-yajaman", en: "Mukhya Yajaman — ₹2,51,000", hi: "मुख्य यज्ञमान — ₹2,51,000" },
+    { value: "sahyogi-yajaman", en: "Sahyogi Yajaman — ₹1,51,000", hi: "सहयोगी यज्ञमान — ₹1,51,000" },
+  ],
+  shivirarthi: [
+    { value: "shivirarthi-1day", en: "1-Day Pass", hi: "एक दिवसीय पास" },
+    { value: "shivirarthi-3day", en: "3-Day Pass", hi: "3 दिवसीय पास" },
+    { value: "shivirarthi-5day", en: "5-Day Pass", hi: "5 दिवसीय पास" },
+  ],
+};
+
 const formLabels = {
-  company: { en: "Company / Organization Name", hi: "कंपनी / संगठन का नाम" },
-  contact: { en: "Contact Person", hi: "संपर्क व्यक्ति" },
+  name: { en: "Full Name", hi: "पूरा नाम" },
+  company: { en: "Company / Organization (if applicable)", hi: "कंपनी / संगठन (यदि लागू हो)" },
   mobile: { en: "Mobile Number", hi: "मोबाइल नंबर" },
   email: { en: "Email Address", hi: "ईमेल पता" },
-  stallType: { en: "Preferred Stall Type", hi: "पसंदीदा स्टॉल प्रकार" },
-  selectStall: { en: "Select Stall Type", hi: "स्टॉल प्रकार चुनें" },
+  category: { en: "Participation Category", hi: "भागीदारी श्रेणी" },
+  selectCategory: { en: "Select Category", hi: "श्रेणी चुनें" },
+  tier: { en: "Preferred Tier", hi: "पसंदीदा स्तर" },
+  selectTier: { en: "Select Tier", hi: "स्तर चुनें" },
   message: { en: "Additional Requirements", hi: "अतिरिक्त आवश्यकताएं" },
   submit: { en: "Submit Enquiry", hi: "पूछताछ भेजें" },
   submitting: { en: "Submitting...", hi: "भेजा जा रहा है..." },
@@ -43,79 +64,84 @@ type FormState = "idle" | "submitting" | "success" | "error";
 
 export default function LeadForm({ locale }: LeadFormProps) {
   const [formState, setFormState] = useState<FormState>("idle");
-  const [selectedStall, setSelectedStall] = useState("");
   const [formData, setFormData] = useState({
+    name: "",
     company: "",
-    contact: "",
     mobile: "",
     email: "",
-    stallType: "",
+    category: "",
+    tier: "",
     message: "",
   });
 
-  // Listen for stall selection from pricing cards
+  // Listen for stall/category selection from pricing cards
   useEffect(() => {
     function handleSelectStall(e: Event) {
       const detail = (e as CustomEvent).detail;
-      if (detail) {
-        setSelectedStall(detail);
-        setFormData((prev) => ({ ...prev, stallType: detail }));
+      if (detail?.category && detail?.tier) {
+        setFormData((prev) => ({ ...prev, category: detail.category, tier: detail.tier }));
+      } else if (detail?.category) {
+        setFormData((prev) => ({ ...prev, category: detail.category, tier: "" }));
       }
     }
     window.addEventListener("selectStall", handleSelectStall);
     return () => window.removeEventListener("selectStall", handleSelectStall);
   }, []);
 
-  // Sync selectedStall with formData
-  useEffect(() => {
-    if (selectedStall) {
-      setFormData((prev) => ({ ...prev, stallType: selectedStall }));
-    }
-  }, [selectedStall]);
+  // Reset tier when category changes
+  function handleCategoryChange(value: string) {
+    setFormData((prev) => ({ ...prev, category: value, tier: "" }));
+  }
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (name === "stallType") setSelectedStall(value);
+    if (name === "category") {
+      handleCategoryChange(value);
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setFormState("submitting");
 
-    const stallLabel =
-      stallTypes.find((s) => s.value === formData.stallType)?.en || formData.stallType;
+    const catLabel = categories.find((c) => c.value === formData.category)?.en || formData.category;
+    const tierLabel =
+      tiersByCategory[formData.category]?.find((t) => t.value === formData.tier)?.en || formData.tier;
 
     try {
       await createSupportTicket({
-        subject: `Maha Yagya Stall Enquiry — ${formData.company} — ${stallLabel}`,
+        subject: `Maha Yagya Enquiry — ${catLabel} — ${tierLabel} — ${formData.name}`,
         message: [
-          `Company: ${formData.company}`,
-          `Contact Person: ${formData.contact}`,
+          `Name: ${formData.name}`,
+          formData.company ? `Company: ${formData.company}` : "",
           `Mobile: ${formData.mobile}`,
           `Email: ${formData.email}`,
-          `Preferred Stall: ${stallLabel}`,
+          `Category: ${catLabel}`,
+          `Tier: ${tierLabel}`,
           formData.message ? `Message: ${formData.message}` : "",
         ]
           .filter(Boolean)
           .join("\n"),
-        category: "yagya-stall-booking",
-        name: formData.contact,
+        category: `yagya-${formData.category}`,
+        name: formData.name,
         email: formData.email,
       });
       setFormState("success");
       setTimeout(() => {
         setFormState("idle");
-        setFormData({ company: "", contact: "", mobile: "", email: "", stallType: "", message: "" });
-        setSelectedStall("");
+        setFormData({ name: "", company: "", mobile: "", email: "", category: "", tier: "", message: "" });
       }, 5000);
     } catch {
       setFormState("error");
       setTimeout(() => setFormState("idle"), 4000);
     }
   }
+
+  const availableTiers = formData.category ? (tiersByCategory[formData.category] || []) : [];
 
   if (formState === "success") {
     return (
@@ -142,12 +168,25 @@ export default function LeadForm({ locale }: LeadFormProps) {
 
       <div>
         <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-          {t(formLabels.company, locale)} *
+          {t(formLabels.name, locale)} *
+        </label>
+        <input
+          type="text"
+          name="name"
+          required
+          value={formData.name}
+          onChange={handleChange}
+          className={inputClass}
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+          {t(formLabels.company, locale)}
         </label>
         <input
           type="text"
           name="company"
-          required
           value={formData.company}
           onChange={handleChange}
           className={inputClass}
@@ -155,19 +194,6 @@ export default function LeadForm({ locale }: LeadFormProps) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-            {t(formLabels.contact, locale)} *
-          </label>
-          <input
-            type="text"
-            name="contact"
-            required
-            value={formData.contact}
-            onChange={handleChange}
-            className={inputClass}
-          />
-        </div>
         <div>
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
             {t(formLabels.mobile, locale)} *
@@ -182,40 +208,61 @@ export default function LeadForm({ locale }: LeadFormProps) {
             className={inputClass}
           />
         </div>
+        <div>
+          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+            {t(formLabels.email, locale)} *
+          </label>
+          <input
+            type="email"
+            name="email"
+            required
+            value={formData.email}
+            onChange={handleChange}
+            className={inputClass}
+          />
+        </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-          {t(formLabels.email, locale)} *
-        </label>
-        <input
-          type="email"
-          name="email"
-          required
-          value={formData.email}
-          onChange={handleChange}
-          className={inputClass}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-          {t(formLabels.stallType, locale)} *
-        </label>
-        <select
-          name="stallType"
-          required
-          value={formData.stallType}
-          onChange={handleChange}
-          className={inputClass}
-        >
-          <option value="">{t(formLabels.selectStall, locale)}</option>
-          {stallTypes.map((stall) => (
-            <option key={stall.value} value={stall.value}>
-              {locale === "en" ? stall.en : stall.hi}
-            </option>
-          ))}
-        </select>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+            {t(formLabels.category, locale)} *
+          </label>
+          <select
+            name="category"
+            required
+            value={formData.category}
+            onChange={handleChange}
+            className={inputClass}
+          >
+            <option value="">{t(formLabels.selectCategory, locale)}</option>
+            {categories.map((cat) => (
+              <option key={cat.value} value={cat.value}>
+                {locale === "en" ? cat.en : cat.hi}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+            {t(formLabels.tier, locale)} *
+          </label>
+          <select
+            name="tier"
+            required
+            value={formData.tier}
+            onChange={handleChange}
+            className={inputClass}
+            disabled={!formData.category}
+          >
+            <option value="">{t(formLabels.selectTier, locale)}</option>
+            {availableTiers.map((tier) => (
+              <option key={tier.value} value={tier.value}>
+                {locale === "en" ? tier.en : tier.hi}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div>

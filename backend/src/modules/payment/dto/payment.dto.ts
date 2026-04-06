@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNumber, IsOptional, Min } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsEnum, Min } from 'class-validator';
 
 // ============================================
 // Payment DTOs
@@ -8,6 +8,13 @@ import { IsString, IsNumber, IsOptional, Min } from 'class-validator';
 export enum PaymentType {
   SUBSCRIPTION = 'subscription',
   DONATION = 'donation',
+  YAGYA = 'yagya',
+}
+
+export enum YagyaCategory {
+  SPONSOR = 'sponsor',
+  YAJAMAN = 'yajaman',
+  SHIVIRARTHI = 'shivirarthi',
 }
 
 /**
@@ -111,6 +118,92 @@ export class VerifyDonationPaymentDto {
   @ApiProperty({ description: 'Internal donation ID' })
   @IsString()
   donationId!: string;
+}
+
+/**
+ * Initiate a Yagya payment (Sponsor/Yajaman/Shivirarthi)
+ * Routes to different Razorpay accounts based on category.
+ */
+export class InitiateYagyaPaymentDto {
+  @ApiProperty({ description: 'Amount in INR' })
+  @IsNumber()
+  @Min(1)
+  amount!: number;
+
+  @ApiProperty({ enum: YagyaCategory, description: 'Participation category' })
+  @IsEnum(YagyaCategory)
+  category!: YagyaCategory;
+
+  @ApiProperty({ description: 'Selected tier ID (e.g., title-partner, vishisht-yajaman)' })
+  @IsString()
+  tierId!: string;
+
+  @ApiProperty({ description: 'Participant name' })
+  @IsString()
+  name!: string;
+
+  @ApiPropertyOptional({ description: 'Email' })
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @ApiPropertyOptional({ description: 'Phone' })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @ApiPropertyOptional({ description: 'Company/Organization name' })
+  @IsOptional()
+  @IsString()
+  company?: string;
+}
+
+/**
+ * Verify a Yagya payment
+ */
+export class VerifyYagyaPaymentDto {
+  @ApiProperty({ description: 'Razorpay order ID' })
+  @IsString()
+  razorpayOrderId!: string;
+
+  @ApiProperty({ description: 'Razorpay payment ID' })
+  @IsString()
+  razorpayPaymentId!: string;
+
+  @ApiProperty({ description: 'Razorpay signature' })
+  @IsString()
+  razorpaySignature!: string;
+
+  @ApiProperty({ description: 'Internal yagya booking ID' })
+  @IsString()
+  bookingId!: string;
+
+  @ApiProperty({ enum: YagyaCategory, description: 'Category (needed for key selection)' })
+  @IsEnum(YagyaCategory)
+  category!: YagyaCategory;
+}
+
+/**
+ * Yagya payment response
+ */
+export class YagyaPaymentResponseDto {
+  @ApiProperty({ description: 'Internal booking ID' })
+  bookingId!: string;
+
+  @ApiProperty({ description: 'Razorpay order ID' })
+  razorpayOrderId!: string;
+
+  @ApiProperty({ description: 'Amount in paise' })
+  amount!: number;
+
+  @ApiProperty({ description: 'Currency' })
+  currency!: string;
+
+  @ApiProperty({ description: 'Razorpay publishable key ID (account-specific)' })
+  razorpayKeyId!: string;
+
+  @ApiPropertyOptional({ description: 'Notes' })
+  notes?: Record<string, string>;
 }
 
 // ============================================

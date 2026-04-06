@@ -271,6 +271,45 @@ export class SettingsService {
   }
 
   /**
+   * Get Razorpay Foundation configuration (Brahmavadini Foundation account).
+   * Used for Sponsor and Yajaman payments.
+   * Falls back to primary Razorpay config if foundation keys are not set.
+   */
+  async getRazorpayFoundationConfig(): Promise<{
+    keyId: string;
+    keySecret: string;
+    webhookSecret: string;
+  }> {
+    const [keyId, keySecret, webhookSecret] = await Promise.all([
+      this.get('RAZORPAY_FOUNDATION_KEY_ID'),
+      this.get('RAZORPAY_FOUNDATION_KEY_SECRET'),
+      this.get('RAZORPAY_FOUNDATION_WEBHOOK_SECRET'),
+    ]);
+
+    // Fall back to primary Razorpay config if foundation keys are not configured
+    if (!keyId || !keySecret) {
+      this.logger.warn('Foundation Razorpay keys not configured, falling back to primary keys');
+      return this.getRazorpayConfig();
+    }
+
+    return { keyId, keySecret, webhookSecret };
+  }
+
+  /**
+   * Get Razorpay config for a specific account.
+   * @param account - 'ashram' for stall/shivirarthi, 'foundation' for sponsor/yajaman
+   */
+  async getRazorpayConfigForAccount(account: 'ashram' | 'foundation'): Promise<{
+    keyId: string;
+    keySecret: string;
+    webhookSecret: string;
+  }> {
+    return account === 'foundation'
+      ? this.getRazorpayFoundationConfig()
+      : this.getRazorpayConfig();
+  }
+
+  /**
    * Test Razorpay credentials by making a simple API call.
    */
   async testRazorpayConnection(keyId: string, keySecret: string): Promise<{

@@ -13,8 +13,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @AdminOnly()
-  @ApiOperation({ summary: 'Create a new user (Admin only)' })
+  @SuperAdminOnly()
+  @ApiOperation({ summary: 'Create a new user (Super Admin only)' })
   @ApiResponse({
     status: 201,
     description: 'User created successfully',
@@ -73,8 +73,8 @@ export class UsersController {
   }
 
   @Put(':id')
-  @AdminOnly()
-  @ApiOperation({ summary: 'Update user (Admin only)' })
+  @SuperAdminOnly()
+  @ApiOperation({ summary: 'Update user (Super Admin only)' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiResponse({
     status: 200,

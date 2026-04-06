@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@/common/guards';
 import { RolesGuard } from '@/common/guards/roles.guard';
-import { SuperAdminOnly } from '@/common/decorators/roles.decorator';
+import { SuperAdminOnly, AdminOnly } from '@/common/decorators/roles.decorator';
 import { CurrentUser, CurrentUserData } from '@/common/decorators/current-user.decorator';
 import { SettingsService } from './settings.service';
 import {
@@ -25,7 +25,7 @@ import {
 
 @Controller('settings')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@SuperAdminOnly()
+@AdminOnly()
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
@@ -56,6 +56,16 @@ export class SettingsController {
   @Get('razorpay')
   async getRazorpayConfig() {
     const settings = await this.settingsService.getByCategory(SettingCategory.RAZORPAY);
+    return { settings };
+  }
+
+  // ============================================
+  // Get Razorpay Foundation config (Brahmavadini Foundation)
+  // ============================================
+
+  @Get('razorpay-foundation')
+  async getRazorpayFoundationConfig() {
+    const settings = await this.settingsService.getByCategory(SettingCategory.RAZORPAY_FOUNDATION);
     return { settings };
   }
 

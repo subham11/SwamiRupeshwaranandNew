@@ -29,7 +29,6 @@ import { JwtAuthGuard, RolesGuard } from '@/common/guards';
 import {
   Public,
   AdminOnly,
-  SuperAdminOnly,
   CurrentUser,
   CurrentUserData,
 } from '@/common/decorators';
@@ -115,9 +114,9 @@ export class SubscriptionsController {
 
   @Delete('plans/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @SuperAdminOnly()
+  @AdminOnly()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Delete subscription plan (Super Admin only)' })
+  @ApiOperation({ summary: 'Delete subscription plan (Admin only)' })
   @ApiParam({ name: 'id', description: 'Plan ID' })
   @ApiResponse({ status: 200, description: 'Plan deleted successfully' })
   async deletePlan(@Param('id') id: string): Promise<void> {

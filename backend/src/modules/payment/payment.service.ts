@@ -22,8 +22,11 @@ import {
   VerifySubscriptionPaymentDto,
   InitiateDonationPaymentDto,
   VerifyDonationPaymentDto,
+  InitiateYagyaPaymentDto,
+  VerifyYagyaPaymentDto,
   SubscriptionPaymentResponseDto,
   DonationPaymentResponseDto,
+  YagyaPaymentResponseDto,
   PaymentVerificationResponseDto,
 } from './dto';
 import {
@@ -43,10 +46,10 @@ interface PaymentRecordEntity {
   GSI2PK?: string;
   GSI2SK?: string;
   id: string;
-  type: 'subscription' | 'donation';
+  type: 'subscription' | 'donation' | 'yagya';
   userId?: string;
   userEmail?: string;
-  entityId: string; // subscriptionId or donationId
+  entityId: string; // subscriptionId, donationId, or yagya bookingId
   razorpayOrderId?: string;
   razorpaySubscriptionId?: string;
   razorpayPaymentId?: string;
@@ -545,6 +548,110 @@ export class PaymentService {
   }
 
   // ============================================
+  // Yagya Payments (Sponsor / Yajaman / Shivirarthi)
+  // ============================================
+
+  /**
+   * Determine which Razorpay account to use based on yagya category.
+   * sponsor & yajaman → Foundation account
+   * shivirarthi → Ashram (primary) account
+   */
+  private getYagyaAccountType(category: string): 'ashram' | 'foundation' {
+    return category === 'sponsor' || category === 'yajaman' ? 'foundation' : 'ashram';
+  }
+
+  /**
+   * Initiate a yagya booking payment.
+   * Uses the appropriate Razorpay account based on category.
+   */
+  async initiateYagyaPayment(
+    dto: InitiateYagyaPaymentDto,
+  ): Promise<YagyaPaymentResponseDto> {
+    const accountType = this.getYagyaAccountType(dto.category);
+    const config = await this.settingsService.getRazorpayConfigForAccount(accountType);
+
+    const Razorpay = require('razorpay');
+    const rzpInstance = new Razorpay({
+      key_id: config.keyId,
+      key_secret: config.keySecret,
+    });
+
+    const bookingId = uuidv4();
+    const order = await rzpInstance.orders.create({
+      amount: dto.amount * 100, // Convert to paise
+      currency: 'INR',
+      receipt: `yagya_${bookingId.substring(0, 8)}`,
+      notes: {
+        type: 'yagya',
+        category: dto.category,
+        tierId: dto.tierId,
+        name: dto.name,
+        email: dto.email || '',
+        phone: dto.phone || '',
+        company: dto.company || '',
+        accountType,
+      },
+    });
+
+    // Store payment record
+    await this.createPaymentRecord({
+      type: 'yagya',
+      userEmail: dto.email,
+      entityId: bookingId,
+      razorpayOrderId: order.id,
+      amount: dto.amount * 100,
+      currency: 'INR',
+      status: 'created',
+    });
+
+    return {
+      bookingId,
+      razorpayOrderId: order.id,
+      amount: dto.amount * 100,
+      currency: 'INR',
+      razorpayKeyId: config.keyId,
+      notes: {
+        category: dto.category,
+        tierId: dto.tierId,
+        name: dto.name,
+      },
+    };
+  }
+
+  /**
+   * Verify a yagya booking payment.
+   * Uses the correct Razorpay key_secret based on category.
+   */
+  async verifyYagyaPayment(
+    dto: VerifyYagyaPaymentDto,
+  ): Promise<PaymentVerificationResponseDto> {
+    const accountType = this.getYagyaAccountType(dto.category);
+    const config = await this.settingsService.getRazorpayConfigForAccount(accountType);
+
+    const generatedSignature = crypto
+      .createHmac('sha256', config.keySecret)
+      .update(`${dto.razorpayOrderId}|${dto.razorpayPaymentId}`)
+      .digest('hex');
+
+    if (generatedSignature !== dto.razorpaySignature) {
+      this.logger.warn(`Yagya payment verification failed for order: ${dto.razorpayOrderId}`);
+      throw new BadRequestException('Payment verification failed.');
+    }
+
+    await this.updatePaymentByEntity(dto.bookingId, {
+      razorpayPaymentId: dto.razorpayPaymentId,
+      status: 'captured',
+    });
+
+    return {
+      success: true,
+      message: 'Yagya booking payment verified successfully!',
+      entityId: dto.bookingId,
+      status: 'completed',
+    };
+  }
+
+  // ============================================
   // Webhook Handler
   // ============================================
 
@@ -794,7 +901,7 @@ export class PaymentService {
   // ============================================
 
   private async createPaymentRecord(data: {
-    type: 'subscription' | 'donation';
+    type: 'subscription' | 'donation' | 'yagya';
     userId?: string;
     userEmail?: string;
     entityId: string;

@@ -1591,6 +1591,57 @@ export async function verifyDonationPayment(
   });
 }
 
+// ============================================
+// Yagya Payments (Sponsor / Yajaman / Shivirarthi)
+// ============================================
+
+export interface YagyaPaymentResponse {
+  bookingId: string;
+  razorpayOrderId: string;
+  amount: number;
+  currency: string;
+  razorpayKeyId: string;
+  notes?: Record<string, string>;
+}
+
+/**
+ * Initiate a yagya booking payment
+ */
+export async function initiateYagyaPayment(
+  data: {
+    amount: number;
+    category: string;
+    tierId: string;
+    name: string;
+    email?: string;
+    phone?: string;
+    company?: string;
+  }
+): Promise<YagyaPaymentResponse> {
+  return apiRequest("/payments/yagya/initiate", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Verify a yagya booking payment
+ */
+export async function verifyYagyaPayment(
+  data: {
+    razorpayOrderId: string;
+    razorpayPaymentId: string;
+    razorpaySignature: string;
+    bookingId: string;
+    category: string;
+  }
+): Promise<PaymentVerificationResponse> {
+  return apiRequest("/payments/yagya/verify", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
 /**
  * Get current user's payment history
  */
@@ -2579,6 +2630,8 @@ export default {
   verifySubscriptionPayment,
   initiateDonationPayment,
   verifyDonationPayment,
+  initiateYagyaPayment,
+  verifyYagyaPayment,
   fetchMyPayments,
   fetchPaymentFailures,
   // Products
