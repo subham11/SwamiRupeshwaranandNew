@@ -343,6 +343,33 @@ a.btn-outline:hover {
   }
 }
 
+/* Speakers Swiper overrides */
+.speakers-swiper .swiper-button-next,
+.speakers-swiper .swiper-button-prev {
+  color: var(--color-primary);
+  width: 36px;
+  height: 36px;
+  background: var(--color-secondary);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.speakers-swiper .swiper-button-next::after,
+.speakers-swiper .swiper-button-prev::after {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.speakers-swiper .swiper-pagination-bullet {
+  background: var(--color-muted);
+  opacity: 0.4;
+}
+
+.speakers-swiper .swiper-pagination-bullet-active {
+  background: var(--color-primary);
+  opacity: 1;
+}
+
 /* Smooth scrollbar */
 ::-webkit-scrollbar {
   width: 10px;

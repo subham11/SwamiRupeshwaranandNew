@@ -5,6 +5,7 @@ import WordsOfWisdom from "@/app/[locale]/(home)/_components/WordsOfWisdom";
 import HomeSections from "@/app/[locale]/(home)/_components/HomeSections";
 import FeaturedProducts from "@/app/[locale]/(home)/_components/FeaturedProducts";
 import SeoSchema from "@/app/[locale]/(home)/_components/SeoSchema";
+import MahaYagyaPopup from "@/app/[locale]/(home)/_components/MahaYagyaPopup";
 import { getHomeContent } from "@/content/contentProvider";
 
 export default async function Page({ params }: { params: Promise<{ locale: AppLocale }> }) {
@@ -21,6 +22,7 @@ export default async function Page({ params }: { params: Promise<{ locale: AppLo
       <WordsOfWisdom locale={locale} quotes={content.quotes} />
       <FeaturedProducts locale={locale} />
       <HomeSections locale={locale} content={content} />
+      <MahaYagyaPopup locale={locale} />
     </div>
   );
 }

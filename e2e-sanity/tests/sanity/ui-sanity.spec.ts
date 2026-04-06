@@ -158,6 +158,111 @@ test.describe('UI Sanity — Navigation & i18n', () => {
   });
 });
 
+test.describe('UI Sanity — Maha Yagya Page', () => {
+
+  test('Maha Yagya page loads', async ({ page }) => {
+    await page.goto('/en/maha-yagya');
+    await expect(page.locator('body')).toBeVisible();
+    const bodyText = await page.textContent('body');
+    expect(bodyText).toContain('Maha Yagya');
+  });
+
+  test('Key Benefits section shows 4 USPs', async ({ page }) => {
+    await page.goto('/en/maha-yagya');
+    const bodyText = await page.textContent('body');
+    expect(bodyText).toContain('25,000+');
+    expect(bodyText).toContain('1 Cr+');
+    expect(bodyText).toContain('Unmissable');
+  });
+
+  test('Sponsor section shows all 4 tiers with prices', async ({ page }) => {
+    await page.goto('/en/maha-yagya');
+    const bodyText = await page.textContent('body');
+    expect(bodyText).toContain('Sponsor');
+    expect(bodyText).toContain('Title Partner');
+    expect(bodyText).toContain('50,00,000');
+    expect(bodyText).toContain('Co Partner');
+    expect(bodyText).toContain('25,00,000');
+    expect(bodyText).toContain('Associate Partner');
+    expect(bodyText).toContain('10,00,000');
+    expect(bodyText).toContain('Prime Stall Partner');
+    expect(bodyText).toContain('5,00,000');
+  });
+
+  test('Yajaman section shows VVIP/VIP tiers', async ({ page }) => {
+    await page.goto('/en/maha-yagya');
+    const bodyText = await page.textContent('body');
+    expect(bodyText).toContain('Yajaman');
+    expect(bodyText).toContain('Vishisht Yajaman');
+    expect(bodyText).toContain('VVIP');
+    expect(bodyText).toContain('5,51,000');
+    expect(bodyText).toContain('Mukhya Yajaman');
+    expect(bodyText).toContain('2,51,000');
+    expect(bodyText).toContain('Sahayogi Yajaman');
+    expect(bodyText).toContain('1,51,000');
+  });
+
+  test('Camps & Programs section shows 4 tiers with prices', async ({ page }) => {
+    await page.goto('/en/maha-yagya');
+    const bodyText = await page.textContent('body');
+    expect(bodyText).toContain('Camps');
+    expect(bodyText).toContain('One Day Camp');
+    expect(bodyText).toContain('11,000');
+    expect(bodyText).toContain('Three Days Camp');
+    expect(bodyText).toContain('21,000');
+    expect(bodyText).toContain('Five Days Camp');
+    expect(bodyText).toContain('51,000');
+    expect(bodyText).toContain('Divine Meet');
+  });
+
+  test('Enquire Now buttons are visible', async ({ page }) => {
+    await page.goto('/en/maha-yagya');
+    const enquireButtons = page.locator('a:has-text("Enquire Now"), button:has-text("Enquire Now")');
+    const count = await enquireButtons.count();
+    expect(count).toBeGreaterThan(0);
+    console.log(`  → Found ${count} "Enquire Now" buttons`);
+  });
+
+  test('Lead form has category and tier dropdowns', async ({ page }) => {
+    await page.goto('/en/maha-yagya');
+    // Scroll to form section
+    const formSection = page.locator('form').first();
+    await formSection.scrollIntoViewIfNeeded();
+    // Category dropdown
+    const categorySelect = page.locator('select[name="category"]');
+    await expect(categorySelect).toBeVisible({ timeout: 10_000 });
+    // Tier dropdown
+    const tierSelect = page.locator('select[name="tier"]');
+    await expect(tierSelect).toBeVisible();
+  });
+
+  test('Lead form category dropdown has 3 options', async ({ page }) => {
+    await page.goto('/en/maha-yagya');
+    const categorySelect = page.locator('select[name="category"]');
+    await categorySelect.scrollIntoViewIfNeeded();
+    const options = categorySelect.locator('option');
+    // placeholder + 3 categories = 4
+    const count = await options.count();
+    expect(count).toBe(4);
+  });
+
+  test('Maha Yagya Hindi page loads with Devanagari', async ({ page }) => {
+    await page.goto('/hi/maha-yagya');
+    await expect(page.locator('body')).toBeVisible();
+    const bodyText = await page.textContent('body');
+    expect(bodyText).toMatch(/[\u0900-\u097F]/); // Devanagari
+    expect(bodyText).toContain('यज्ञमान');
+  });
+
+  test('Maha Yagya page loads within 12 seconds', async ({ page }) => {
+    const start = Date.now();
+    await page.goto('/en/maha-yagya', { waitUntil: 'domcontentloaded' });
+    const elapsed = Date.now() - start;
+    console.log(`  → Maha Yagya DOMContentLoaded in ${elapsed}ms`);
+    expect(elapsed).toBeLessThan(12_000);
+  });
+});
+
 test.describe('UI Sanity — Performance', () => {
 
   test('Homepage loads within 10 seconds', async ({ page }) => {

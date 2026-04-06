@@ -13,6 +13,7 @@ import { t, type BilingualContent } from "@/content/contentProvider";
 import CMSTextBlocks from "@/components/CMSTextBlocks";
 import CountdownTimer from "./_components/CountdownTimer";
 import LeadForm from "./_components/LeadForm";
+import SpeakersCarousel from "./_components/SpeakersCarousel";
 import {
   FadeUp,
   StaggerContainer,
@@ -193,6 +194,8 @@ const participationOptions = {
           popular: true,
           features: [
             { en: "VVIP Category", hi: "VVIP श्रेणी" },
+            { en: "Free Accommodation & Meals", hi: "निःशुल्क आवास और भोजन" },
+            { en: "Free Health Checkup", hi: "निःशुल्क स्वास्थ्य जांच" },
             { en: "Yagya Participation", hi: "यज्ञ सहभागिता" },
             { en: "Divine Meet with Saints", hi: "संतों से दिव्य भेंट" },
             { en: "Sankalp for Family Wellness", hi: "परिवार कल्याण हेतु संकल्प" },
@@ -207,6 +210,8 @@ const participationOptions = {
           popular: false,
           features: [
             { en: "VIP Category", hi: "VIP श्रेणी" },
+            { en: "Free Accommodation & Meals", hi: "निःशुल्क आवास और भोजन" },
+            { en: "Free Health Checkup", hi: "निःशुल्क स्वास्थ्य जांच" },
             { en: "Yagya Participation", hi: "यज्ञ सहभागिता" },
             { en: "Divine Meet with Saints", hi: "संतों से दिव्य भेंट" },
             { en: "Sankalp for Family Wellness", hi: "परिवार कल्याण हेतु संकल्प" },
@@ -221,6 +226,8 @@ const participationOptions = {
           popular: false,
           features: [
             { en: "VIP Category", hi: "VIP श्रेणी" },
+            { en: "Free Accommodation & Meals", hi: "निःशुल्क आवास और भोजन" },
+            { en: "Free Health Checkup", hi: "निःशुल्क स्वास्थ्य जांच" },
             { en: "Yagya Participation", hi: "यज्ञ सहभागिता" },
             { en: "Divine Meet with Saints", hi: "संतों से दिव्य भेंट" },
             { en: "Sankalp for Family Wellness", hi: "परिवार कल्याण हेतु संकल्प" },
@@ -242,8 +249,9 @@ const participationOptions = {
           priceLabel: { en: "₹11,000", hi: "₹11,000" },
           popular: false,
           features: [
-            { en: "Yoga Camp", hi: "योग शिविर" },
+            { en: "Free Accommodation & Meals", hi: "निःशुल्क आवास और भोजन" },
             { en: "Free Health Checkup", hi: "निःशुल्क स्वास्थ्य जांच" },
+            { en: "Yoga Camp", hi: "योग शिविर" },
             { en: "Ayurveda Consultation", hi: "आयुर्वेद परामर्श" },
           ],
         },
@@ -254,6 +262,8 @@ const participationOptions = {
           priceLabel: { en: "₹21,000", hi: "₹21,000" },
           popular: true,
           features: [
+            { en: "Free Accommodation & Meals", hi: "निःशुल्क आवास और भोजन" },
+            { en: "Free Health Checkup", hi: "निःशुल्क स्वास्थ्य जांच" },
             { en: "Yoga Sessions", hi: "योग सत्र" },
             { en: "Medical & Ayurveda Interaction", hi: "चिकित्सा और आयुर्वेद परामर्श" },
           ],
@@ -265,8 +275,9 @@ const participationOptions = {
           priceLabel: { en: "₹51,000", hi: "₹51,000" },
           popular: false,
           features: [
+            { en: "Free Accommodation & Meals", hi: "निःशुल्क आवास और भोजन" },
+            { en: "Free Health Checkup", hi: "निःशुल्क स्वास्थ्य जांच" },
             { en: "Full Wellness Program", hi: "पूर्ण कल्याण कार्यक्रम" },
-            { en: "Accommodation & Meals", hi: "आवास और भोजन" },
             { en: "Pitra Shanti Puja", hi: "पितृ शांति पूजा" },
           ],
         },
@@ -277,6 +288,8 @@ const participationOptions = {
           priceLabel: { en: "₹51,000", hi: "₹51,000" },
           popular: false,
           features: [
+            { en: "Free Accommodation & Meals", hi: "निःशुल्क आवास और भोजन" },
+            { en: "Free Health Checkup", hi: "निःशुल्क स्वास्थ्य जांच" },
             { en: "Personal Horoscope Analysis", hi: "व्यक्तिगत कुंडली विश्लेषण" },
             { en: "Divine Guidance", hi: "दिव्य मार्गदर्शन" },
             { en: "Yagya Participation", hi: "यज्ञ सहभागिता" },
@@ -373,6 +386,15 @@ const cmsFallbackSections = [
     },
   },
 ];
+
+const speakersSection = {
+  title: { en: "Our Speakers", hi: "हमारे वक्ता" },
+  subtitle: {
+    en: "Renowned spiritual leaders, wellness experts & scholars gracing the event",
+    hi: "इस आयोजन की शोभा बढ़ाने वाले प्रसिद्ध आध्यात्मिक नेता, कल्याण विशेषज्ञ और विद्वान",
+  },
+  comingSoon: { en: "Full speaker lineup coming soon!", hi: "संपूर्ण वक्ता सूची जल्द आ रही है!" },
+};
 
 const finalCTA = {
   title: { en: "Don't Miss This Opportunity!", hi: "इस अवसर को न चूकें!" },
@@ -767,6 +789,31 @@ export default async function MahaYagyaPage({
               </StaggerCard>
             ))}
           </StaggerContainer>
+        </Container>
+      </section>
+
+      <SacredDivider icon="🎤" />
+
+      {/* ═══ SPEAKERS CAROUSEL ═══ */}
+      <section className="py-16 sm:py-20 md:py-24">
+        <Container>
+          <FadeUp>
+            <SectionHeading
+              title={t(speakersSection.title, locale)}
+              subtitle={t(speakersSection.subtitle, locale)}
+            />
+          </FadeUp>
+          <FadeUp delay={0.2}>
+            <SpeakersCarousel locale={locale} />
+          </FadeUp>
+          <FadeUp delay={0.35}>
+            <p
+              className="text-center mt-6 text-sm font-medium animate-pulse"
+              style={{ color: "var(--color-accent)" }}
+            >
+              {t(speakersSection.comingSoon, locale)}
+            </p>
+          </FadeUp>
         </Container>
       </section>
 
