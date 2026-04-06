@@ -44,9 +44,7 @@ export class InvoiceService {
         // ============================================
         // Header
         // ============================================
-        doc
-          .rect(0, 0, pageWidth, 100)
-          .fill(orange);
+        doc.rect(0, 0, pageWidth, 100).fill(orange);
 
         doc
           .font('Helvetica-Bold')
@@ -108,14 +106,13 @@ export class InvoiceService {
         let addrLine = addr.addressLine1;
         if (addr.addressLine2) addrLine += ', ' + addr.addressLine2;
         doc.text(addrLine, marginLeft, billToY + 34, { width: contentWidth / 2 - 20 });
-        doc.text(
-          `${addr.city}, ${addr.state} - ${addr.pincode}`,
-          marginLeft,
-          billToY + 48,
-          { width: contentWidth / 2 - 20 },
-        );
+        doc.text(`${addr.city}, ${addr.state} - ${addr.pincode}`, marginLeft, billToY + 48, {
+          width: contentWidth / 2 - 20,
+        });
         doc.text(addr.country, marginLeft, billToY + 62, { width: contentWidth / 2 - 20 });
-        doc.text(`Phone: ${addr.phone}`, marginLeft, billToY + 76, { width: contentWidth / 2 - 20 });
+        doc.text(`Phone: ${addr.phone}`, marginLeft, billToY + 76, {
+          width: contentWidth / 2 - 20,
+        });
 
         // ============================================
         // Divider
@@ -304,11 +301,7 @@ export class InvoiceService {
     const buffer = await this.generateInvoice(order);
     const key = `invoices/${order.id}.pdf`;
 
-    const result = await this.storageService.uploadFileWithKey(
-      key,
-      buffer,
-      'application/pdf',
-    );
+    const result = await this.storageService.uploadFileWithKey(key, buffer, 'application/pdf');
 
     this.logger.log(`Invoice uploaded for order ${order.id}: ${result.url}`);
     return result.url;

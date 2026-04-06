@@ -11,14 +11,15 @@
 
 import type { PreSignUpTriggerEvent, PreSignUpTriggerHandler } from 'aws-lambda';
 
-export const handler: PreSignUpTriggerHandler = async (
-  event: PreSignUpTriggerEvent,
-) => {
-  console.log('PreSignUp trigger invoked', JSON.stringify({
-    userName: event.userName,
-    triggerSource: event.triggerSource,
-    email: event.request.userAttributes?.email,
-  }));
+export const handler: PreSignUpTriggerHandler = async (event: PreSignUpTriggerEvent) => {
+  console.log(
+    'PreSignUp trigger invoked',
+    JSON.stringify({
+      userName: event.userName,
+      triggerSource: event.triggerSource,
+      email: event.request.userAttributes?.email,
+    }),
+  );
 
   // Auto-confirm user
   event.response.autoConfirmUser = true;

@@ -102,7 +102,7 @@ test.describe('STORY-022 | Styled Email Templates', () => {
 
     await page.goto('/login');
     await page.locator('[data-testid="tab-otp"]').click();
-    await page.locator('[data-testid="auth-email"]').fill('testuser@bhairavapath.com');
+    await page.locator('[data-testid="auth-email"]').fill('testuser@swamirupeshwaranand.org');
     await page.locator('[data-testid="send-otp-btn"]').click();
     await page.waitForTimeout(1500);
     expect(emailCalled).toBe(true);
@@ -117,8 +117,9 @@ test.describe('STORY-022 | Styled Email Templates', () => {
       if (await preview.isVisible({ timeout: 5_000 }).catch(() => false)) {
         const html = await preview.innerHTML();
         // Must contain branded content (orange gradient or logo text)
-        const hasBranding = html.includes('bhairavapath') ||
-                            html.includes('Bhairavapath')  ||
+        const hasBranding = html.includes('swamirupeshwaranand') ||
+                            html.includes('Swamirupeshwaranand') ||
+                            html.includes('Swami Rupeshwaranand') ||
                             html.includes('gradient')      ||
                             html.includes('header');
         expect(hasBranding).toBeTruthy();

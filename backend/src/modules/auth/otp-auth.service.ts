@@ -6,7 +6,11 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CognitoService, AuthResult, CustomAuthInitResult } from '../../common/cognito/cognito.service';
+import {
+  CognitoService,
+  AuthResult,
+  CustomAuthInitResult,
+} from '../../common/cognito/cognito.service';
 import { DATABASE_SERVICE, DatabaseService } from '../../common/database/database.interface';
 import * as crypto from 'crypto';
 
@@ -101,11 +105,7 @@ export class OtpAuthService {
    * Map Cognito AuthResult to our API response format.
    * Also syncs user record in app table.
    */
-  private async buildAuthResponse(
-    email: string,
-    authResult: AuthResult,
-    isNewUser: boolean,
-  ) {
+  private async buildAuthResponse(email: string, authResult: AuthResult, isNewUser: boolean) {
     const normalizedEmail = email.toLowerCase().trim();
 
     // Get or create user in app table

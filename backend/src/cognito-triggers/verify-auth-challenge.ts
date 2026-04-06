@@ -10,7 +10,10 @@
  *   - OTP deletion after use (prevents replay)
  */
 
-import type { VerifyAuthChallengeResponseTriggerEvent, VerifyAuthChallengeResponseTriggerHandler } from 'aws-lambda';
+import type {
+  VerifyAuthChallengeResponseTriggerEvent,
+  VerifyAuthChallengeResponseTriggerHandler,
+} from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, GetCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import * as crypto from 'crypto';
@@ -54,10 +57,12 @@ export const handler: VerifyAuthChallengeResponseTriggerHandler = async (
       // Check expiry from DynamoDB
       if (OTP_TABLE) {
         try {
-          const record = await ddbClient.send(new GetCommand({
-            TableName: OTP_TABLE,
-            Key: { PK: `COGNITO_OTP#${email}`, SK: 'CHALLENGE' },
-          }));
+          const record = await ddbClient.send(
+            new GetCommand({
+              TableName: OTP_TABLE,
+              Key: { PK: `COGNITO_OTP#${email}`, SK: 'CHALLENGE' },
+            }),
+          );
 
           if (!record.Item || record.Item.expiresAt < Math.floor(Date.now() / 1000)) {
             console.warn('OTP expired for:', email);
@@ -66,10 +71,12 @@ export const handler: VerifyAuthChallengeResponseTriggerHandler = async (
           }
 
           // Delete OTP after successful verification (prevent replay)
-          await ddbClient.send(new DeleteCommand({
-            TableName: OTP_TABLE,
-            Key: { PK: `COGNITO_OTP#${email}`, SK: 'CHALLENGE' },
-          }));
+          await ddbClient.send(
+            new DeleteCommand({
+              TableName: OTP_TABLE,
+              Key: { PK: `COGNITO_OTP#${email}`, SK: 'CHALLENGE' },
+            }),
+          );
         } catch (error) {
           console.error('DynamoDB error during OTP verification:', error);
           // If we can't check DynamoDB, still verify based on hash

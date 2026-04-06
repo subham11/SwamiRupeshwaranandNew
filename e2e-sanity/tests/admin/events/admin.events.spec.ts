@@ -148,7 +148,7 @@ test.describe('STORY-029 | Activity Log (Audit Trail)', () => {
 
   test('activity log stats endpoint returns totals and breakdowns', async ({ request }) => {
     const loginRes = await request.post('/api/auth/login', {
-      data: { email: process.env.ADMIN_EMAIL || 'admin@bhairavapath.com',
+      data: { email: process.env.ADMIN_EMAIL || 'admin@swamirupeshwaranand.org',
               password: process.env.ADMIN_PASSWORD || 'Admin@1234' },
     });
     const { accessToken } = await loginRes.json();

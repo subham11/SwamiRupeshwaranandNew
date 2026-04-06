@@ -47,7 +47,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         slug: 'home',
         title: { en: 'Home', hi: 'होम' },
-        description: { en: 'Welcome to Sri Pitambara Peeth', hi: 'श्री पीताम्बरा पीठ में आपका स्वागत है' },
+        description: {
+          en: 'Welcome to Sri Pitambara Peeth',
+          hi: 'श्री पीताम्बरा पीठ में आपका स्वागत है',
+        },
         path: '/',
         displayOrder: 0,
         status: PageStatus.PUBLISHED,
@@ -55,7 +58,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         slug: 'swamiji',
         title: { en: 'About Swamiji', hi: 'स्वामीजी के बारे में' },
-        description: { en: 'Biography, teachings, and mission', hi: 'जीवन परिचय, शिक्षाएं और मिशन' },
+        description: {
+          en: 'Biography, teachings, and mission',
+          hi: 'जीवन परिचय, शिक्षाएं और मिशन',
+        },
         path: '/swamiji',
         displayOrder: 1,
         status: PageStatus.PUBLISHED,
@@ -63,7 +69,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         slug: 'bajrang-baan',
         title: { en: 'Bajrang Baan', hi: 'बजरंग बाण' },
-        description: { en: 'Sacred Bajrang Baan text and audio', hi: 'पवित्र बजरंग बाण पाठ और ऑडियो' },
+        description: {
+          en: 'Sacred Bajrang Baan text and audio',
+          hi: 'पवित्र बजरंग बाण पाठ और ऑडियो',
+        },
         path: '/bajrang-baan',
         displayOrder: 2,
         status: PageStatus.PUBLISHED,
@@ -95,7 +104,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         slug: 'ashram',
         title: { en: 'About the Ashram', hi: 'आश्रम के बारे में' },
-        description: { en: 'A sanctuary of peace and spirituality', hi: 'शांति और आध्यात्मिकता का अभयारण्य' },
+        description: {
+          en: 'A sanctuary of peace and spirituality',
+          hi: 'शांति और आध्यात्मिकता का अभयारण्य',
+        },
         path: '/ashram',
         displayOrder: 6,
         status: PageStatus.PUBLISHED,
@@ -103,7 +115,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         slug: 'gurukul',
         title: { en: 'One District One Gurukul', hi: 'एक जिला एक गुरुकुल' },
-        description: { en: 'Reviving ancient wisdom through modern education', hi: 'आधुनिक शिक्षा के माध्यम से प्राचीन ज्ञान का पुनरुद्धार' },
+        description: {
+          en: 'Reviving ancient wisdom through modern education',
+          hi: 'आधुनिक शिक्षा के माध्यम से प्राचीन ज्ञान का पुनरुद्धार',
+        },
         path: '/gurukul',
         displayOrder: 7,
         status: PageStatus.PUBLISHED,
@@ -127,7 +142,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         slug: 'services',
         title: { en: 'Our Services', hi: 'हमारी सेवाएं' },
-        description: { en: 'Spiritual offerings for your journey', hi: 'आपकी आध्यात्मिक यात्रा के लिए सेवाएं' },
+        description: {
+          en: 'Spiritual offerings for your journey',
+          hi: 'आपकी आध्यात्मिक यात्रा के लिए सेवाएं',
+        },
         path: '/services',
         displayOrder: 10,
         status: PageStatus.PUBLISHED,
@@ -135,7 +153,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         slug: 'teaching-inner-peace',
         title: { en: 'Path to Inner Peace', hi: 'आंतरिक शांति का मार्ग' },
-        description: { en: 'Ancient techniques for finding tranquility', hi: 'शांति पाने की प्राचीन तकनीकें' },
+        description: {
+          en: 'Ancient techniques for finding tranquility',
+          hi: 'शांति पाने की प्राचीन तकनीकें',
+        },
         path: '/teachings/inner-peace',
         displayOrder: 11,
         status: PageStatus.PUBLISHED,
@@ -151,7 +172,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         slug: 'teaching-seva',
         title: { en: 'Service to Humanity', hi: 'मानवता की सेवा' },
-        description: { en: 'Selfless service as spiritual practice', hi: 'निःस्वार्थ सेवा आध्यात्मिक अभ्यास के रूप में' },
+        description: {
+          en: 'Selfless service as spiritual practice',
+          hi: 'निःस्वार्थ सेवा आध्यात्मिक अभ्यास के रूप में',
+        },
         path: '/teachings/seva',
         displayOrder: 13,
         status: PageStatus.PUBLISHED,
@@ -159,7 +183,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         slug: 'teaching-dharma',
         title: { en: 'Living with Purpose', hi: 'उद्देश्य के साथ जीना' },
-        description: { en: 'Find your dharma and higher purpose', hi: 'अपने धर्म और उच्च उद्देश्य को खोजें' },
+        description: {
+          en: 'Find your dharma and higher purpose',
+          hi: 'अपने धर्म और उच्च उद्देश्य को खोजें',
+        },
         path: '/teachings/dharma',
         displayOrder: 14,
         status: PageStatus.PUBLISHED,
@@ -199,14 +226,20 @@ export class PageComponentsSeedService implements OnModuleInit {
               {
                 imageUrl: '/images/hero-1.svg',
                 heading: { en: 'Sri Pitambara Peeth', hi: 'श्री पीताम्बरा पीठ' },
-                subheading: { en: 'A sacred abode of spiritual wisdom and divine grace', hi: 'आध्यात्मिक ज्ञान और दैवीय कृपा का पवित्र धाम' },
+                subheading: {
+                  en: 'A sacred abode of spiritual wisdom and divine grace',
+                  hi: 'आध्यात्मिक ज्ञान और दैवीय कृपा का पवित्र धाम',
+                },
                 ctaText: { en: 'Learn More', hi: 'और जानें' },
                 ctaLink: '/swamiji',
               },
               {
                 imageUrl: '/images/hero-2.svg',
                 heading: { en: 'Daily Inspirations & Teachings', hi: 'दैनिक प्रेरणा और शिक्षाएं' },
-                subheading: { en: 'Ancient wisdom for contemporary challenges', hi: 'समकालीन चुनौतियों के लिए प्राचीन ज्ञान' },
+                subheading: {
+                  en: 'Ancient wisdom for contemporary challenges',
+                  hi: 'समकालीन चुनौतियों के लिए प्राचीन ज्ञान',
+                },
                 ctaText: { en: 'Explore', hi: 'खोजें' },
                 ctaLink: '/teachings',
               },
@@ -224,7 +257,13 @@ export class PageComponentsSeedService implements OnModuleInit {
         isVisible: true,
         fields: [
           { key: 'title', localizedValue: { en: 'Sacred Teachings', hi: 'पवित्र शिक्षाएं' } },
-          { key: 'subtitle', localizedValue: { en: 'Wisdom from the ancient scriptures', hi: 'प्राचीन शास्त्रों से ज्ञान' } },
+          {
+            key: 'subtitle',
+            localizedValue: {
+              en: 'Wisdom from the ancient scriptures',
+              hi: 'प्राचीन शास्त्रों से ज्ञान',
+            },
+          },
           { key: 'layout', value: 'grid' },
           { key: 'maxItems', value: 6 },
         ],
@@ -237,13 +276,22 @@ export class PageComponentsSeedService implements OnModuleInit {
         isVisible: true,
         fields: [
           { key: 'title', localizedValue: { en: 'Upcoming Events', hi: 'आगामी कार्यक्रम' } },
-          { key: 'subtitle', localizedValue: { en: 'Join us for these divine occasions', hi: 'इन पवित्र अवसरों पर हमारे साथ जुड़ें' } },
+          {
+            key: 'subtitle',
+            localizedValue: {
+              en: 'Join us for these divine occasions',
+              hi: 'इन पवित्र अवसरों पर हमारे साथ जुड़ें',
+            },
+          },
           {
             key: 'events',
             value: [
               {
                 title: { en: 'Hanuman Chalisa Path', hi: 'हनुमान चालीसा पाठ' },
-                description: { en: 'Weekly recitation of Hanuman Chalisa', hi: 'हनुमान चालीसा का साप्ताहिक पाठ' },
+                description: {
+                  en: 'Weekly recitation of Hanuman Chalisa',
+                  hi: 'हनुमान चालीसा का साप्ताहिक पाठ',
+                },
                 date: '2026-03-01T07:00:00',
                 location: { en: 'Main Temple Hall', hi: 'मुख्य मंदिर हॉल' },
                 link: '/events',
@@ -265,7 +313,10 @@ export class PageComponentsSeedService implements OnModuleInit {
             key: 'quotes',
             value: [
               {
-                text: { en: 'The purpose of life is to serve others.', hi: 'जीवन का उद्देश्य दूसरों की सेवा करना है।' },
+                text: {
+                  en: 'The purpose of life is to serve others.',
+                  hi: 'जीवन का उद्देश्य दूसरों की सेवा करना है।',
+                },
                 author: { en: 'Swami Rupeshwaranand', hi: 'स्वामी रूपेश्वरानंद' },
               },
             ],
@@ -280,7 +331,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         componentType: ComponentType.TEXT_BLOCK,
         name: { en: 'Early Life & Calling', hi: 'प्रारंभिक जीवन और आह्वान' },
-        description: { en: 'About Swamiji - Early Life section', hi: 'स्वामीजी के बारे में - प्रारंभिक जीवन अनुभाग' },
+        description: {
+          en: 'About Swamiji - Early Life section',
+          hi: 'स्वामीजी के बारे में - प्रारंभिक जीवन अनुभाग',
+        },
         displayOrder: 0,
         isVisible: true,
         fields: [
@@ -304,7 +358,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         componentType: ComponentType.TEXT_BLOCK,
         name: { en: 'Teachings & Philosophy', hi: 'शिक्षाएं और दर्शन' },
-        description: { en: 'About Swamiji - Teachings section', hi: 'स्वामीजी के बारे में - शिक्षाएं अनुभाग' },
+        description: {
+          en: 'About Swamiji - Teachings section',
+          hi: 'स्वामीजी के बारे में - शिक्षाएं अनुभाग',
+        },
         displayOrder: 1,
         isVisible: true,
         fields: [
@@ -318,7 +375,7 @@ export class PageComponentsSeedService implements OnModuleInit {
           {
             key: 'content',
             localizedValue: {
-              en: '<p>Swami Ji\'s teachings blend ancient Vedic wisdom with practical guidance for modern life. He emphasizes the importance of self-realization, selfless service (seva), and the cultivation of inner peace through meditation and devotion.</p>',
+              en: "<p>Swami Ji's teachings blend ancient Vedic wisdom with practical guidance for modern life. He emphasizes the importance of self-realization, selfless service (seva), and the cultivation of inner peace through meditation and devotion.</p>",
               hi: '<p>स्वामी जी की शिक्षाएं प्राचीन वैदिक ज्ञान को आधुनिक जीवन के लिए व्यावहारिक मार्गदर्शन के साथ मिलाती हैं। वे आत्म-साक्षात्कार, निःस्वार्थ सेवा (सेवा), और ध्यान और भक्ति के माध्यम से आंतरिक शांति की खेती के महत्व पर जोर देते हैं।</p>',
             },
           },
@@ -328,7 +385,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         componentType: ComponentType.TEXT_BLOCK,
         name: { en: 'Mission & Vision', hi: 'मिशन और दृष्टि' },
-        description: { en: 'About Swamiji - Mission section', hi: 'स्वामीजी के बारे में - मिशन अनुभाग' },
+        description: {
+          en: 'About Swamiji - Mission section',
+          hi: 'स्वामीजी के बारे में - मिशन अनुभाग',
+        },
         displayOrder: 2,
         isVisible: true,
         fields: [
@@ -358,7 +418,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         componentType: ComponentType.TEXT_BLOCK,
         name: { en: 'Contact Information', hi: 'संपर्क जानकारी' },
-        description: { en: 'Contact details (address, phone, email, hours)', hi: 'संपर्क विवरण (पता, फोन, ईमेल, समय)' },
+        description: {
+          en: 'Contact details (address, phone, email, hours)',
+          hi: 'संपर्क विवरण (पता, फोन, ईमेल, समय)',
+        },
         displayOrder: 0,
         isVisible: true,
         fields: [
@@ -385,7 +448,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         componentType: ComponentType.TEXT_BLOCK,
         name: { en: 'Ashram Description', hi: 'आश्रम विवरण' },
-        description: { en: 'About the Ashram - main description', hi: 'आश्रम के बारे में - मुख्य विवरण' },
+        description: {
+          en: 'About the Ashram - main description',
+          hi: 'आश्रम के बारे में - मुख्य विवरण',
+        },
         displayOrder: 0,
         isVisible: true,
         fields: [
@@ -454,7 +520,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         componentType: ComponentType.TEXT_BLOCK,
         name: { en: 'Gurukul Vision', hi: 'गुरुकुल दृष्टि' },
-        description: { en: 'Vision pillars of Gurukul education', hi: 'गुरुकुल शिक्षा के दृष्टि स्तंभ' },
+        description: {
+          en: 'Vision pillars of Gurukul education',
+          hi: 'गुरुकुल शिक्षा के दृष्टि स्तंभ',
+        },
         displayOrder: 1,
         isVisible: true,
         fields: [
@@ -486,7 +555,7 @@ export class PageComponentsSeedService implements OnModuleInit {
           {
             key: 'content',
             localizedValue: {
-              en: '<h3>01 — Preserve Cultural Heritage</h3><p>Safeguard and transmit India\'s rich spiritual and cultural heritage to future generations through systematic education.</p><h3>02 — Bridge Ancient & Modern</h3><p>Create a harmonious blend of traditional Gurukul system with contemporary educational requirements and career opportunities.</p><h3>03 — Rural Empowerment</h3><p>Bring quality spiritual education to rural areas, ensuring every child has access to transformative learning regardless of location.</p><h3>04 — Self-Reliant Citizens</h3><p>Develop self-reliant individuals who can contribute positively to society while maintaining spiritual grounding and ethical values.</p>',
+              en: "<h3>01 — Preserve Cultural Heritage</h3><p>Safeguard and transmit India's rich spiritual and cultural heritage to future generations through systematic education.</p><h3>02 — Bridge Ancient & Modern</h3><p>Create a harmonious blend of traditional Gurukul system with contemporary educational requirements and career opportunities.</p><h3>03 — Rural Empowerment</h3><p>Bring quality spiritual education to rural areas, ensuring every child has access to transformative learning regardless of location.</p><h3>04 — Self-Reliant Citizens</h3><p>Develop self-reliant individuals who can contribute positively to society while maintaining spiritual grounding and ethical values.</p>",
               hi: '<h3>01 — सांस्कृतिक विरासत को संरक्षित करें</h3><p>व्यवस्थित शिक्षा के माध्यम से भारत की समृद्ध आध्यात्मिक और सांस्कृतिक विरासत को भावी पीढ़ियों तक सुरक्षित और संचारित करें।</p><h3>02 — प्राचीन और आधुनिक का सेतु</h3><p>पारंपरिक गुरुकुल प्रणाली को समकालीन शैक्षिक आवश्यकताओं और करियर के अवसरों के साथ सामंजस्यपूर्ण मिश्रण बनाएं।</p><h3>03 — ग्रामीण सशक्तिकरण</h3><p>ग्रामीण क्षेत्रों में गुणवत्तापूर्ण आध्यात्मिक शिक्षा लाएं, यह सुनिश्चित करते हुए कि हर बच्चे की स्थान की परवाह किए बिना परिवर्तनकारी शिक्षा तक पहुंच हो।</p><h3>04 — आत्मनिर्भर नागरिक</h3><p>आत्मनिर्भर व्यक्तियों का विकास करें जो आध्यात्मिक आधार और नैतिक मूल्यों को बनाए रखते हुए समाज में सकारात्मक योगदान दे सकें।</p>',
             },
           },
@@ -496,7 +565,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         componentType: ComponentType.TEXT_BLOCK,
         name: { en: 'Gurukul Curriculum', hi: 'गुरुकुल पाठ्यक्रम' },
-        description: { en: 'Subjects taught in the Gurukul', hi: 'गुरुकुल में पढ़ाए जाने वाले विषय' },
+        description: {
+          en: 'Subjects taught in the Gurukul',
+          hi: 'गुरुकुल में पढ़ाए जाने वाले विषय',
+        },
         displayOrder: 3,
         isVisible: true,
         fields: [
@@ -796,7 +868,10 @@ export class PageComponentsSeedService implements OnModuleInit {
       {
         componentType: ComponentType.TEXT_BLOCK,
         name: { en: 'Inner Peace Content', hi: 'आंतरिक शांति सामग्री' },
-        description: { en: 'Full teaching article on inner peace', hi: 'आंतरिक शांति पर पूर्ण शिक्षण लेख' },
+        description: {
+          en: 'Full teaching article on inner peace',
+          hi: 'आंतरिक शांति पर पूर्ण शिक्षण लेख',
+        },
         displayOrder: 0,
         isVisible: true,
         fields: [
@@ -807,7 +882,7 @@ export class PageComponentsSeedService implements OnModuleInit {
           {
             key: 'content',
             localizedValue: {
-              en: '<p>In the hustle of modern life, finding inner peace seems like a distant dream. Swami Ji teaches that peace is not something external to be found, but an internal state to be uncovered.</p><p>Through daily meditation practice, mindful breathing, and conscious living, we can peel away the layers of stress and anxiety that cloud our natural state of serenity.</p><p>The path to inner peace begins with understanding that true happiness comes from within. When we stop seeking validation and fulfillment from external sources, we begin to discover the infinite reservoir of peace that resides in our hearts.</p><p>Swami Ji recommends starting with just 10 minutes of silent meditation each morning. Sit comfortably, close your eyes, and simply observe your breath. Don\'t try to control it—just witness. This simple practice, done consistently, can transform your relationship with yourself and the world around you.</p>',
+              en: "<p>In the hustle of modern life, finding inner peace seems like a distant dream. Swami Ji teaches that peace is not something external to be found, but an internal state to be uncovered.</p><p>Through daily meditation practice, mindful breathing, and conscious living, we can peel away the layers of stress and anxiety that cloud our natural state of serenity.</p><p>The path to inner peace begins with understanding that true happiness comes from within. When we stop seeking validation and fulfillment from external sources, we begin to discover the infinite reservoir of peace that resides in our hearts.</p><p>Swami Ji recommends starting with just 10 minutes of silent meditation each morning. Sit comfortably, close your eyes, and simply observe your breath. Don't try to control it—just witness. This simple practice, done consistently, can transform your relationship with yourself and the world around you.</p>",
               hi: '<p>आधुनिक जीवन की भागदौड़ में, आंतरिक शांति पाना एक दूर का सपना लगता है। स्वामी जी सिखाते हैं कि शांति कोई बाहरी चीज़ नहीं है जो खोजी जाए, बल्कि यह एक आंतरिक अवस्था है जिसे उजागर किया जाना है।</p><p>दैनिक ध्यान अभ्यास, सचेत श्वास और जागरूक जीवन के माध्यम से, हम तनाव और चिंता की उन परतों को हटा सकते हैं जो हमारी प्राकृतिक शांति की स्थिति को ढक देती हैं।</p><p>आंतरिक शांति का मार्ग यह समझने से शुरू होता है कि सच्चा सुख भीतर से आता है।</p><p>स्वामी जी हर सुबह केवल 10 मिनट के मौन ध्यान से शुरू करने की सलाह देते हैं। आराम से बैठें, आंखें बंद करें और बस अपनी सांस को देखें।</p>',
             },
           },
@@ -1064,12 +1139,22 @@ export class PageComponentsSeedService implements OnModuleInit {
       });
     }
 
-    const totalComponents = HOME_COMPONENTS.length + SWAMIJI_COMPONENTS.length +
-      CONTACT_COMPONENTS.length + ASHRAM_COMPONENTS.length + GURUKUL_COMPONENTS.length +
-      TEACHINGS_COMPONENTS.length + DONATION_COMPONENTS.length + EVENTS_COMPONENTS.length +
-      SERVICES_COMPONENTS.length + TEACHING_INNER_PEACE_COMPONENTS.length +
-      TEACHING_MANTRAS_COMPONENTS.length + TEACHING_SEVA_COMPONENTS.length +
+    const totalComponents =
+      HOME_COMPONENTS.length +
+      SWAMIJI_COMPONENTS.length +
+      CONTACT_COMPONENTS.length +
+      ASHRAM_COMPONENTS.length +
+      GURUKUL_COMPONENTS.length +
+      TEACHINGS_COMPONENTS.length +
+      DONATION_COMPONENTS.length +
+      EVENTS_COMPONENTS.length +
+      SERVICES_COMPONENTS.length +
+      TEACHING_INNER_PEACE_COMPONENTS.length +
+      TEACHING_MANTRAS_COMPONENTS.length +
+      TEACHING_SEVA_COMPONENTS.length +
       TEACHING_DHARMA_COMPONENTS.length;
-    this.logger.log(`✨ Seeded ${createdPages.length} pages and ${totalComponents} total components.`);
+    this.logger.log(
+      `✨ Seeded ${createdPages.length} pages and ${totalComponents} total components.`,
+    );
   }
 }

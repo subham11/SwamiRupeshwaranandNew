@@ -89,7 +89,10 @@ describe('OtpAuthService', () => {
       const result = await service.requestOtp('new@example.com');
 
       expect(result.success).toBe(true);
-      expect(mockCognitoService.createUser).toHaveBeenCalledWith('new@example.com', expect.any(String));
+      expect(mockCognitoService.createUser).toHaveBeenCalledWith(
+        'new@example.com',
+        expect.any(String),
+      );
       expect(mockCognitoService.setUserPassword).toHaveBeenCalled();
     });
 
@@ -206,7 +209,10 @@ describe('OtpAuthService', () => {
       expect(result.success).toBe(true);
       expect(result.accessToken).toBe('cognito-access-token');
       expect(result.user?.email).toBe('test@example.com');
-      expect(mockCognitoService.authenticate).toHaveBeenCalledWith('test@example.com', 'TestPassword123!');
+      expect(mockCognitoService.authenticate).toHaveBeenCalledWith(
+        'test@example.com',
+        'TestPassword123!',
+      );
     });
 
     it('should throw error for invalid credentials', async () => {
@@ -214,9 +220,9 @@ describe('OtpAuthService', () => {
         new UnauthorizedException('Incorrect username or password'),
       );
 
-      await expect(
-        service.loginWithPassword('test@example.com', 'WrongPassword'),
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(service.loginWithPassword('test@example.com', 'WrongPassword')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 

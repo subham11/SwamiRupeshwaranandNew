@@ -51,12 +51,12 @@ interface ShippingAddress {
 }
 
 interface OrderEntity {
-  PK: string;           // ORDER#<orderId>
-  SK: string;           // ORDER#<orderId>
-  GSI1PK: string;       // ORDER
-  GSI1SK: string;       // DATE#<createdAt>
-  GSI2PK: string;       // USER#<userId>
-  GSI2SK: string;       // ORDER#<createdAt>
+  PK: string; // ORDER#<orderId>
+  SK: string; // ORDER#<orderId>
+  GSI1PK: string; // ORDER
+  GSI1SK: string; // DATE#<createdAt>
+  GSI2PK: string; // USER#<userId>
+  GSI2SK: string; // ORDER#<createdAt>
   id: string;
   userId: string;
   userEmail: string;
@@ -121,8 +121,7 @@ export class OrdersService {
    */
   private async ensureRazorpayInitialized(): Promise<void> {
     const needsReinit =
-      !this.razorpay ||
-      Date.now() - this.razorpayInitializedAt > this.RAZORPAY_REINIT_INTERVAL_MS;
+      !this.razorpay || Date.now() - this.razorpayInitializedAt > this.RAZORPAY_REINIT_INTERVAL_MS;
 
     if (needsReinit) {
       try {
@@ -155,10 +154,7 @@ export class OrdersService {
   // Checkout: Create Order + Razorpay Order
   // ============================================
 
-  async checkout(
-    userId: string,
-    userEmail: string,
-  ): Promise<CheckoutResponseDto> {
+  async checkout(userId: string, userEmail: string): Promise<CheckoutResponseDto> {
     await this.ensureRazorpayInitialized();
 
     // 1. Fetch cart
@@ -293,10 +289,7 @@ export class OrdersService {
     }
 
     // 2. Fetch order
-    const order = await this.db.get<OrderEntity>(
-      `ORDER#${dto.orderId}`,
-      `ORDER#${dto.orderId}`,
-    );
+    const order = await this.db.get<OrderEntity>(`ORDER#${dto.orderId}`, `ORDER#${dto.orderId}`);
 
     if (!order) {
       throw new NotFoundException(`Order ${dto.orderId} not found`);
@@ -330,7 +323,9 @@ export class OrdersService {
       },
     });
 
-    this.logger.log(`Order ${dto.orderId} payment verified. RazorpayPaymentId: ${dto.razorpayPaymentId}`);
+    this.logger.log(
+      `Order ${dto.orderId} payment verified. RazorpayPaymentId: ${dto.razorpayPaymentId}`,
+    );
 
     // 4. Clear cart
     try {
@@ -347,7 +342,14 @@ export class OrdersService {
 
     // 6. Generate and upload invoice PDF (non-blocking)
     this.invoiceService
-      .generateAndUpload(this.toResponseDto({ ...order, status: OrderStatus.PAID, paymentStatus: 'captured', razorpayPaymentId: dto.razorpayPaymentId }))
+      .generateAndUpload(
+        this.toResponseDto({
+          ...order,
+          status: OrderStatus.PAID,
+          paymentStatus: 'captured',
+          razorpayPaymentId: dto.razorpayPaymentId,
+        }),
+      )
       .catch((err) =>
         this.logger.warn(`Failed to generate/upload invoice for order ${order.id}: ${err.message}`),
       );
@@ -365,10 +367,7 @@ export class OrdersService {
    * Webhook signature is already verified by the payment module.
    */
   async confirmOrderFromWebhook(orderId: string, razorpayPaymentId: string): Promise<void> {
-    const order = await this.db.get<OrderEntity>(
-      `ORDER#${orderId}`,
-      `ORDER#${orderId}`,
-    );
+    const order = await this.db.get<OrderEntity>(`ORDER#${orderId}`, `ORDER#${orderId}`);
 
     if (!order) {
       this.logger.warn(`Webhook: Order ${orderId} not found`);
@@ -410,9 +409,18 @@ export class OrdersService {
 
     // Generate and upload invoice PDF (non-blocking)
     this.invoiceService
-      .generateAndUpload(this.toResponseDto({ ...order, status: OrderStatus.PAID, paymentStatus: 'captured', razorpayPaymentId }))
+      .generateAndUpload(
+        this.toResponseDto({
+          ...order,
+          status: OrderStatus.PAID,
+          paymentStatus: 'captured',
+          razorpayPaymentId,
+        }),
+      )
       .catch((err) =>
-        this.logger.warn(`Webhook: Failed to generate/upload invoice for order ${order.id}: ${err.message}`),
+        this.logger.warn(
+          `Webhook: Failed to generate/upload invoice for order ${order.id}: ${err.message}`,
+        ),
       );
   }
 
@@ -421,10 +429,7 @@ export class OrdersService {
   // ============================================
 
   async getOrderById(orderId: string): Promise<OrderResponseDto | null> {
-    const order = await this.db.get<OrderEntity>(
-      `ORDER#${orderId}`,
-      `ORDER#${orderId}`,
-    );
+    const order = await this.db.get<OrderEntity>(`ORDER#${orderId}`, `ORDER#${orderId}`);
     return order ? this.toResponseDto(order) : null;
   }
 
@@ -457,14 +462,8 @@ export class OrdersService {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
-  async updateOrderStatus(
-    orderId: string,
-    dto: UpdateOrderStatusDto,
-  ): Promise<OrderResponseDto> {
-    const order = await this.db.get<OrderEntity>(
-      `ORDER#${orderId}`,
-      `ORDER#${orderId}`,
-    );
+  async updateOrderStatus(orderId: string, dto: UpdateOrderStatusDto): Promise<OrderResponseDto> {
+    const order = await this.db.get<OrderEntity>(`ORDER#${orderId}`, `ORDER#${orderId}`);
 
     if (!order) {
       throw new NotFoundException(`Order ${orderId} not found`);
@@ -495,10 +494,7 @@ export class OrdersService {
       expressionAttributeValues,
     });
 
-    const updated = await this.db.get<OrderEntity>(
-      `ORDER#${orderId}`,
-      `ORDER#${orderId}`,
-    );
+    const updated = await this.db.get<OrderEntity>(`ORDER#${orderId}`, `ORDER#${orderId}`);
 
     // Send status update email (non-blocking)
     this.sendOrderStatusUpdateEmail(updated!, dto.status, dto.trackingNumber).catch((err) =>
@@ -833,7 +829,9 @@ Swami Rupeshwaranand Ashram
       html,
     });
 
-    this.logger.log(`Order status update email (${newStatus}) sent to ${order.userEmail} for order ${order.id}`);
+    this.logger.log(
+      `Order status update email (${newStatus}) sent to ${order.userEmail} for order ${order.id}`,
+    );
   }
 
   // ============================================
@@ -865,12 +863,10 @@ Swami Rupeshwaranand Ashram
     );
     const thisMonthRevenue = thisMonthOrders.reduce((sum, o) => sum + o.totalAmount, 0);
 
-    const lastMonthOrders = orders.filter(
-      (o) => {
-        const d = new Date(o.createdAt);
-        return d >= lastMonthStart && d <= lastMonthEnd && o.status !== OrderStatus.CANCELLED;
-      },
-    );
+    const lastMonthOrders = orders.filter((o) => {
+      const d = new Date(o.createdAt);
+      return d >= lastMonthStart && d <= lastMonthEnd && o.status !== OrderStatus.CANCELLED;
+    });
     const lastMonthRevenue = lastMonthOrders.reduce((sum, o) => sum + o.totalAmount, 0);
 
     const nonCancelledOrders = orders.filter((o) => o.status !== OrderStatus.CANCELLED);
@@ -886,7 +882,8 @@ Swami Rupeshwaranand Ashram
     }
 
     // Top 5 products by quantity sold
-    const productQuantities: Record<string, { title: string; quantity: number; revenue: number }> = {};
+    const productQuantities: Record<string, { title: string; quantity: number; revenue: number }> =
+      {};
     for (const order of nonCancelledOrders) {
       for (const item of order.items) {
         if (!productQuantities[item.productId]) {

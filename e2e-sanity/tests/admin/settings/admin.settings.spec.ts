@@ -104,8 +104,8 @@ test.describe('STORY-031 | SMTP Email Settings', () => {
     await page.locator('[data-testid="tab-smtp"]').click();
     await page.locator('[data-testid="smtp-host"]').fill('smtp.test-server.com');
     await page.locator('[data-testid="smtp-port"]').fill('587');
-    await page.locator('[data-testid="smtp-from-email"]').fill('noreply@bhairavapath.com');
-    await page.locator('[data-testid="smtp-from-name"]').fill('Bhairavapath');
+    await page.locator('[data-testid="smtp-from-email"]').fill('noreply@swamirupeshwaranand.org');
+    await page.locator('[data-testid="smtp-from-name"]').fill('Swami Rupeshwaranand');
     await page.locator('[data-testid="save-smtp-btn"]').click();
     await expect(admin.successToast).toBeVisible({ timeout: 8_000 });
   });

@@ -7,8 +7,8 @@ test.describe('UI Sanity — Public Pages Load', () => {
 
   test('Homepage loads and shows content', async ({ page }) => {
     await page.goto('/en');
-    // Title may be "Swami Rupeshwaranand" or "bhairavapath"
-    await expect(page).toHaveTitle(/swami|rupeshwaranand|bhairavapath|भैरवपथ/i);
+    // Title should contain "Swami Rupeshwaranand"
+    await expect(page).toHaveTitle(/swami|rupeshwaranand|swamirupeshwaranand/i);
     await expect(page.locator('body')).toBeVisible();
     const header = page.locator('header, nav').first();
     await expect(header).toBeVisible({ timeout: 15_000 });

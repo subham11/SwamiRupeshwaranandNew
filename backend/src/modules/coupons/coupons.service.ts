@@ -23,10 +23,10 @@ import {
 // ============================================
 
 interface CouponEntity {
-  PK: string;       // COUPON#<couponId>
-  SK: string;       // COUPON#<couponId>
-  GSI1PK: string;   // COUPON
-  GSI1SK: string;   // CODE#<code>
+  PK: string; // COUPON#<couponId>
+  SK: string; // COUPON#<couponId>
+  GSI1PK: string; // COUPON
+  GSI1SK: string; // CODE#<code>
   id: string;
   code: string;
   type: CouponType;
@@ -43,8 +43,8 @@ interface CouponEntity {
 }
 
 interface CouponUsageEntity {
-  PK: string;       // COUPON_USAGE#<couponId>
-  SK: string;       // USER#<userId>
+  PK: string; // COUPON_USAGE#<couponId>
+  SK: string; // USER#<userId>
   couponId: string;
   userId: string;
   orderId: string;
@@ -110,10 +110,7 @@ export class CouponsService {
   }
 
   async updateCoupon(id: string, dto: UpdateCouponDto): Promise<CouponResponseDto> {
-    const existing = await this.databaseService.get<CouponEntity>(
-      `COUPON#${id}`,
-      `COUPON#${id}`,
-    );
+    const existing = await this.databaseService.get<CouponEntity>(`COUPON#${id}`, `COUPON#${id}`);
 
     if (!existing) {
       throw new NotFoundException(`Coupon with ID ${id} not found`);
@@ -148,13 +145,17 @@ export class CouponsService {
       code: newCode,
       type: dto.type !== undefined ? dto.type : existing.type,
       value: dto.value !== undefined ? dto.value : existing.value,
-      minOrderAmount: dto.minOrderAmount !== undefined ? dto.minOrderAmount : existing.minOrderAmount,
+      minOrderAmount:
+        dto.minOrderAmount !== undefined ? dto.minOrderAmount : existing.minOrderAmount,
       maxDiscount: dto.maxDiscount !== undefined ? dto.maxDiscount : existing.maxDiscount,
       expiresAt: dto.expiresAt !== undefined ? dto.expiresAt : existing.expiresAt,
       isActive: dto.isActive !== undefined ? dto.isActive : existing.isActive,
       usageLimit: dto.usageLimit !== undefined ? dto.usageLimit : existing.usageLimit,
       usageCount: existing.usageCount,
-      applicableCategories: dto.applicableCategories !== undefined ? dto.applicableCategories : existing.applicableCategories,
+      applicableCategories:
+        dto.applicableCategories !== undefined
+          ? dto.applicableCategories
+          : existing.applicableCategories,
       createdAt: existing.createdAt,
       updatedAt: now,
     };
@@ -170,10 +171,7 @@ export class CouponsService {
   }
 
   async deleteCoupon(id: string): Promise<void> {
-    const existing = await this.databaseService.get<CouponEntity>(
-      `COUPON#${id}`,
-      `COUPON#${id}`,
-    );
+    const existing = await this.databaseService.get<CouponEntity>(`COUPON#${id}`, `COUPON#${id}`);
 
     if (!existing) {
       throw new NotFoundException(`Coupon with ID ${id} not found`);
@@ -323,10 +321,7 @@ export class CouponsService {
   }
 
   async getCouponStats(id: string): Promise<CouponStatsDto> {
-    const coupon = await this.databaseService.get<CouponEntity>(
-      `COUPON#${id}`,
-      `COUPON#${id}`,
-    );
+    const coupon = await this.databaseService.get<CouponEntity>(`COUPON#${id}`, `COUPON#${id}`);
 
     if (!coupon) {
       throw new NotFoundException(`Coupon with ID ${id} not found`);

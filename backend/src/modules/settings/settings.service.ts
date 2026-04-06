@@ -7,10 +7,10 @@ import { SettingCategory } from './dto';
 // DynamoDB Settings Entity (single-table design)
 // ============================================
 interface SettingEntity {
-  PK: string;          // SETTINGS#<key>
-  SK: string;          // SETTINGS#<key>
-  GSI1PK: string;      // SETTINGS
-  GSI1SK: string;      // CATEGORY#<category>#KEY#<key>
+  PK: string; // SETTINGS#<key>
+  SK: string; // SETTINGS#<key>
+  GSI1PK: string; // SETTINGS
+  GSI1SK: string; // CATEGORY#<category>#KEY#<key>
   key: string;
   value: string;
   category: string;
@@ -172,15 +172,17 @@ export class SettingsService {
    * List all settings for a category.
    * Secret values are masked in the response.
    */
-  async getByCategory(category: string): Promise<Array<{
-    key: string;
-    value: string;
-    category: string;
-    description?: string;
-    isSecret: boolean;
-    updatedAt: string;
-    updatedBy?: string;
-  }>> {
+  async getByCategory(category: string): Promise<
+    Array<{
+      key: string;
+      value: string;
+      category: string;
+      description?: string;
+      isSecret: boolean;
+      updatedAt: string;
+      updatedBy?: string;
+    }>
+  > {
     const result = await this.db.query<SettingEntity>(this.entityType, {
       indexName: 'GSI1',
       keyConditionExpression: 'GSI1PK = :pk AND begins_with(GSI1SK, :skPrefix)',
@@ -204,15 +206,17 @@ export class SettingsService {
   /**
    * List all settings across all categories (admin view)
    */
-  async getAll(): Promise<Array<{
-    key: string;
-    value: string;
-    category: string;
-    description?: string;
-    isSecret: boolean;
-    updatedAt: string;
-    updatedBy?: string;
-  }>> {
+  async getAll(): Promise<
+    Array<{
+      key: string;
+      value: string;
+      category: string;
+      description?: string;
+      isSecret: boolean;
+      updatedAt: string;
+      updatedBy?: string;
+    }>
+  > {
     const result = await this.db.query<SettingEntity>(this.entityType, {
       indexName: 'GSI1',
       keyConditionExpression: 'GSI1PK = :pk',
@@ -237,10 +241,7 @@ export class SettingsService {
   // ============================================
 
   async delete(key: string): Promise<void> {
-    await this.db.delete(
-      `${this.entityType}#${key}`,
-      `${this.entityType}#${key}`,
-    );
+    await this.db.delete(`${this.entityType}#${key}`, `${this.entityType}#${key}`);
 
     // Remove from cache
     this.cache.delete(key);
@@ -304,15 +305,16 @@ export class SettingsService {
     keySecret: string;
     webhookSecret: string;
   }> {
-    return account === 'foundation'
-      ? this.getRazorpayFoundationConfig()
-      : this.getRazorpayConfig();
+    return account === 'foundation' ? this.getRazorpayFoundationConfig() : this.getRazorpayConfig();
   }
 
   /**
    * Test Razorpay credentials by making a simple API call.
    */
-  async testRazorpayConnection(keyId: string, keySecret: string): Promise<{
+  async testRazorpayConnection(
+    keyId: string,
+    keySecret: string,
+  ): Promise<{
     success: boolean;
     message: string;
   }> {

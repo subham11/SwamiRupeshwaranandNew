@@ -1,4 +1,4 @@
-# Bhairavapath.com — Playwright E2E Sanity Test Suite
+# Swamirupeshwaranand.org — Playwright E2E Sanity Test Suite
 
 End-to-end sanity coverage for all **39 Jira stories across 18 epics**.  
 Built with **Playwright** + **TypeScript** + **Page Object Model**.
@@ -8,7 +8,7 @@ Built with **Playwright** + **TypeScript** + **Page Object Model**.
 ## 📁 Project Structure
 
 ```
-bhairavapath-e2e/
+swamirupeshwaranand-e2e/
 ├── playwright.config.ts              # 8 browser projects (Chrome/Firefox/Safari/Mobile + setup/teardown)
 ├── package.json                      # Scripts, deps (npm run test:*)
 ├── tsconfig.json

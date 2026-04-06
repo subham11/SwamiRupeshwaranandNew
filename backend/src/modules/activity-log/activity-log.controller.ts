@@ -1,17 +1,7 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { ActivityLogService } from './activity-log.service';
-import {
-  ActivityLogQueryDto,
-  ActivityLogListResponseDto,
-  ActivityLogStatsDto,
-} from './dto';
+import { ActivityLogQueryDto, ActivityLogListResponseDto, ActivityLogStatsDto } from './dto';
 import { JwtAuthGuard, RolesGuard } from '@/common/guards';
 import { AdminOnly } from '@/common/decorators';
 
@@ -34,9 +24,7 @@ export class ActivityLogController {
   @ApiQuery({ name: 'entityType', required: false, description: 'Filter by entity type' })
   @ApiQuery({ name: 'userId', required: false, description: 'Filter by user ID' })
   @ApiResponse({ status: 200, type: ActivityLogListResponseDto })
-  async getActivityLogs(
-    @Query() query: ActivityLogQueryDto,
-  ): Promise<ActivityLogListResponseDto> {
+  async getActivityLogs(@Query() query: ActivityLogQueryDto): Promise<ActivityLogListResponseDto> {
     const limit = query.limit || 20;
 
     // If userId is specified, query by user (GSI2)

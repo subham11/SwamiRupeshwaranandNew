@@ -10,7 +10,12 @@
 
 import type { PostAuthenticationTriggerEvent, PostAuthenticationTriggerHandler } from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import {
+  DynamoDBDocumentClient,
+  GetCommand,
+  PutCommand,
+  UpdateCommand,
+} from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
 const ddbClient = DynamoDBDocumentClient.from(
@@ -26,11 +31,14 @@ export const handler: PostAuthenticationTriggerHandler = async (
   const name = event.request.userAttributes?.name;
   const cognitoSub = event.request.userAttributes?.sub || event.userName;
 
-  console.log('PostAuthentication trigger', JSON.stringify({
-    userName: event.userName,
-    triggerSource: event.triggerSource,
-    email,
-  }));
+  console.log(
+    'PostAuthentication trigger',
+    JSON.stringify({
+      userName: event.userName,
+      triggerSource: event.triggerSource,
+      email,
+    }),
+  );
 
   if (!MAIN_TABLE) {
     console.warn('MAIN_TABLE not configured, skipping user sync');
@@ -39,47 +47,53 @@ export const handler: PostAuthenticationTriggerHandler = async (
 
   try {
     // Check if user exists in app table
-    const existing = await ddbClient.send(new GetCommand({
-      TableName: MAIN_TABLE,
-      Key: { PK: `USER#${email}`, SK: 'PROFILE' },
-    }));
+    const existing = await ddbClient.send(
+      new GetCommand({
+        TableName: MAIN_TABLE,
+        Key: { PK: `USER#${email}`, SK: 'PROFILE' },
+      }),
+    );
 
     const now = new Date().toISOString();
 
     if (existing.Item) {
       // Update last login and ensure Cognito sub is synced
-      await ddbClient.send(new UpdateCommand({
-        TableName: MAIN_TABLE,
-        Key: { PK: `USER#${email}`, SK: 'PROFILE' },
-        UpdateExpression: 'SET lastLoginAt = :now, updatedAt = :now, cognitoSub = :sub',
-        ExpressionAttributeValues: {
-          ':now': now,
-          ':sub': cognitoSub,
-        },
-      }));
+      await ddbClient.send(
+        new UpdateCommand({
+          TableName: MAIN_TABLE,
+          Key: { PK: `USER#${email}`, SK: 'PROFILE' },
+          UpdateExpression: 'SET lastLoginAt = :now, updatedAt = :now, cognitoSub = :sub',
+          ExpressionAttributeValues: {
+            ':now': now,
+            ':sub': cognitoSub,
+          },
+        }),
+      );
       console.log(`Updated last login for: ${email}`);
     } else {
       // Create new user record (first-time login via Cognito)
       const userId = uuidv4();
-      await ddbClient.send(new PutCommand({
-        TableName: MAIN_TABLE,
-        Item: {
-          PK: `USER#${email}`,
-          SK: 'PROFILE',
-          id: userId,
-          cognitoSub,
-          email,
-          name: name || undefined,
-          hasPassword: event.triggerSource === 'PostAuthentication_Authentication',
-          isVerified: true,
-          role: 'user',
-          createdAt: now,
-          updatedAt: now,
-          lastLoginAt: now,
-          GSI1PK: 'USER',
-          GSI1SK: now,
-        },
-      }));
+      await ddbClient.send(
+        new PutCommand({
+          TableName: MAIN_TABLE,
+          Item: {
+            PK: `USER#${email}`,
+            SK: 'PROFILE',
+            id: userId,
+            cognitoSub,
+            email,
+            name: name || undefined,
+            hasPassword: event.triggerSource === 'PostAuthentication_Authentication',
+            isVerified: true,
+            role: 'user',
+            createdAt: now,
+            updatedAt: now,
+            lastLoginAt: now,
+            GSI1PK: 'USER',
+            GSI1SK: now,
+          },
+        }),
+      );
       console.log(`Created new user record for: ${email}`);
     }
   } catch (error) {

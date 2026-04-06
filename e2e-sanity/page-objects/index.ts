@@ -1,5 +1,5 @@
 // page-objects/index.ts
-// All Page Object Models for bhairavapath.com
+// All Page Object Models for swamirupeshwaranand.org
 
 import { Page, Locator, expect } from '@playwright/test';
 

@@ -1,5 +1,5 @@
 # .github/workflows/e2e.yml
-# Bhairavapath.com — Playwright E2E Sanity Suite
+# Swamirupeshwaranand.org — Playwright E2E Sanity Suite
 # Triggers: push to main/develop, PRs, and manual dispatch
 
 name: E2E Sanity Tests

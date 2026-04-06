@@ -126,7 +126,7 @@ test.describe('STORY-010 | Coupon Redemption (Customer)', () => {
   // Helper: create active coupon via API and return code
   async function createCoupon(request: any, overrides: Record<string, any> = {}) {
     const loginRes = await request.post(`${API_URL}/auth/login`, {
-      data: { email: process.env.ADMIN_EMAIL || 'admin@bhairavapath.com',
+      data: { email: process.env.ADMIN_EMAIL || 'admin@swamirupeshwaranand.org',
               password: process.env.ADMIN_PASSWORD || 'Admin@1234' },
     });
     const { accessToken } = await loginRes.json();

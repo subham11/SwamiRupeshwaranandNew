@@ -1,4 +1,11 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, Logger, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+  Logger,
+  Inject,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
@@ -56,7 +63,9 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     if (!this.verifier) {
-      this.logger.error('Cognito JWT verifier not configured (missing COGNITO_USER_POOL_ID or COGNITO_CLIENT_ID)');
+      this.logger.error(
+        'Cognito JWT verifier not configured (missing COGNITO_USER_POOL_ID or COGNITO_CLIENT_ID)',
+      );
       throw new UnauthorizedException('Authentication not configured');
     }
 
@@ -88,7 +97,9 @@ export class JwtAuthGuard implements CanActivate {
 
       return true;
     } catch (error) {
-      this.logger.warn(`Cognito JWT verification failed: ${error instanceof Error ? error.message : 'unknown'}`);
+      this.logger.warn(
+        `Cognito JWT verification failed: ${error instanceof Error ? error.message : 'unknown'}`,
+      );
       throw new UnauthorizedException('Invalid or expired token');
     }
   }

@@ -29,11 +29,7 @@ import {
   YagyaPaymentResponseDto,
   PaymentVerificationResponseDto,
 } from './dto';
-import {
-  PaymentMethod,
-  SubscriptionStatus,
-  BillingCycle,
-} from '@/modules/subscriptions/dto';
+import { PaymentMethod, SubscriptionStatus, BillingCycle } from '@/modules/subscriptions/dto';
 
 // ============================================
 // Payment Record Entity (stored in DynamoDB)
@@ -116,8 +112,7 @@ export class PaymentService {
    */
   private async ensureRazorpayInitialized(): Promise<void> {
     const needsReinit =
-      !this.razorpay ||
-      Date.now() - this.razorpayInitializedAt > this.RAZORPAY_REINIT_INTERVAL_MS;
+      !this.razorpay || Date.now() - this.razorpayInitializedAt > this.RAZORPAY_REINIT_INTERVAL_MS;
 
     if (needsReinit) {
       await this.refreshRazorpayKeys();
@@ -260,7 +255,10 @@ export class PaymentService {
       [BillingCycle.YEARLY]: { period: 'yearly', interval: 1 },
     };
 
-    const billing = periodMap[plan.billingCycle] || { period: 'monthly' as RazorpayPeriod, interval: 1 };
+    const billing = periodMap[plan.billingCycle] || {
+      period: 'monthly' as RazorpayPeriod,
+      interval: 1,
+    };
 
     await this.ensureRazorpayInitialized();
 
@@ -399,7 +397,11 @@ export class PaymentService {
 
     if (generatedSignature !== dto.razorpaySignature) {
       this.logger.warn(`Payment verification failed for order: ${dto.razorpayOrderId}`);
-      await this.recordPaymentFailure(dto.subscriptionId, 'Signature verification failed', 'SIGNATURE_MISMATCH');
+      await this.recordPaymentFailure(
+        dto.subscriptionId,
+        'Signature verification failed',
+        'SIGNATURE_MISMATCH',
+      );
       throw new BadRequestException('Payment verification failed. Invalid signature.');
     }
 
@@ -436,7 +438,11 @@ export class PaymentService {
 
     if (generatedSignature !== dto.razorpaySignature) {
       this.logger.warn(`Subscription payment verification failed: ${dto.razorpaySubscriptionId}`);
-      await this.recordPaymentFailure(dto.subscriptionId, 'Signature verification failed', 'SIGNATURE_MISMATCH');
+      await this.recordPaymentFailure(
+        dto.subscriptionId,
+        'Signature verification failed',
+        'SIGNATURE_MISMATCH',
+      );
       throw new BadRequestException('Payment verification failed. Invalid signature.');
     }
 
@@ -564,9 +570,7 @@ export class PaymentService {
    * Initiate a yagya booking payment.
    * Uses the appropriate Razorpay account based on category.
    */
-  async initiateYagyaPayment(
-    dto: InitiateYagyaPaymentDto,
-  ): Promise<YagyaPaymentResponseDto> {
+  async initiateYagyaPayment(dto: InitiateYagyaPaymentDto): Promise<YagyaPaymentResponseDto> {
     const accountType = this.getYagyaAccountType(dto.category);
     const config = await this.settingsService.getRazorpayConfigForAccount(accountType);
 
@@ -622,9 +626,7 @@ export class PaymentService {
    * Verify a yagya booking payment.
    * Uses the correct Razorpay key_secret based on category.
    */
-  async verifyYagyaPayment(
-    dto: VerifyYagyaPaymentDto,
-  ): Promise<PaymentVerificationResponseDto> {
+  async verifyYagyaPayment(dto: VerifyYagyaPaymentDto): Promise<PaymentVerificationResponseDto> {
     const accountType = this.getYagyaAccountType(dto.category);
     const config = await this.settingsService.getRazorpayConfigForAccount(accountType);
 
@@ -752,7 +754,9 @@ export class PaymentService {
     if (subscriptionId) {
       // Renew the subscription - extend end date
       await this.subscriptionsService.activateSubscription(subscriptionId, payment.id);
-      this.logger.log(`Subscription renewed via autopay: ${subscriptionId}, payment: ${payment.id}`);
+      this.logger.log(
+        `Subscription renewed via autopay: ${subscriptionId}, payment: ${payment.id}`,
+      );
     }
   }
 
@@ -795,10 +799,7 @@ export class PaymentService {
 
     const subscriptionId = subscription.notes?.subscriptionId;
     if (subscriptionId) {
-      await this.subscriptionsService.cancelSubscription(
-        subscriptionId,
-        'Cancelled via Razorpay',
-      );
+      await this.subscriptionsService.cancelSubscription(subscriptionId, 'Cancelled via Razorpay');
       this.logger.log(`Subscription cancelled via webhook: ${subscriptionId}`);
     }
   }
@@ -836,7 +837,9 @@ export class PaymentService {
       await this.recordPaymentFailure(subscriptionId, errorDesc, errorCode);
       this.logger.warn(`Payment failed for subscription: ${subscriptionId} - ${errorDesc}`);
     } else if (type === 'product_order' && orderId) {
-      this.logger.warn(`Payment failed for product order: ${orderId} - ${errorDesc} (${errorCode})`);
+      this.logger.warn(
+        `Payment failed for product order: ${orderId} - ${errorDesc} (${errorCode})`,
+      );
       // Order stays in payment_pending — admin can check and handle
     }
   }
@@ -864,9 +867,10 @@ export class PaymentService {
   // Payment Failure Tracking
   // ============================================
 
-  async getPaymentFailures(
-    filters?: { status?: string; limit?: number },
-  ): Promise<PaymentRecordEntity[]> {
+  async getPaymentFailures(filters?: {
+    status?: string;
+    limit?: number;
+  }): Promise<PaymentRecordEntity[]> {
     const result = await this.db.query<PaymentRecordEntity>(this.paymentEntityType, {
       indexName: 'GSI1',
       keyConditionExpression: 'GSI1PK = :pk',
@@ -945,7 +949,12 @@ export class PaymentService {
 
   private async updatePaymentByEntity(
     entityId: string,
-    updates: Partial<Pick<PaymentRecordEntity, 'razorpayPaymentId' | 'status' | 'failureReason' | 'errorCode' | 'method'>>,
+    updates: Partial<
+      Pick<
+        PaymentRecordEntity,
+        'razorpayPaymentId' | 'status' | 'failureReason' | 'errorCode' | 'method'
+      >
+    >,
   ): Promise<void> {
     // Find payment record by entityId
     const result = await this.db.query<PaymentRecordEntity>(this.paymentEntityType, {

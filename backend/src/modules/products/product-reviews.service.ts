@@ -203,10 +203,7 @@ export class ProductReviewsService {
   // List All Reviews (Admin)
   // ============================================
 
-  async listAllReviews(
-    limit?: number,
-    cursor?: string,
-  ): Promise<ProductReviewListResponseDto> {
+  async listAllReviews(limit?: number, cursor?: string): Promise<ProductReviewListResponseDto> {
     const effectiveLimit = limit || 20;
     let lastKey: Record<string, unknown> | undefined;
 
@@ -278,9 +275,7 @@ export class ProductReviewsService {
     const avgRating =
       totalReviews > 0
         ? parseFloat(
-            (
-              approvedReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
-            ).toFixed(1),
+            (approvedReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1),
           )
         : 0;
 

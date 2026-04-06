@@ -189,9 +189,7 @@ export class UsersService {
 
     const activeUsers = users.filter((u) => u.status === 'active').length;
 
-    const newUsersThisMonth = users.filter(
-      (u) => new Date(u.createdAt) >= thisMonthStart,
-    ).length;
+    const newUsersThisMonth = users.filter((u) => new Date(u.createdAt) >= thisMonthStart).length;
 
     const newUsersLastMonth = users.filter((u) => {
       const d = new Date(u.createdAt);

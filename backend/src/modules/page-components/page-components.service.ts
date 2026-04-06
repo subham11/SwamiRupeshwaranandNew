@@ -111,14 +111,59 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     icon: '🔝',
     isGlobal: true,
     fields: [
-      { key: 'logoImage', label: 'Logo Image', type: FieldType.IMAGE, helpText: 'Upload a logo image (leave blank to use the default ॐ symbol)' },
-      { key: 'brandName', label: 'Brand Name', type: FieldType.TEXT, required: true, localized: true, defaultValue: 'Swami Rupeshwaranand' },
-      { key: 'brandTagline', label: 'Brand Tagline', type: FieldType.TEXT, localized: true, defaultValue: 'Path to Inner Peace' },
-      { key: 'contactPhone', label: 'Contact Phone', type: FieldType.TEXT, defaultValue: '+91 1234567890' },
-      { key: 'contactEmail', label: 'Contact Email', type: FieldType.TEXT, defaultValue: 'info@example.org' },
-      { key: 'ctaButtonLabel', label: 'CTA Button Label', type: FieldType.TEXT, localized: true, defaultValue: 'Donate' },
-      { key: 'ctaButtonLink', label: 'CTA Button Link', type: FieldType.URL, defaultValue: '/donation' },
-      { key: 'socialLinks', label: 'Social Media Links', type: FieldType.JSON, helpText: 'Array of objects: { platform, url, icon }. e.g. [{"platform":"YouTube","url":"https://youtube.com/...","icon":"youtube"}]' },
+      {
+        key: 'logoImage',
+        label: 'Logo Image',
+        type: FieldType.IMAGE,
+        helpText: 'Upload a logo image (leave blank to use the default ॐ symbol)',
+      },
+      {
+        key: 'brandName',
+        label: 'Brand Name',
+        type: FieldType.TEXT,
+        required: true,
+        localized: true,
+        defaultValue: 'Swami Rupeshwaranand',
+      },
+      {
+        key: 'brandTagline',
+        label: 'Brand Tagline',
+        type: FieldType.TEXT,
+        localized: true,
+        defaultValue: 'Path to Inner Peace',
+      },
+      {
+        key: 'contactPhone',
+        label: 'Contact Phone',
+        type: FieldType.TEXT,
+        defaultValue: '+91 1234567890',
+      },
+      {
+        key: 'contactEmail',
+        label: 'Contact Email',
+        type: FieldType.TEXT,
+        defaultValue: 'info@example.org',
+      },
+      {
+        key: 'ctaButtonLabel',
+        label: 'CTA Button Label',
+        type: FieldType.TEXT,
+        localized: true,
+        defaultValue: 'Donate',
+      },
+      {
+        key: 'ctaButtonLink',
+        label: 'CTA Button Link',
+        type: FieldType.URL,
+        defaultValue: '/donation',
+      },
+      {
+        key: 'socialLinks',
+        label: 'Social Media Links',
+        type: FieldType.JSON,
+        helpText:
+          'Array of objects: { platform, url, icon }. e.g. [{"platform":"YouTube","url":"https://youtube.com/...","icon":"youtube"}]',
+      },
     ],
   },
   {
@@ -128,15 +173,64 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
     icon: '🔻',
     isGlobal: true,
     fields: [
-      { key: 'aboutDescription', label: 'About Description', type: FieldType.RICHTEXT, localized: true, helpText: 'Short description shown in the footer' },
-      { key: 'contactAddress', label: 'Contact Address', type: FieldType.TEXTAREA, localized: true, defaultValue: 'Sri Pitambara Peeth' },
-      { key: 'contactPhone', label: 'Contact Phone', type: FieldType.TEXT, defaultValue: '+91 1234567890' },
-      { key: 'contactEmail', label: 'Contact Email', type: FieldType.TEXT, defaultValue: 'info@example.org' },
-      { key: 'quickLinks', label: 'Quick Links', type: FieldType.JSON, helpText: 'Array of link objects: { label: {en, hi}, href }' },
-      { key: 'offeringLinks', label: 'Offering Links', type: FieldType.JSON, helpText: 'Array of link objects: { label: {en, hi}, href }' },
-      { key: 'socialLinks', label: 'Social Media Links', type: FieldType.JSON, helpText: 'Array of objects: { platform, url, icon }' },
-      { key: 'copyrightText', label: 'Copyright Text', type: FieldType.TEXT, localized: true, defaultValue: 'All rights reserved.' },
-      { key: 'newsletterLabel', label: 'Newsletter Label', type: FieldType.TEXT, localized: true, defaultValue: 'Subscribe to Newsletter' },
+      {
+        key: 'aboutDescription',
+        label: 'About Description',
+        type: FieldType.RICHTEXT,
+        localized: true,
+        helpText: 'Short description shown in the footer',
+      },
+      {
+        key: 'contactAddress',
+        label: 'Contact Address',
+        type: FieldType.TEXTAREA,
+        localized: true,
+        defaultValue: 'Sri Pitambara Peeth',
+      },
+      {
+        key: 'contactPhone',
+        label: 'Contact Phone',
+        type: FieldType.TEXT,
+        defaultValue: '+91 1234567890',
+      },
+      {
+        key: 'contactEmail',
+        label: 'Contact Email',
+        type: FieldType.TEXT,
+        defaultValue: 'info@example.org',
+      },
+      {
+        key: 'quickLinks',
+        label: 'Quick Links',
+        type: FieldType.JSON,
+        helpText: 'Array of link objects: { label: {en, hi}, href }',
+      },
+      {
+        key: 'offeringLinks',
+        label: 'Offering Links',
+        type: FieldType.JSON,
+        helpText: 'Array of link objects: { label: {en, hi}, href }',
+      },
+      {
+        key: 'socialLinks',
+        label: 'Social Media Links',
+        type: FieldType.JSON,
+        helpText: 'Array of objects: { platform, url, icon }',
+      },
+      {
+        key: 'copyrightText',
+        label: 'Copyright Text',
+        type: FieldType.TEXT,
+        localized: true,
+        defaultValue: 'All rights reserved.',
+      },
+      {
+        key: 'newsletterLabel',
+        label: 'Newsletter Label',
+        type: FieldType.TEXT,
+        localized: true,
+        defaultValue: 'Subscribe to Newsletter',
+      },
     ],
   },
   {
@@ -150,7 +244,8 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
         label: 'Hero Slides',
         type: FieldType.JSON,
         required: true,
-        helpText: 'Array of slide objects: { imageUrl, heading: {en,hi}, subheading: {en,hi}, ctaText: {en,hi}, ctaLink }',
+        helpText:
+          'Array of slide objects: { imageUrl, heading: {en,hi}, subheading: {en,hi}, ctaText: {en,hi}, ctaLink }',
       },
       {
         key: 'overlayOpacity',
@@ -214,7 +309,8 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
         key: 'events',
         label: 'Events',
         type: FieldType.JSON,
-        helpText: 'Array of event objects: { title: {en,hi}, description: {en,hi}, date, location: {en,hi}, imageUrl, link }',
+        helpText:
+          'Array of event objects: { title: {en,hi}, description: {en,hi}, date, location: {en,hi}, imageUrl, link }',
       },
       { key: 'viewAllLink', label: 'View All Link', type: FieldType.URL },
     ],
@@ -504,14 +600,36 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
         label: 'Slides',
         type: FieldType.JSON,
         required: true,
-        helpText: 'Array of slide objects: { image, title: {en,hi}, subtitle: {en,hi}, cta_text: {en,hi}, cta_link, overlay_color }',
+        helpText:
+          'Array of slide objects: { image, title: {en,hi}, subtitle: {en,hi}, cta_text: {en,hi}, cta_link, overlay_color }',
       },
       { key: 'autoplay', label: 'Auto Play', type: FieldType.BOOLEAN, defaultValue: true },
-      { key: 'autoplayDelay', label: 'Autoplay Delay (ms)', type: FieldType.NUMBER, defaultValue: 5000 },
-      { key: 'showPagination', label: 'Show Pagination', type: FieldType.BOOLEAN, defaultValue: true },
-      { key: 'showNavigation', label: 'Show Navigation Arrows', type: FieldType.BOOLEAN, defaultValue: true },
+      {
+        key: 'autoplayDelay',
+        label: 'Autoplay Delay (ms)',
+        type: FieldType.NUMBER,
+        defaultValue: 5000,
+      },
+      {
+        key: 'showPagination',
+        label: 'Show Pagination',
+        type: FieldType.BOOLEAN,
+        defaultValue: true,
+      },
+      {
+        key: 'showNavigation',
+        label: 'Show Navigation Arrows',
+        type: FieldType.BOOLEAN,
+        defaultValue: true,
+      },
       { key: 'loop', label: 'Loop', type: FieldType.BOOLEAN, defaultValue: true },
-      { key: 'height', label: 'Height', type: FieldType.SELECT, options: ['small', 'medium', 'large', 'full'], defaultValue: 'large' },
+      {
+        key: 'height',
+        label: 'Height',
+        type: FieldType.SELECT,
+        options: ['small', 'medium', 'large', 'full'],
+        defaultValue: 'large',
+      },
     ],
   },
   {
@@ -527,12 +645,29 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
         label: 'Items',
         type: FieldType.JSON,
         required: true,
-        helpText: 'Array of card objects: { image, name: {en,hi}, title: {en,hi}, description: {en,hi} }',
+        helpText:
+          'Array of card objects: { image, name: {en,hi}, title: {en,hi}, description: {en,hi} }',
       },
       { key: 'autoScroll', label: 'Auto Scroll', type: FieldType.BOOLEAN, defaultValue: true },
-      { key: 'scrollSpeed', label: 'Scroll Speed (ms)', type: FieldType.NUMBER, defaultValue: 3000 },
-      { key: 'cardStyle', label: 'Card Style', type: FieldType.SELECT, options: ['rounded', 'circular', 'square'], defaultValue: 'rounded' },
-      { key: 'showDescription', label: 'Show Description', type: FieldType.BOOLEAN, defaultValue: true },
+      {
+        key: 'scrollSpeed',
+        label: 'Scroll Speed (ms)',
+        type: FieldType.NUMBER,
+        defaultValue: 3000,
+      },
+      {
+        key: 'cardStyle',
+        label: 'Card Style',
+        type: FieldType.SELECT,
+        options: ['rounded', 'circular', 'square'],
+        defaultValue: 'rounded',
+      },
+      {
+        key: 'showDescription',
+        label: 'Show Description',
+        type: FieldType.BOOLEAN,
+        defaultValue: true,
+      },
     ],
   },
   {
@@ -554,8 +689,18 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
       { key: 'description', label: 'Description', type: FieldType.TEXTAREA, localized: true },
       { key: 'ctaText', label: 'CTA Button Text', type: FieldType.TEXT, localized: true },
       { key: 'ctaLink', label: 'CTA Button Link', type: FieldType.URL },
-      { key: 'delayMs', label: 'Delay Before Showing (ms)', type: FieldType.NUMBER, defaultValue: 2000 },
-      { key: 'showOnce', label: 'Show Only Once Per Session', type: FieldType.BOOLEAN, defaultValue: true },
+      {
+        key: 'delayMs',
+        label: 'Delay Before Showing (ms)',
+        type: FieldType.NUMBER,
+        defaultValue: 2000,
+      },
+      {
+        key: 'showOnce',
+        label: 'Show Only Once Per Session',
+        type: FieldType.BOOLEAN,
+        defaultValue: true,
+      },
       {
         key: 'animationStyle',
         label: 'Animation Style',
@@ -563,7 +708,12 @@ const COMPONENT_TEMPLATES: ComponentTemplateDto[] = [
         options: ['fade', 'slide-up', 'scale', 'blur-in'],
         defaultValue: 'scale',
       },
-      { key: 'overlayColor', label: 'Overlay Color', type: FieldType.COLOR, defaultValue: 'rgba(0,0,0,0.6)' },
+      {
+        key: 'overlayColor',
+        label: 'Overlay Color',
+        type: FieldType.COLOR,
+        defaultValue: 'rgba(0,0,0,0.6)',
+      },
     ],
   },
   {
@@ -596,14 +746,8 @@ export class PageComponentsService {
    * Fire-and-forget — never blocks the API response.
    */
   private triggerRevalidation(slugs?: string[]): void {
-    const frontendUrl = this.configService.get<string>(
-      'FRONTEND_URL',
-      'https://bhairavapath.com',
-    );
-    const secret = this.configService.get<string>(
-      'REVALIDATE_SECRET',
-      'srw-cms-revalidate-2026',
-    );
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'https://swamirupeshwaranand.org');
+    const secret = this.configService.get<string>('REVALIDATE_SECRET', 'srw-cms-revalidate-2026');
 
     const body = JSON.stringify({ secret, slugs: slugs || [] });
 
@@ -1089,14 +1233,10 @@ export class PageComponentsService {
     // Validate template exists and is global
     const template = this.getComponentTemplate(componentType);
     if (!template) {
-      throw new NotFoundException(
-        `Template not found for type: ${componentType}`,
-      );
+      throw new NotFoundException(`Template not found for type: ${componentType}`);
     }
     if (!template.isGlobal) {
-      throw new BadRequestException(
-        `Component type ${componentType} is not a global component`,
-      );
+      throw new BadRequestException(`Component type ${componentType} is not a global component`);
     }
 
     // Build default fields from template

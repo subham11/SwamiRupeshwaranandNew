@@ -28,7 +28,7 @@ import {
 const EVENT_DATE = "2026-06-10T06:00:00+05:30"; // June 10, 2026
 const WHATSAPP_NUMBER = "919876543210"; // Update with actual number
 const PHONE_NUMBER = "+91-9876543210";
-const EMAIL_ADDRESS = "yagya@bhairavapath.com";
+const EMAIL_ADDRESS = "yagya@swamirupeshwaranand.org";
 
 // ─── Bilingual Content ──────────────────────────────────────
 
@@ -497,7 +497,7 @@ export default async function MahaYagyaPage({
             organizer: {
               "@type": "Organization",
               name: "Swami Rupeshwaranand Ji Maharaj Ashram",
-              url: "https://bhairavapath.com",
+              url: "https://swamirupeshwaranand.org",
             },
             offers: participationOptions.categories.flatMap((cat) =>
               cat.tiers.filter((tier) => tier.price).map((tier) => ({

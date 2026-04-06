@@ -1,23 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Param,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiParam,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Delete, Param, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { WishlistService } from './wishlist.service';
-import {
-  WishlistResponseDto,
-  WishlistCheckResponseDto,
-} from './dto';
+import { WishlistResponseDto, WishlistCheckResponseDto } from './dto';
 import { JwtAuthGuard } from '@/common/guards';
 import { CurrentUser, CurrentUserData } from '@/common/decorators';
 
@@ -49,7 +33,11 @@ export class WishlistController {
   @Get('check/:productId')
   @ApiOperation({ summary: 'Check if product is in wishlist' })
   @ApiParam({ name: 'productId', description: 'Product ID to check' })
-  @ApiResponse({ status: 200, description: 'Wishlist check result', type: WishlistCheckResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Wishlist check result',
+    type: WishlistCheckResponseDto,
+  })
   async isInWishlist(
     @Param('productId') productId: string,
     @CurrentUser() user: CurrentUserData,
@@ -60,7 +48,11 @@ export class WishlistController {
   @Delete(':productId')
   @ApiOperation({ summary: 'Remove product from wishlist' })
   @ApiParam({ name: 'productId', description: 'Product ID to remove' })
-  @ApiResponse({ status: 200, description: 'Product removed from wishlist', type: WishlistResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Product removed from wishlist',
+    type: WishlistResponseDto,
+  })
   async removeFromWishlist(
     @Param('productId') productId: string,
     @CurrentUser() user: CurrentUserData,

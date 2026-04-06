@@ -10,18 +10,24 @@
  *   3. If 3 failed attempts → deny access
  */
 
-import type { DefineAuthChallengeTriggerEvent, DefineAuthChallengeTriggerHandler } from 'aws-lambda';
+import type {
+  DefineAuthChallengeTriggerEvent,
+  DefineAuthChallengeTriggerHandler,
+} from 'aws-lambda';
 
 export const handler: DefineAuthChallengeTriggerHandler = async (
   event: DefineAuthChallengeTriggerEvent,
 ) => {
-  console.log('DefineAuthChallenge invoked', JSON.stringify({
-    userName: event.userName,
-    session: event.request.session?.map(s => ({
-      challengeName: s.challengeName,
-      challengeResult: s.challengeResult,
-    })),
-  }));
+  console.log(
+    'DefineAuthChallenge invoked',
+    JSON.stringify({
+      userName: event.userName,
+      session: event.request.session?.map((s) => ({
+        challengeName: s.challengeName,
+        challengeResult: s.challengeResult,
+      })),
+    }),
+  );
 
   const session = event.request.session || [];
 
@@ -57,10 +63,7 @@ export const handler: DefineAuthChallengeTriggerHandler = async (
   // Check the most recent challenge result
   const lastSession = session[session.length - 1];
 
-  if (
-    lastSession.challengeName === 'CUSTOM_CHALLENGE' &&
-    lastSession.challengeResult === true
-  ) {
+  if (lastSession.challengeName === 'CUSTOM_CHALLENGE' && lastSession.challengeResult === true) {
     // OTP verified successfully → issue tokens
     console.log(`OTP verified for user: ${event.userName}`);
     event.response.issueTokens = true;

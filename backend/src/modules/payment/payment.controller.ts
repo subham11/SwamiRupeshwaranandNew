@@ -10,13 +10,7 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import {
   InitiateSubscriptionPaymentDto,
@@ -32,12 +26,7 @@ import {
   PaymentVerificationResponseDto,
 } from './dto';
 import { JwtAuthGuard, RolesGuard } from '@/common/guards';
-import {
-  Public,
-  AdminOnly,
-  CurrentUser,
-  CurrentUserData,
-} from '@/common/decorators';
+import { Public, AdminOnly, CurrentUser, CurrentUserData } from '@/common/decorators';
 
 @ApiTags('Payments')
 @Controller('payments')
@@ -75,7 +64,8 @@ export class PaymentController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Verify one-time order payment',
-    description: 'Verifies Razorpay signature for one-time payments (5100/21000 plans) and activates subscription.',
+    description:
+      'Verifies Razorpay signature for one-time payments (5100/21000 plans) and activates subscription.',
   })
   @ApiResponse({
     status: 200,
@@ -170,7 +160,8 @@ export class PaymentController {
   @Public()
   @ApiOperation({
     summary: 'Verify yagya booking payment',
-    description: 'Verifies Razorpay signature for yagya payment using the correct account credentials.',
+    description:
+      'Verifies Razorpay signature for yagya payment using the correct account credentials.',
   })
   @ApiResponse({
     status: 200,
@@ -192,7 +183,8 @@ export class PaymentController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Razorpay webhook handler',
-    description: 'Handles all Razorpay webhook events (payment captured, failed, subscription events, etc.)',
+    description:
+      'Handles all Razorpay webhook events (payment captured, failed, subscription events, etc.)',
   })
   async handleRazorpayWebhook(
     @Body() body: any,

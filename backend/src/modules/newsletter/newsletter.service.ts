@@ -388,9 +388,7 @@ export class NewsletterService {
           to: subscriber.email,
           toName: subscriber.name,
           subject: campaign.subject[locale] || campaign.subject.en,
-          html: this.wrapEmailContent(
-            campaign.content[locale] || campaign.content.en,
-          ),
+          html: this.wrapEmailContent(campaign.content[locale] || campaign.content.en),
         });
         sent++;
       } catch (error) {

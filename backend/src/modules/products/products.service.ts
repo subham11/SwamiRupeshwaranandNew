@@ -211,12 +211,26 @@ export class ProductsService {
     const expressionAttributeValues: Record<string, any> = {};
 
     const fieldsToUpdate = [
-      'title', 'titleHi', 'subtitle', 'subtitleHi',
-      'description', 'descriptionHi', 'categoryId',
-      'price', 'originalPrice', 'images', 'videoKey',
-      'weight', 'weightHi', 'tags', 'stockStatus',
-      'isFeatured', 'isActive', 'displayOrder',
-      'purchaseLink', 'purchaseLinkHi',
+      'title',
+      'titleHi',
+      'subtitle',
+      'subtitleHi',
+      'description',
+      'descriptionHi',
+      'categoryId',
+      'price',
+      'originalPrice',
+      'images',
+      'videoKey',
+      'weight',
+      'weightHi',
+      'tags',
+      'stockStatus',
+      'isFeatured',
+      'isActive',
+      'displayOrder',
+      'purchaseLink',
+      'purchaseLinkHi',
     ];
 
     for (const field of fieldsToUpdate) {
@@ -262,7 +276,8 @@ export class ProductsService {
       updateExpressions.push('GSI2PK = :gsi2pk');
       expressionAttributeValues[':gsi2pk'] = `CATEGORY#${newCategoryId}`;
       updateExpressions.push('GSI2SK = :gsi2sk');
-      expressionAttributeValues[':gsi2sk'] = `${this.productEntity}#${String(newOrder).padStart(5, '0')}`;
+      expressionAttributeValues[':gsi2sk'] =
+        `${this.productEntity}#${String(newOrder).padStart(5, '0')}`;
     }
 
     updateExpressions.push('updatedAt = :updatedAt');
@@ -298,10 +313,7 @@ export class ProductsService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    await this.databaseService.delete(
-      `${this.productEntity}#${id}`,
-      `${this.productEntity}#${id}`,
-    );
+    await this.databaseService.delete(`${this.productEntity}#${id}`, `${this.productEntity}#${id}`);
 
     // Decrement category product count
     await this.updateCategoryProductCount(existing.categoryId, -1);
@@ -530,8 +542,13 @@ export class ProductsService {
     const expressionAttributeValues: Record<string, any> = {};
 
     const fieldsToUpdate = [
-      'name', 'nameHi', 'description', 'descriptionHi',
-      'imageKey', 'isActive', 'displayOrder',
+      'name',
+      'nameHi',
+      'description',
+      'descriptionHi',
+      'imageKey',
+      'isActive',
+      'displayOrder',
     ];
 
     for (const field of fieldsToUpdate) {
@@ -552,7 +569,8 @@ export class ProductsService {
     // Update GSI1SK if displayOrder changed
     if (dto.displayOrder !== undefined) {
       updateExpressions.push('GSI1SK = :gsi1sk');
-      expressionAttributeValues[':gsi1sk'] = `${this.categoryEntity}#${String(dto.displayOrder).padStart(5, '0')}`;
+      expressionAttributeValues[':gsi1sk'] =
+        `${this.categoryEntity}#${String(dto.displayOrder).padStart(5, '0')}`;
     }
 
     updateExpressions.push('updatedAt = :updatedAt');
@@ -562,21 +580,16 @@ export class ProductsService {
       return this.mapCategoryToResponse(existing);
     }
 
-    const updated = await this.databaseService.update<ProductCategoryEntity>(
-      this.categoryEntity,
-      {
-        key: {
-          PK: `${this.categoryEntity}#${id}`,
-          SK: `${this.categoryEntity}#${id}`,
-        },
-        updateExpression: `SET ${updateExpressions.join(', ')}`,
-        expressionAttributeNames:
-          Object.keys(expressionAttributeNames).length > 0
-            ? expressionAttributeNames
-            : undefined,
-        expressionAttributeValues,
+    const updated = await this.databaseService.update<ProductCategoryEntity>(this.categoryEntity, {
+      key: {
+        PK: `${this.categoryEntity}#${id}`,
+        SK: `${this.categoryEntity}#${id}`,
       },
-    );
+      updateExpression: `SET ${updateExpressions.join(', ')}`,
+      expressionAttributeNames:
+        Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
+      expressionAttributeValues,
+    });
 
     return this.mapCategoryToResponse(updated);
   }
@@ -642,7 +655,8 @@ export class ProductsService {
         PK: `${this.productEntity}#${productId}`,
         SK: `${this.productEntity}#${productId}`,
       },
-      updateExpression: 'SET avgRating = :avgRating, totalReviews = :totalReviews, updatedAt = :updatedAt',
+      updateExpression:
+        'SET avgRating = :avgRating, totalReviews = :totalReviews, updatedAt = :updatedAt',
       expressionAttributeValues: {
         ':avgRating': avgRating,
         ':totalReviews': totalReviews,
@@ -751,10 +765,7 @@ export class ProductsService {
     return result.items[0] || null;
   }
 
-  private async updateCategoryProductCount(
-    categoryId: string,
-    increment: number,
-  ): Promise<void> {
+  private async updateCategoryProductCount(categoryId: string, increment: number): Promise<void> {
     try {
       await this.databaseService.update(this.categoryEntity, {
         key: {
@@ -795,9 +806,7 @@ export class ProductsService {
       images: product.images,
       imageUrls: product.images?.map((key) => this.storageService.getPublicUrl(key)) || [],
       videoKey: product.videoKey,
-      videoUrl: product.videoKey
-        ? this.storageService.getPublicUrl(product.videoKey)
-        : undefined,
+      videoUrl: product.videoKey ? this.storageService.getPublicUrl(product.videoKey) : undefined,
       weight: product.weight,
       weightHi: product.weightHi,
       tags: product.tags,
@@ -823,9 +832,7 @@ export class ProductsService {
       descriptionHi: category.descriptionHi,
       slug: category.slug,
       imageKey: category.imageKey,
-      imageUrl: category.imageKey
-        ? this.storageService.getPublicUrl(category.imageKey)
-        : undefined,
+      imageUrl: category.imageKey ? this.storageService.getPublicUrl(category.imageKey) : undefined,
       isActive: category.isActive,
       displayOrder: category.displayOrder,
       productCount: category.productCount,

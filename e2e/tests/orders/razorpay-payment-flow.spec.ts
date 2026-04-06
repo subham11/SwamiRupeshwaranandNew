@@ -99,7 +99,7 @@ test.describe.serial('Razorpay Payment Flow (Test Mode)', () => {
             },
             prefill: {
               name: 'E2E Test Buyer',
-              email: 'test@bhairavapath.com',
+              email: 'test@swamirupeshwaranand.org',
               contact: '+919004023156',
             },
           });

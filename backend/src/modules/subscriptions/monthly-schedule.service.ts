@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  Inject,
-  NotFoundException,
-  BadRequestException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
 import { SubscriptionsService } from './subscriptions.service';
@@ -227,13 +221,7 @@ export class MonthlyScheduleService {
     const expressionAttributeNames: Record<string, string> = {};
     const expressionAttributeValues: Record<string, any> = {};
 
-    const fieldsToUpdate = [
-      'title',
-      'titleHi',
-      'description',
-      'descriptionHi',
-      'isPublished',
-    ];
+    const fieldsToUpdate = ['title', 'titleHi', 'description', 'descriptionHi', 'isPublished'];
 
     for (const field of fieldsToUpdate) {
       if ((dto as any)[field] !== undefined) {
@@ -283,10 +271,7 @@ export class MonthlyScheduleService {
       throw new NotFoundException(`Monthly schedule with ID ${id} not found`);
     }
 
-    await this.databaseService.delete(
-      `${this.entityType}#${id}`,
-      `${this.entityType}#${id}`,
-    );
+    await this.databaseService.delete(`${this.entityType}#${id}`, `${this.entityType}#${id}`);
   }
 
   // ============================================
@@ -356,11 +341,7 @@ export class MonthlyScheduleService {
       return null;
     }
 
-    const schedule = await this.findScheduleByPlanAndMonth(
-      activeSubscription.planId,
-      year,
-      month,
-    );
+    const schedule = await this.findScheduleByPlanAndMonth(activeSubscription.planId, year, month);
 
     if (!schedule || !schedule.isPublished) {
       return null;

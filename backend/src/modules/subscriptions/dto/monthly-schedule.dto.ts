@@ -46,7 +46,10 @@ export class CreateMonthlyScheduleDto {
   @Max(12)
   month!: number;
 
-  @ApiPropertyOptional({ description: 'Schedule title (e.g. "January Collection")', example: 'January 2026 Collection' })
+  @ApiPropertyOptional({
+    description: 'Schedule title (e.g. "January Collection")',
+    example: 'January 2026 Collection',
+  })
   @IsOptional()
   @IsString()
   title?: string;
@@ -56,7 +59,7 @@ export class CreateMonthlyScheduleDto {
   @IsString()
   titleHi?: string;
 
-  @ApiPropertyOptional({ description: 'Description of this month\'s content' })
+  @ApiPropertyOptional({ description: "Description of this month's content" })
   @IsOptional()
   @IsString()
   description?: string;
@@ -66,7 +69,10 @@ export class CreateMonthlyScheduleDto {
   @IsString()
   descriptionHi?: string;
 
-  @ApiProperty({ description: 'Content items assigned to this month', type: [ScheduleContentItemDto] })
+  @ApiProperty({
+    description: 'Content items assigned to this month',
+    type: [ScheduleContentItemDto],
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ScheduleContentItemDto)
@@ -137,7 +143,10 @@ export class MonthlyScheduleResponseDto {
   @ApiPropertyOptional({ description: 'Description in Hindi' })
   descriptionHi?: string;
 
-  @ApiProperty({ description: 'Content items in this schedule', type: [MonthlyScheduleContentItemResponseDto] })
+  @ApiProperty({
+    description: 'Content items in this schedule',
+    type: [MonthlyScheduleContentItemResponseDto],
+  })
   contentItems!: MonthlyScheduleContentItemResponseDto[];
 
   @ApiProperty({ description: 'Total content items count' })
@@ -180,7 +189,10 @@ export class UserMonthlyContentResponseDto {
   @ApiPropertyOptional({ description: 'Schedule description' })
   description?: string;
 
-  @ApiProperty({ description: 'Content items available this month', type: [MonthlyScheduleContentItemResponseDto] })
+  @ApiProperty({
+    description: 'Content items available this month',
+    type: [MonthlyScheduleContentItemResponseDto],
+  })
   contentItems!: MonthlyScheduleContentItemResponseDto[];
 
   @ApiProperty({ description: 'Total items' })
@@ -197,7 +209,10 @@ export class UserMonthlyOverviewResponseDto {
   @ApiProperty({ description: 'Plan ID' })
   planId!: string;
 
-  @ApiProperty({ description: 'Monthly schedules available', type: [UserMonthlyContentResponseDto] })
+  @ApiProperty({
+    description: 'Monthly schedules available',
+    type: [UserMonthlyContentResponseDto],
+  })
   months!: UserMonthlyContentResponseDto[];
 
   @ApiProperty({ description: 'Total months available' })

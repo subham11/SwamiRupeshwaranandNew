@@ -1,4 +1,4 @@
-# Jira Stories - Swami Rupeshwaranand Platform (bhairavapath.com)
+# Jira Stories - Swami Rupeshwaranand Platform (swamirupeshwaranand.org)
 
 ---
 

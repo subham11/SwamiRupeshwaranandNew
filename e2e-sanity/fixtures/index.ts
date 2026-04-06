@@ -3,11 +3,11 @@
 
 export const TEST_USERS = {
   admin: {
-    email:    process.env.ADMIN_EMAIL    || 'admin@bhairavapath.com',
+    email:    process.env.ADMIN_EMAIL    || 'admin@swamirupeshwaranand.org',
     password: process.env.ADMIN_PASSWORD || 'Admin@1234',
   },
   user: {
-    email:    process.env.USER_EMAIL    || 'testuser@bhairavapath.com',
+    email:    process.env.USER_EMAIL    || 'testuser@swamirupeshwaranand.org',
     password: process.env.USER_PASSWORD || 'User@1234',
     name:     'Sanity Tester',
     phone:    '9000000001',

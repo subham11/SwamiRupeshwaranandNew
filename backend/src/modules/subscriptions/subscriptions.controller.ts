@@ -26,12 +26,7 @@ import {
   ContentType,
 } from './dto';
 import { JwtAuthGuard, RolesGuard } from '@/common/guards';
-import {
-  Public,
-  AdminOnly,
-  CurrentUser,
-  CurrentUserData,
-} from '@/common/decorators';
+import { Public, AdminOnly, CurrentUser, CurrentUserData } from '@/common/decorators';
 
 @ApiTags('Subscriptions')
 @Controller('subscriptions')
@@ -401,7 +396,11 @@ export class SubscriptionsController {
     description:
       'Returns content of the specified type from the free subscription plan. No authentication required.',
   })
-  @ApiParam({ name: 'contentType', enum: ContentType, description: 'Type of content (stotra, kavach, etc.)' })
+  @ApiParam({
+    name: 'contentType',
+    enum: ContentType,
+    description: 'Type of content (stotra, kavach, etc.)',
+  })
   @ApiQuery({ name: 'locale', required: false })
   @ApiResponse({
     status: 200,

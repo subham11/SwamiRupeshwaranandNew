@@ -159,9 +159,7 @@ export class ActivityLogService {
     const items = await this.databaseService.scan<ActivityLogEntity>(this.entityName, filter);
 
     // Sort by createdAt descending and limit
-    const sorted = items
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-      .slice(0, limit);
+    const sorted = items.sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, limit);
 
     return {
       items: sorted.map((item) => this.mapToResponse(item)),

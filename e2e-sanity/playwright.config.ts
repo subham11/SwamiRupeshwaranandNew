@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
 
 /**
- * Bhairavapath.com — End-to-End Sanity Test Suite
+ * Swamirupeshwaranand.org — End-to-End Sanity Test Suite
  * Covers all 39 stories across 18 epics
  */
 

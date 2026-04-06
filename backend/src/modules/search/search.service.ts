@@ -108,18 +108,16 @@ export class SearchService {
     const filtered = result.items
       .filter((item) => {
         if (!item.isActive) return false;
-        const title = String(isHindi && item.titleHi ? item.titleHi : item.title || '').toLowerCase();
+        const title = String(
+          isHindi && item.titleHi ? item.titleHi : item.title || '',
+        ).toLowerCase();
         const description = String(
-          isHindi && item.descriptionHi ? item.descriptionHi : item.description || ''
+          isHindi && item.descriptionHi ? item.descriptionHi : item.description || '',
         ).toLowerCase();
         const subtitle = String(
-          isHindi && item.subtitleHi ? item.subtitleHi : item.subtitle || ''
+          isHindi && item.subtitleHi ? item.subtitleHi : item.subtitle || '',
         ).toLowerCase();
-        return (
-          title.includes(query) ||
-          description.includes(query) ||
-          subtitle.includes(query)
-        );
+        return title.includes(query) || description.includes(query) || subtitle.includes(query);
       })
       .slice(0, limit);
 
@@ -153,9 +151,11 @@ export class SearchService {
     const filtered = result.items
       .filter((item) => {
         if (!item.isActive) return false;
-        const title = String(isHindi && item.titleHi ? item.titleHi : item.title || '').toLowerCase();
+        const title = String(
+          isHindi && item.titleHi ? item.titleHi : item.title || '',
+        ).toLowerCase();
         const description = String(
-          isHindi && item.descriptionHi ? item.descriptionHi : item.description || ''
+          isHindi && item.descriptionHi ? item.descriptionHi : item.description || '',
         ).toLowerCase();
         return title.includes(query) || description.includes(query);
       })
@@ -190,7 +190,9 @@ export class SearchService {
     const filtered = result.items
       .filter((item) => {
         if (item.status !== 'published') return false;
-        const title = String(isHindi && item.titleHi ? item.titleHi : item.title || '').toLowerCase();
+        const title = String(
+          isHindi && item.titleHi ? item.titleHi : item.title || '',
+        ).toLowerCase();
         const slug = String(item.slug || '').toLowerCase();
         return title.includes(query) || slug.includes(query);
       })

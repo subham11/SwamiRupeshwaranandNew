@@ -119,7 +119,7 @@ test.describe('STORY-014 | Backend Stats Endpoints', () => {
 
   async function getAdminToken(request: any) {
     const res = await request.post(`${API_URL}/auth/login`, {
-      data: { email: process.env.ADMIN_EMAIL || 'admin@bhairavapath.com',
+      data: { email: process.env.ADMIN_EMAIL || 'admin@swamirupeshwaranand.org',
               password: process.env.ADMIN_PASSWORD || 'Admin@1234' },
     });
     return (await res.json()).accessToken;

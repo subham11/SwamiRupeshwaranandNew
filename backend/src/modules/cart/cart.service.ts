@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  Inject,
-  NotFoundException,
-  BadRequestException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
 import {
   AddToCartDto,
@@ -117,7 +111,8 @@ export class CartService {
       const newQty = existing.quantity + quantity;
       await this.databaseService.update('CART', {
         key: { PK: `CART#${userId}`, SK: `ITEM#${dto.productId}` },
-        updateExpression: 'SET quantity = :qty, updatedAt = :now, price = :price, title = :title, stockStatus = :stockStatus',
+        updateExpression:
+          'SET quantity = :qty, updatedAt = :now, price = :price, title = :title, stockStatus = :stockStatus',
         expressionAttributeValues: {
           ':qty': newQty,
           ':now': now,
@@ -243,10 +238,7 @@ export class CartService {
   // ============================================
 
   async getAddress(userId: string): Promise<AddressResponseDto | null> {
-    const address = await this.databaseService.get<UserAddressEntity>(
-      `CART#${userId}`,
-      'ADDRESS',
-    );
+    const address = await this.databaseService.get<UserAddressEntity>(`CART#${userId}`, 'ADDRESS');
 
     if (!address) return null;
 
@@ -265,10 +257,7 @@ export class CartService {
   async updateAddress(userId: string, dto: UpdateAddressDto): Promise<AddressResponseDto> {
     const now = new Date().toISOString();
 
-    const existing = await this.databaseService.get<UserAddressEntity>(
-      `CART#${userId}`,
-      'ADDRESS',
-    );
+    const existing = await this.databaseService.get<UserAddressEntity>(`CART#${userId}`, 'ADDRESS');
 
     const addressEntity: UserAddressEntity = {
       PK: `CART#${userId}`,

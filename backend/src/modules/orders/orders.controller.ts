@@ -51,7 +51,11 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create order from cart and initiate Razorpay payment' })
-  @ApiResponse({ status: 201, description: 'Order created, Razorpay order returned', type: CheckoutResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Order created, Razorpay order returned',
+    type: CheckoutResponseDto,
+  })
   async checkout(@CurrentUser() user: CurrentUserData): Promise<CheckoutResponseDto> {
     return this.ordersService.checkout(user.sub, user.email);
   }
@@ -60,7 +64,11 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Verify Razorpay payment and confirm order' })
-  @ApiResponse({ status: 200, description: 'Payment verified', type: OrderPaymentVerificationResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Payment verified',
+    type: OrderPaymentVerificationResponseDto,
+  })
   async verifyPayment(
     @Body() dto: VerifyProductOrderPaymentDto,
     @CurrentUser() user: CurrentUserData,
@@ -95,10 +103,7 @@ export class OrdersController {
   @ApiParam({ name: 'id', description: 'Order ID' })
   @ApiProduces('application/pdf')
   @ApiResponse({ status: 200, description: 'Invoice PDF' })
-  async getAdminInvoice(
-    @Param('id') id: string,
-    @Res() res: Response,
-  ) {
+  async getAdminInvoice(@Param('id') id: string, @Res() res: Response) {
     const order = await this.ordersService.getOrderById(id);
     if (!order) {
       throw new NotFoundException(`Order ${id} not found`);

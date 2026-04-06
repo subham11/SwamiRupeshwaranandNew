@@ -1,25 +1,16 @@
-import {
-  Injectable,
-  Inject,
-  NotFoundException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
 import { DatabaseService, DATABASE_SERVICE } from '@/common/database';
-import {
-  WishlistItemResponseDto,
-  WishlistResponseDto,
-  WishlistCheckResponseDto,
-} from './dto';
+import { WishlistItemResponseDto, WishlistResponseDto, WishlistCheckResponseDto } from './dto';
 
 // ============================================
 // Entity Interfaces (DynamoDB Single-Table)
 // ============================================
 
 interface WishlistItemEntity {
-  PK: string;       // WISHLIST#<userId>
-  SK: string;       // PRODUCT#<productId>
-  GSI1PK: string;   // WISHLIST
-  GSI1SK: string;   // USER#<userId>
+  PK: string; // WISHLIST#<userId>
+  SK: string; // PRODUCT#<productId>
+  GSI1PK: string; // WISHLIST
+  GSI1SK: string; // USER#<userId>
   userId: string;
   productId: string;
   productTitle: string;

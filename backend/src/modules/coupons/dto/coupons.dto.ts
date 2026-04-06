@@ -42,7 +42,10 @@ export class CreateCouponDto {
   @Min(0)
   minOrderAmount: number;
 
-  @ApiPropertyOptional({ description: 'Maximum discount amount (for percentage type)', example: 200 })
+  @ApiPropertyOptional({
+    description: 'Maximum discount amount (for percentage type)',
+    example: 200,
+  })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -57,7 +60,10 @@ export class CreateCouponDto {
   @IsBoolean()
   isActive?: boolean;
 
-  @ApiPropertyOptional({ description: 'Maximum number of total uses (0 = unlimited)', example: 100 })
+  @ApiPropertyOptional({
+    description: 'Maximum number of total uses (0 = unlimited)',
+    example: 100,
+  })
   @IsOptional()
   @IsNumber()
   @Min(0)

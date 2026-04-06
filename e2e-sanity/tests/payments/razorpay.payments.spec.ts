@@ -202,7 +202,7 @@ test.describe('STORY-017 | Razorpay Payment Integration', () => {
 
   test('all payment events are logged (API check)', async ({ request }) => {
     const loginRes = await request.post('/api/auth/login', {
-      data: { email: process.env.ADMIN_EMAIL || 'admin@bhairavapath.com',
+      data: { email: process.env.ADMIN_EMAIL || 'admin@swamirupeshwaranand.org',
               password: process.env.ADMIN_PASSWORD || 'Admin@1234' },
     });
     const { accessToken } = await loginRes.json();

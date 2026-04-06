@@ -5,7 +5,7 @@ import path from 'path';
 // Load .env from e2e-sanity directory
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
-export const BASE_URL = process.env.BASE_URL || 'https://bhairavapath.com';
+export const BASE_URL = process.env.BASE_URL || 'https://swamirupeshwaranand.org';
 export const API_URL  = process.env.API_URL  || 'https://n4vi400a5e.execute-api.ap-south-1.amazonaws.com/prod/api/v1';
 
 export default defineConfig({

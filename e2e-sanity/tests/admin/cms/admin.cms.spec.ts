@@ -77,7 +77,7 @@ test.describe('STORY-020 | CMS Page Builder', () => {
     await expect(block).toBeVisible({ timeout: 5_000 });
     const textField = block.locator('[data-testid="component-text-content"]');
     if (await textField.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await textField.fill('Hello Bhairavapath Sanity Test');
+      await textField.fill('Hello Swamirupeshwaranand Sanity Test');
     }
   });
 

@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -162,9 +152,7 @@ export class ProductsController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'cursor', required: false })
   @ApiResponse({ status: 200, type: ProductListResponseDto })
-  async listProductsAdmin(
-    @Query() query: ProductListQueryDto,
-  ): Promise<ProductListResponseDto> {
+  async listProductsAdmin(@Query() query: ProductListQueryDto): Promise<ProductListResponseDto> {
     return this.productsService.listProductsAdmin(query);
   }
 
@@ -178,9 +166,7 @@ export class ProductsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create a product category (Admin only)' })
   @ApiResponse({ status: 201, type: ProductCategoryResponseDto })
-  async createCategory(
-    @Body() dto: CreateProductCategoryDto,
-  ): Promise<ProductCategoryResponseDto> {
+  async createCategory(@Body() dto: CreateProductCategoryDto): Promise<ProductCategoryResponseDto> {
     return this.productsService.createCategory(dto);
   }
 
@@ -267,9 +253,7 @@ export class ProductsController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'cursor', required: false })
   @ApiResponse({ status: 200, type: ProductListResponseDto })
-  async listPublicProducts(
-    @Query() query: ProductListQueryDto,
-  ): Promise<ProductListResponseDto> {
+  async listPublicProducts(@Query() query: ProductListQueryDto): Promise<ProductListResponseDto> {
     return this.productsService.listProducts(query);
   }
 

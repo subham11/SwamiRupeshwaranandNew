@@ -72,7 +72,7 @@ export class EmailService {
   private transporter: Transporter;
   private readonly fromEmail: string;
   private readonly fromName: string;
-  private readonly baseUrl = 'https://bhairavapath.com';
+  private readonly baseUrl = 'https://swamirupeshwaranand.org';
 
   constructor(private readonly configService: ConfigService) {
     this.fromEmail = this.configService.get<string>(
@@ -128,7 +128,12 @@ export class EmailService {
 
   // ─── Shared Template Helpers ────────────────────────────────────────
 
-  private emailShell(title: string, headerTitle: string, headerSubtitle: string, bodyHtml: string): string {
+  private emailShell(
+    title: string,
+    headerTitle: string,
+    headerSubtitle: string,
+    bodyHtml: string,
+  ): string {
     return `
 <!DOCTYPE html>
 <html lang="en">
@@ -397,7 +402,12 @@ Swami Rupeshwaranand Ashram
       ${this.ctaButton('View Order', `${this.baseUrl}/account/orders/${orderData.orderId}`)}
     `;
 
-    const html = this.emailShell('Order Confirmation', 'Order Confirmed!', 'Swami Rupeshwaranand ji', bodyHtml);
+    const html = this.emailShell(
+      'Order Confirmation',
+      'Order Confirmed!',
+      'Swami Rupeshwaranand ji',
+      bodyHtml,
+    );
 
     const text = `
 Order Confirmed - #${orderData.orderId}
@@ -430,11 +440,22 @@ Swami Rupeshwaranand Ashram
   // ─── Order Status Update Email ──────────────────────────────────────
 
   async sendOrderStatusUpdateEmail(to: string, orderData: OrderStatusUpdateData): Promise<boolean> {
-    const statusConfig: Record<string, { subject: string; heading: string; message: string; icon: string; color: string; bgColor: string }> = {
+    const statusConfig: Record<
+      string,
+      {
+        subject: string;
+        heading: string;
+        message: string;
+        icon: string;
+        color: string;
+        bgColor: string;
+      }
+    > = {
       processing: {
         subject: `Order #${orderData.orderId} is being prepared`,
-        heading: 'We\'re Preparing Your Order',
-        message: 'Our team is carefully preparing your items. We will notify you once your order has been shipped.',
+        heading: "We're Preparing Your Order",
+        message:
+          'Our team is carefully preparing your items. We will notify you once your order has been shipped.',
         icon: '&#9881;',
         color: '#2563EB',
         bgColor: '#EFF6FF',
@@ -458,7 +479,8 @@ Swami Rupeshwaranand Ashram
       cancelled: {
         subject: `Order #${orderData.orderId} has been cancelled`,
         heading: 'Your Order Has Been Cancelled',
-        message: 'Your order has been cancelled. If you did not request this cancellation, please contact us immediately.',
+        message:
+          'Your order has been cancelled. If you did not request this cancellation, please contact us immediately.',
         icon: '&#10005;',
         color: '#DC2626',
         bgColor: '#FEF2F2',
@@ -528,7 +550,12 @@ Swami Rupeshwaranand Ashram
       ${this.ctaButton('View Order', `${this.baseUrl}/account/orders/${orderData.orderId}`)}
     `;
 
-    const html = this.emailShell('Order Status Update', config.heading, 'Swami Rupeshwaranand ji', bodyHtml);
+    const html = this.emailShell(
+      'Order Status Update',
+      config.heading,
+      'Swami Rupeshwaranand ji',
+      bodyHtml,
+    );
 
     const text = `
 ${config.heading}
@@ -553,7 +580,10 @@ Swami Rupeshwaranand Ashram
 
   // ─── Subscription Confirmation Email ────────────────────────────────
 
-  async sendSubscriptionConfirmationEmail(to: string, data: SubscriptionConfirmationData): Promise<boolean> {
+  async sendSubscriptionConfirmationEmail(
+    to: string,
+    data: SubscriptionConfirmationData,
+  ): Promise<boolean> {
     const subject = `Subscription Confirmed - ${data.planName}`;
 
     const featureRows = data.features
@@ -611,7 +641,12 @@ Swami Rupeshwaranand Ashram
       ${this.ctaButton('Access Your Content', `${this.baseUrl}/account/subscriptions`)}
     `;
 
-    const html = this.emailShell('Subscription Confirmed', 'Subscription Confirmed!', 'Swami Rupeshwaranand ji', bodyHtml);
+    const html = this.emailShell(
+      'Subscription Confirmed',
+      'Subscription Confirmed!',
+      'Swami Rupeshwaranand ji',
+      bodyHtml,
+    );
 
     const text = `
 Subscription Confirmed - ${data.planName}
@@ -700,7 +735,12 @@ Swami Rupeshwaranand Ashram
       </p>
     `;
 
-    const html = this.emailShell('Donation Receipt', 'Thank You for Your Donation', 'Swami Rupeshwaranand ji', bodyHtml);
+    const html = this.emailShell(
+      'Donation Receipt',
+      'Thank You for Your Donation',
+      'Swami Rupeshwaranand ji',
+      bodyHtml,
+    );
 
     const text = `
 Thank You for Your Generous Donation, ${data.donorName}!
@@ -788,7 +828,12 @@ Swami Rupeshwaranand Ashram
       </p>
     `;
 
-    const html = this.emailShell('Newsletter Welcome', 'Welcome to Our Newsletter', 'Swami Rupeshwaranand ji', bodyHtml);
+    const html = this.emailShell(
+      'Newsletter Welcome',
+      'Welcome to Our Newsletter',
+      'Swami Rupeshwaranand ji',
+      bodyHtml,
+    );
 
     const text = `
 Welcome to the Swami Rupeshwaranand Ashram Newsletter!
@@ -864,9 +909,13 @@ Swami Rupeshwaranand Ashram
     expiryMinutes: number;
   }): string {
     const isPasswordReset = params.purpose === 'Password Reset';
-    const otpDigits = params.otp.split('').map(
-      (d) => `<td style="width: 44px; height: 52px; background-color: #FFF7ED; border: 2px solid #FDBA74; border-radius: 8px; text-align: center; vertical-align: middle;"><span style="font-size: 26px; font-weight: 700; color: #9A3412; font-family: monospace;">${d}</span></td>`,
-    ).join('<td style="width: 8px;"></td>');
+    const otpDigits = params.otp
+      .split('')
+      .map(
+        (d) =>
+          `<td style="width: 44px; height: 52px; background-color: #FFF7ED; border: 2px solid #FDBA74; border-radius: 8px; text-align: center; vertical-align: middle;"><span style="font-size: 26px; font-weight: 700; color: #9A3412; font-family: monospace;">${d}</span></td>`,
+      )
+      .join('<td style="width: 8px;"></td>');
 
     const securityWarning = isPasswordReset
       ? `
@@ -1056,6 +1105,11 @@ Swami Rupeshwaranand Ashram
       </table>
     `;
 
-    return this.emailShell('Admin Invitation', 'Admin Portal Invitation', 'Swami Rupeshwaranand ji', bodyHtml);
+    return this.emailShell(
+      'Admin Invitation',
+      'Admin Portal Invitation',
+      'Swami Rupeshwaranand ji',
+      bodyHtml,
+    );
   }
 }

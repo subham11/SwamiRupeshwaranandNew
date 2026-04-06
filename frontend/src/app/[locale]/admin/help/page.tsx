@@ -648,7 +648,7 @@ export default function AdminHelpPage() {
 
           <InfoBox type="info" title="Page Slugs">
             <p>The slug is the URL path for the page. Use lowercase letters, numbers, and hyphens only.</p>
-            <p><strong>Example:</strong> Title &quot;About Our Ashram&quot; → Slug: <code className="text-orange-600">about-our-ashram</code> → URL: <code className="text-orange-600">bhairavapath.com/en/about-our-ashram</code></p>
+            <p><strong>Example:</strong> Title &quot;About Our Ashram&quot; → Slug: <code className="text-orange-600">about-our-ashram</code> → URL: <code className="text-orange-600">swamirupeshwaranand.org/en/about-our-ashram</code></p>
           </InfoBox>
 
           <SubHeading id="cms-components">Adding Components</SubHeading>
@@ -1236,8 +1236,8 @@ subscription.pending    → Marks payment pending`}
             <h4 className="font-semibold text-gray-900 dark:text-white mb-3">Page Details</h4>
             <FieldTable
               fields={[
-                { name: 'English URL', type: 'URL', required: false, description: 'bhairavapath.com/en/maha-yagya' },
-                { name: 'Hindi URL', type: 'URL', required: false, description: 'bhairavapath.com/hi/maha-yagya' },
+                { name: 'English URL', type: 'URL', required: false, description: 'swamirupeshwaranand.org/en/maha-yagya' },
+                { name: 'Hindi URL', type: 'URL', required: false, description: 'swamirupeshwaranand.org/hi/maha-yagya' },
                 { name: 'Navigation', type: 'Location', required: false, description: 'Appears under "Offerings" dropdown as "Maha Yagya 2026"' },
                 { name: 'Lead Form', type: 'Action', required: false, description: 'Stall booking enquiries → submitted as support tickets with category "yagya-stall-booking"' },
                 { name: 'CMS Slug', type: 'CMS', required: false, description: 'Create a CMS page with slug "maha-yagya" to add/edit content blocks on this page' },
@@ -1360,7 +1360,7 @@ COGNITO_USER_POOL_ID → SSM: /swami-rupeshwaranand/prod/cognito-user-pool-id
 COGNITO_CLIENT_ID    → SSM: /swami-rupeshwaranand/prod/cognito-client-id
 SES_FROM_EMAIL       → SSM: /swami-rupeshwaranand/prod/ses-from-email
 S3_BUCKET            → swami-rupeshwaranand-uploads-prod
-FRONTEND_URL         → https://bhairavapath.com (for CMS revalidation webhook)
+FRONTEND_URL         → https://swamirupeshwaranand.org (for CMS revalidation webhook)
 REVALIDATE_SECRET    → Shared secret for on-demand cache purge`}
           />
           <CodeBlock

@@ -1,7 +1,7 @@
 {
-  "name": "bhairavapath-e2e",
+  "name": "swamirupeshwaranand-e2e",
   "version": "1.0.0",
-  "description": "End-to-end sanity test suite for bhairavapath.com (39 stories, 18 epics)",
+  "description": "End-to-end sanity test suite for swamirupeshwaranand.org (39 stories, 18 epics)",
   "private": true,
   "scripts": {
     "test": "playwright test",

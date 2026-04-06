@@ -9,7 +9,11 @@ import { StorageModule } from '@/common/storage';
 
 @Module({
   imports: [StorageModule],
-  controllers: [SubscriptionsController, SubscriptionContentUploadController, MonthlyScheduleController],
+  controllers: [
+    SubscriptionsController,
+    SubscriptionContentUploadController,
+    MonthlyScheduleController,
+  ],
   providers: [SubscriptionsService, SubscriptionContentService, MonthlyScheduleService],
   exports: [SubscriptionsService, SubscriptionContentService, MonthlyScheduleService],
 })

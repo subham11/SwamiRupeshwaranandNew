@@ -14,7 +14,10 @@
  *   - Rate limiting via cooldown tracking
  */
 
-import type { CreateAuthChallengeTriggerEvent, CreateAuthChallengeTriggerHandler } from 'aws-lambda';
+import type {
+  CreateAuthChallengeTriggerEvent,
+  CreateAuthChallengeTriggerHandler,
+} from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
@@ -51,11 +54,13 @@ async function triggerOtpEmail(email: string, otp: string): Promise<void> {
   }
 
   try {
-    await lambdaClient.send(new InvokeCommand({
-      FunctionName: SEND_OTP_EMAIL_FUNCTION,
-      InvocationType: 'Event', // Async — returns 202 immediately
-      Payload: Buffer.from(JSON.stringify({ email, otp })),
-    }));
+    await lambdaClient.send(
+      new InvokeCommand({
+        FunctionName: SEND_OTP_EMAIL_FUNCTION,
+        InvocationType: 'Event', // Async — returns 202 immediately
+        Payload: Buffer.from(JSON.stringify({ email, otp })),
+      }),
+    );
     console.log(`Async OTP email triggered for ${email}`);
   } catch (error) {
     console.error('Failed to invoke sendOtpEmail Lambda:', error);
@@ -71,15 +76,17 @@ export const handler: CreateAuthChallengeTriggerHandler = async (
 
   // Check if this is a new challenge or a retry
   const session = event.request.session || [];
-  const isRetry = session.some(s => s.challengeName === 'CUSTOM_CHALLENGE');
+  const isRetry = session.some((s) => s.challengeName === 'CUSTOM_CHALLENGE');
 
   // Rate limit: for retries within same session, reuse existing OTP if still valid
   if (isRetry && OTP_TABLE) {
     try {
-      const existing = await ddbClient.send(new GetCommand({
-        TableName: OTP_TABLE,
-        Key: { PK: `COGNITO_OTP#${email}`, SK: 'CHALLENGE' },
-      }));
+      const existing = await ddbClient.send(
+        new GetCommand({
+          TableName: OTP_TABLE,
+          Key: { PK: `COGNITO_OTP#${email}`, SK: 'CHALLENGE' },
+        }),
+      );
 
       if (existing.Item && existing.Item.expiresAt > Math.floor(Date.now() / 1000)) {
         // Existing OTP still valid — don't send a new one, reuse the hash
@@ -108,18 +115,20 @@ export const handler: CreateAuthChallengeTriggerHandler = async (
 
   // Store hashed OTP in DynamoDB with TTL
   if (OTP_TABLE) {
-    await ddbClient.send(new PutCommand({
-      TableName: OTP_TABLE,
-      Item: {
-        PK: `COGNITO_OTP#${email}`,
-        SK: 'CHALLENGE',
-        otpHash,
-        email,
-        expiresAt,
-        createdAt: new Date().toISOString(),
-        ttl: expiresAt, // DynamoDB TTL auto-deletes expired records
-      },
-    }));
+    await ddbClient.send(
+      new PutCommand({
+        TableName: OTP_TABLE,
+        Item: {
+          PK: `COGNITO_OTP#${email}`,
+          SK: 'CHALLENGE',
+          otpHash,
+          email,
+          expiresAt,
+          createdAt: new Date().toISOString(),
+          ttl: expiresAt, // DynamoDB TTL auto-deletes expired records
+        },
+      }),
+    );
   }
 
   // Send OTP email asynchronously (fire-and-forget via separate Lambda)
