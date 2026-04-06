@@ -29,12 +29,7 @@ import {
   UserMonthlyOverviewResponseDto,
 } from './dto';
 import { JwtAuthGuard, RolesGuard } from '@/common/guards';
-import {
-  Public,
-  AdminOnly,
-  CurrentUser,
-  CurrentUserData,
-} from '@/common/decorators';
+import { AdminOnly, CurrentUser, CurrentUserData } from '@/common/decorators';
 
 @ApiTags('Monthly Content Schedule')
 @Controller('subscriptions/schedules')
@@ -55,9 +50,7 @@ export class MonthlyScheduleController {
     description: 'Schedule created successfully',
     type: MonthlyScheduleResponseDto,
   })
-  async createSchedule(
-    @Body() dto: CreateMonthlyScheduleDto,
-  ): Promise<MonthlyScheduleResponseDto> {
+  async createSchedule(@Body() dto: CreateMonthlyScheduleDto): Promise<MonthlyScheduleResponseDto> {
     return this.scheduleService.createSchedule(dto);
   }
 
@@ -90,9 +83,7 @@ export class MonthlyScheduleController {
     type: MonthlyScheduleResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Schedule not found' })
-  async findScheduleById(
-    @Param('id') id: string,
-  ): Promise<MonthlyScheduleResponseDto> {
+  async findScheduleById(@Param('id') id: string): Promise<MonthlyScheduleResponseDto> {
     return this.scheduleService.findScheduleById(id);
   }
 
@@ -159,9 +150,9 @@ export class MonthlyScheduleController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
-    summary: 'Get monthly overview for current user\'s subscription',
+    summary: "Get monthly overview for current user's subscription",
     description:
-      'Returns all published monthly schedules for the user\'s active subscription plan, with content details per month.',
+      "Returns all published monthly schedules for the user's active subscription plan, with content details per month.",
   })
   @ApiResponse({
     status: 200,
@@ -178,9 +169,9 @@ export class MonthlyScheduleController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
-    summary: 'Get content for a specific month of current user\'s subscription',
+    summary: "Get content for a specific month of current user's subscription",
     description:
-      'Returns the content items available for a specific month under the user\'s active subscription.',
+      "Returns the content items available for a specific month under the user's active subscription.",
   })
   @ApiParam({ name: 'year', description: 'Year (e.g. 2026)' })
   @ApiParam({ name: 'month', description: 'Month (1-12)' })

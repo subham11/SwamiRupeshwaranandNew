@@ -6,14 +6,13 @@ import {
   Delete,
   Body,
   Param,
-  Query,
   UseGuards,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@/common/guards';
 import { RolesGuard } from '@/common/guards/roles.guard';
-import { SuperAdminOnly, AdminOnly } from '@/common/decorators/roles.decorator';
+import { AdminOnly } from '@/common/decorators/roles.decorator';
 import { CurrentUser, CurrentUserData } from '@/common/decorators/current-user.decorator';
 import { SettingsService } from './settings.service';
 import {
@@ -74,10 +73,7 @@ export class SettingsController {
   // ============================================
 
   @Put()
-  async updateSetting(
-    @Body() dto: UpdateSettingDto,
-    @CurrentUser() user: CurrentUserData,
-  ) {
+  async updateSetting(@Body() dto: UpdateSettingDto, @CurrentUser() user: CurrentUserData) {
     await this.settingsService.set(dto.key, dto.value, {
       category: dto.category as SettingCategory,
       description: dto.description,
@@ -97,11 +93,7 @@ export class SettingsController {
     @Body() dto: BulkUpdateSettingsDto,
     @CurrentUser() user: CurrentUserData,
   ) {
-    await this.settingsService.bulkSet(
-      dto.category as SettingCategory,
-      dto.settings,
-      user.email,
-    );
+    await this.settingsService.bulkSet(dto.category as SettingCategory, dto.settings, user.email);
 
     // Invalidate cache after bulk update
     this.settingsService.invalidateCache();
@@ -119,10 +111,7 @@ export class SettingsController {
   @Post('razorpay/test')
   @HttpCode(HttpStatus.OK)
   async testRazorpayConnection(@Body() dto: TestRazorpayConnectionDto) {
-    const result = await this.settingsService.testRazorpayConnection(
-      dto.keyId,
-      dto.keySecret,
-    );
+    const result = await this.settingsService.testRazorpayConnection(dto.keyId, dto.keySecret);
     return result;
   }
 

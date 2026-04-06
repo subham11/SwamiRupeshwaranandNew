@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 import { PageComponentsService } from '../page-components.service';
 import { DATABASE_SERVICE } from '@/common/database';
 import { ComponentType, PageStatus } from '../dto';
@@ -14,6 +15,10 @@ describe('PageComponentsService', () => {
     query: jest.fn(),
   };
 
+  const mockConfigService = {
+    get: jest.fn().mockReturnValue('test-value'),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -21,6 +26,10 @@ describe('PageComponentsService', () => {
         {
           provide: DATABASE_SERVICE,
           useValue: mockDb,
+        },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
         },
       ],
     }).compile();
@@ -132,16 +141,16 @@ describe('PageComponentsService', () => {
         })
         // 4th query: findComponentsByPage('p2')
         .mockResolvedValueOnce({
-          items: [
-            makeComponent('c3', 'p2', ComponentType.TEXT_BLOCK),
-          ],
+          items: [makeComponent('c3', 'p2', ComponentType.TEXT_BLOCK)],
         });
       mockDb.put.mockResolvedValue({}); // for auto-init
 
       const result = await service.findGlobalComponents();
 
       // announcement_bar found from p1, header & footer auto-initialized
-      expect(result.items.some((c) => c.componentType === ComponentType.ANNOUNCEMENT_BAR)).toBe(true);
+      expect(result.items.some((c) => c.componentType === ComponentType.ANNOUNCEMENT_BAR)).toBe(
+        true,
+      );
       expect(result.items.some((c) => c.componentType === ComponentType.HEADER)).toBe(true);
       expect(result.items.some((c) => c.componentType === ComponentType.FOOTER)).toBe(true);
       // HERO_SECTION and TEXT_BLOCK must not be included
@@ -160,9 +169,7 @@ describe('PageComponentsService', () => {
         })
         // 3rd query: findComponentsByPage('p1')
         .mockResolvedValueOnce({
-          items: [
-            makeComponent('c1', 'p1', ComponentType.HERO_SECTION),
-          ],
+          items: [makeComponent('c1', 'p1', ComponentType.HERO_SECTION)],
         });
       mockDb.put.mockResolvedValue({}); // for auto-init
 
@@ -250,14 +257,13 @@ describe('PageComponentsService', () => {
     });
 
     it('does not auto-initialize when all globals already exist in __GLOBAL__', async () => {
-      mockDb.query
-        .mockResolvedValueOnce({
-          items: [
-            makeComponent('g1', '__GLOBAL__', ComponentType.ANNOUNCEMENT_BAR),
-            makeComponent('g2', '__GLOBAL__', ComponentType.HEADER),
-            makeComponent('g3', '__GLOBAL__', ComponentType.FOOTER),
-          ],
-        });
+      mockDb.query.mockResolvedValueOnce({
+        items: [
+          makeComponent('g1', '__GLOBAL__', ComponentType.ANNOUNCEMENT_BAR),
+          makeComponent('g2', '__GLOBAL__', ComponentType.HEADER),
+          makeComponent('g3', '__GLOBAL__', ComponentType.FOOTER),
+        ],
+      });
 
       const result = await service.findGlobalComponents();
 
