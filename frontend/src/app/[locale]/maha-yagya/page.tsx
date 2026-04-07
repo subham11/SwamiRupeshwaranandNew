@@ -35,8 +35,8 @@ const EMAIL_ADDRESS = "yagya@swamirupeshwaranand.org";
 const hero = {
   badge: { en: "Limited Stalls Available", hi: "सीमित स्टॉल उपलब्ध" },
   title: {
-    en: "108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo",
-    hi: "108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो",
+    en: "108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project",
+    hi: "108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ",
   },
   subtitle: {
     en: "The Holy City of Varanasi, Uttar Pradesh • June 10, 2026",
@@ -47,6 +47,10 @@ const hero = {
   tagline: {
     en: "A sacred confluence of spirituality, wellness & commerce — 25,000+ daily footfall, 5 divine days",
     hi: "अध्यात्म, स्वास्थ्य और व्यापार का पवित्र संगम — 25,000+ दैनिक उपस्थिति, 5 दिव्य दिन",
+  },
+  initiative: {
+    en: "An initiative by Brahmavadini Spiritual Services Pvt. Ltd. & Brahmavadini Foundation & Swami Rupeshwaranand Ashram",
+    hi: "ब्रह्मवादिनी स्पिरिचुअल सर्विसेज प्रा. लि. एवं ब्रह्मवादिनी फाउंडेशन एवं स्वामी रूपेश्वरानंद आश्रम की एक पहल",
   },
 };
 
@@ -68,7 +72,7 @@ const keyBenefits = {
     },
     {
       icon: "📱",
-      value: { en: "1 Cr+", hi: "1 करोड़+" },
+      value: { en: "2 Cr+", hi: "2 करोड़+" },
       title: { en: "Digital Reach", hi: "डिजिटल पहुंच" },
       desc: {
         en: "Over 1 crore digital impressions through social media, live streaming, and national media coverage",
@@ -307,7 +311,7 @@ const highlights = {
     { value: "25,000+", label: { en: "Daily Footfall", hi: "दैनिक उपस्थिति" } },
     { value: "5", label: { en: "Divine Days", hi: "दिव्य दिन" } },
     { value: "300+", label: { en: "Exhibition Stalls", hi: "प्रदर्शनी स्टॉल" } },
-    { value: "1 Cr+", label: { en: "Digital Reach", hi: "डिजिटल पहुंच" } },
+    { value: "2 Cr+", label: { en: "Digital Reach", hi: "डिजिटल पहुंच" } },
     { value: "Free", label: { en: "Health Checkup", hi: "स्वास्थ्य जांच" } },
   ],
 };
@@ -409,8 +413,8 @@ const finalCTA = {
 
 const floating = {
   whatsappMsg: {
-    en: "Hi, I'm interested in booking a stall at the 108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo in Varanasi. Please share details.",
-    hi: "नमस्ते, मैं वाराणसी में 108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो में स्टॉल बुक करने में रुचि रखता/रखती हूं। कृपया विवरण साझा करें।",
+    en: "Hi, I'm interested in booking a stall at the 108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project in Varanasi. Please share details.",
+    hi: "नमस्ते, मैं वाराणसी में 108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ में स्टॉल बुक करने में रुचि रखता/रखती हूं। कृपया विवरण साझा करें।",
   },
 };
 
@@ -424,13 +428,13 @@ export async function generateMetadata({
   const { locale } = await params;
 
   const titles: Record<AppLocale, string> = {
-    en: "108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo — Book Your Stall",
-    hi: "108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो — अपना स्टॉल बुक करें",
+    en: "108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project — Book Your Stall",
+    hi: "108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ — अपना स्टॉल बुक करें",
   };
 
   const descriptions: Record<AppLocale, string> = {
-    en: "Book your exhibition stall at the 108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo in Varanasi. 25,000+ daily visitors, 5 days, 300+ stalls. Standard ₹50K, Premium ₹1L, Prime ₹2L.",
-    hi: "वाराणसी में 108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो में अपना प्रदर्शनी स्टॉल बुक करें। 25,000+ दैनिक आगंतुक, 5 दिन, 300+ स्टॉल।",
+    en: "Book your exhibition stall at the 108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project in Varanasi. 25,000+ daily visitors, 5 days, 300+ stalls. Standard ₹50K, Premium ₹1L, Prime ₹2L.",
+    hi: "वाराणसी में 108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ में अपना प्रदर्शनी स्टॉल बुक करें। 25,000+ दैनिक आगंतुक, 5 दिन, 300+ स्टॉल।",
   };
 
   return {
@@ -478,7 +482,7 @@ export default async function MahaYagyaPage({
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Event",
-            name: "108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo",
+            name: "108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project",
             description: t(hero.tagline, "en"),
             startDate: EVENT_DATE,
             endDate: "2026-06-14T20:00:00+05:30",
@@ -541,9 +545,28 @@ export default async function MahaYagyaPage({
             {t(hero.subtitle, locale)}
           </p>
 
-          <p className="text-base sm:text-lg text-white/60 max-w-3xl mx-auto mb-8">
+          <p className="text-base sm:text-lg text-white/60 max-w-3xl mx-auto mb-4">
             {t(hero.tagline, locale)}
           </p>
+
+          <div className="max-w-2xl mx-auto mb-8 px-4 py-3 rounded-xl border border-white/10" style={{ background: "rgba(255,255,255,0.05)" }}>
+            <p className="text-xs sm:text-sm tracking-widest uppercase text-white/40 mb-1.5">
+              {locale === "hi" ? "एक पहल" : "An initiative by"}
+            </p>
+            <p className="text-sm sm:text-base text-white/80 font-medium leading-relaxed">
+              <a href="https://brahmavadini.in" target="_blank" rel="noopener noreferrer" className="text-white hover:text-amber-300 transition-colors border-b border-white/30 hover:border-amber-300 pb-px">
+                {locale === "hi" ? "ब्रह्मवादिनी स्पिरिचुअल सर्विसेज प्रा. लि." : "Brahmavadini Spiritual Services Pvt. Ltd."}
+              </a>
+              <span className="mx-2 text-white/30">•</span>
+              <a href="https://brahmavadini.org" target="_blank" rel="noopener noreferrer" className="text-white hover:text-amber-300 transition-colors border-b border-white/30 hover:border-amber-300 pb-px">
+                {locale === "hi" ? "ब्रह्मवादिनी फाउंडेशन" : "Brahmavadini Foundation"}
+              </a>
+              <span className="mx-2 text-white/30">•</span>
+              <a href="https://swamirupeshwaranand.in" target="_blank" rel="noopener noreferrer" className="text-white hover:text-amber-300 transition-colors border-b border-white/30 hover:border-amber-300 pb-px">
+                {locale === "hi" ? "स्वामी रूपेश्वरानंद आश्रम" : "Swami Rupeshwaranand Ashram"}
+              </a>
+            </p>
+          </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <GoldenButton href="#stall-options" className="text-lg px-8 py-4">

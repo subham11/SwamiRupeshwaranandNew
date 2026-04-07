@@ -14,8 +14,8 @@ const content = {
     hi: "108 कुंड विश्व शांति महायज्ञ",
   },
   subtitle: {
-    en: "& Global Health and Wellness Mega Expo",
-    hi: "एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो",
+    en: "& Global Health and Wellness Mega Expo with Launching of Mega Environmental Project",
+    hi: "एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ",
   },
   location: {
     en: "📍 Varanasi, UP • 10–14 June 2026",
@@ -23,9 +23,13 @@ const content = {
   },
   highlights: [
     { en: "25,000+ Daily Visitors", hi: "25,000+ दैनिक आगंतुक" },
-    { en: "1 Cr+ Digital Reach", hi: "1 करोड़+ डिजिटल पहुंच" },
+    { en: "2 Cr+ Digital Reach", hi: "2 करोड़+ डिजिटल पहुंच" },
     { en: "300+ Exhibition Stalls", hi: "300+ प्रदर्शनी स्टॉल" },
   ],
+  initiative: {
+    en: "An initiative by Brahmavadini Spiritual Services Pvt. Ltd. & Brahmavadini Foundation & Swami Rupeshwaranand Ashram",
+    hi: "ब्रह्मवादिनी स्पिरिचुअल सर्विसेज प्रा. लि. एवं ब्रह्मवादिनी फाउंडेशन एवं स्वामी रूपेश्वरानंद आश्रम की एक पहल",
+  },
   cta: { en: "Learn More & Participate", hi: "और जानें और भाग लें" },
   dismiss: { en: "Maybe Later", hi: "बाद में" },
 };
@@ -150,6 +154,32 @@ export default function MahaYagyaPopup({ locale }: { locale: AppLocale }) {
                     {t(h, locale)}
                   </span>
                 ))}
+              </motion.div>
+
+              {/* Initiative */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.38 }}
+                className="mb-5 px-3 py-2 rounded-lg border border-white/10"
+                style={{ background: "rgba(255,255,255,0.05)" }}
+              >
+                <p className="text-[10px] tracking-widest uppercase text-white/35 mb-1">
+                  {locale === "hi" ? "एक पहल" : "An initiative by"}
+                </p>
+                <p className="text-[11px] sm:text-xs text-white/70 leading-relaxed">
+                  <a href="https://brahmavadini.in" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-amber-300 transition-colors border-b border-white/20 hover:border-amber-300 pb-px">
+                    {locale === "hi" ? "ब्रह्मवादिनी स्पिरिचुअल सर्विसेज प्रा. लि." : "Brahmavadini Spiritual Services Pvt. Ltd."}
+                  </a>
+                  <span className="mx-1.5 text-white/25">•</span>
+                  <a href="https://brahmavadini.org" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-amber-300 transition-colors border-b border-white/20 hover:border-amber-300 pb-px">
+                    {locale === "hi" ? "ब्रह्मवादिनी फाउंडेशन" : "Brahmavadini Foundation"}
+                  </a>
+                  <span className="mx-1.5 text-white/25">•</span>
+                  <a href="https://swamirupeshwaranand.in" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-amber-300 transition-colors border-b border-white/20 hover:border-amber-300 pb-px">
+                    {locale === "hi" ? "स्वामी रूपेश्वरानंद आश्रम" : "Swami Rupeshwaranand Ashram"}
+                  </a>
+                </p>
               </motion.div>
 
               {/* CTA */}

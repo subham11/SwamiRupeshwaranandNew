@@ -171,7 +171,7 @@ test.describe('UI Sanity — Maha Yagya Page', () => {
     await page.goto('/en/maha-yagya');
     const bodyText = await page.textContent('body');
     expect(bodyText).toContain('25,000+');
-    expect(bodyText).toContain('1 Cr+');
+    expect(bodyText).toContain('2 Cr+');
     expect(bodyText).toContain('Unmissable');
   });
 
