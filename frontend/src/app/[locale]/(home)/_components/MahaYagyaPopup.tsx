@@ -119,17 +119,21 @@ export default function MahaYagyaPopup({ locale }: { locale: AppLocale }) {
                 {t(content.title, locale)}
               </motion.h3>
 
-              <motion.p
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 }}
-                className="text-base sm:text-lg font-medium mb-3"
-                style={{ color: "var(--color-gold)" }}
+                className="text-sm sm:text-base font-medium mb-3 leading-snug"
               >
-                {locale === "hi"
-                  ? <>एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो<br />एवं मेगा पर्यावरण परियोजना का शुभारंभ</>
-                  : <>&amp; Global Health and Wellness Mega Expo<br />with Launching of Mega Environmental Project</>}
-              </motion.p>
+                <span className="block text-base sm:text-lg" style={{ color: "var(--color-gold)" }}>&amp;</span>
+                <span className="block text-white/80">
+                  {locale === "hi" ? "वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो" : "Global Health and Wellness Mega Expo"}
+                </span>
+                <span className="block text-base sm:text-lg" style={{ color: "var(--color-gold)" }}>&amp;</span>
+                <span className="block text-white/80">
+                  {locale === "hi" ? "मेगा पर्यावरण परियोजना का शुभारंभ" : "Launching of Mega Environmental Project"}
+                </span>
+              </motion.div>
 
               <motion.p
                 initial={{ opacity: 0 }}

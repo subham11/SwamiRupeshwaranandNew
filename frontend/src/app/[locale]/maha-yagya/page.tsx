@@ -537,14 +537,17 @@ export default async function MahaYagyaPage({
             🔥 {t(hero.badge, locale)}
           </span>
 
-          <h1 className="font-heading text-white mb-4">
-            <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+          <h1 className="font-heading text-white mb-4 leading-tight">
+            <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">
               {locale === "hi" ? "108 कुंड विश्व शांति महायज्ञ" : "108 Kund World Peace Mahayagya"}
             </span>
-            <span className="block text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium mt-2 text-white/80 leading-snug">
-              {locale === "hi"
-                ? <>एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो<br className="hidden sm:inline" /> एवं मेगा पर्यावरण परियोजना का शुभारंभ</>
-                : <>&amp; Global Health and Wellness Mega Expo<br className="hidden sm:inline" /> with Launching of Mega Environmental Project</>}
+            <span className="block text-xl sm:text-2xl md:text-3xl font-medium mt-2" style={{ color: "var(--color-gold)" }}>&amp;</span>
+            <span className="block text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-white/80">
+              {locale === "hi" ? "वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो" : "Global Health and Wellness Mega Expo"}
+            </span>
+            <span className="block text-xl sm:text-2xl md:text-3xl font-medium mt-1" style={{ color: "var(--color-gold)" }}>&amp;</span>
+            <span className="block text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-white/80">
+              {locale === "hi" ? "मेगा पर्यावरण परियोजना का शुभारंभ" : "Launching of Mega Environmental Project"}
             </span>
           </h1>
 
