@@ -5,6 +5,7 @@ import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import Header from "@/components/layout/Header";
 import FloatingLanguageSwitcher from "@/components/layout/FloatingLanguageSwitcher";
 import Footer from "@/components/layout/Footer";
+import HtmlLangSetter from "@/components/layout/HtmlLangSetter";
 import type { AppLocale } from "@/i18n/config";
 import { isLocale, i18nConfig } from "@/i18n/config";
 import { buildMetadata } from "@/lib/seo";
@@ -32,23 +33,20 @@ export default async function LocaleLayout({
   const locale = (isLocale(localeParam) ? localeParam : i18nConfig.defaultLocale) as AppLocale;
 
   return (
-    <html lang={locale}>
-      <body>
-        <Providers>
-          <AnnouncementBar locale={locale} />
-          <Suspense fallback={<div className="h-16 border-b border-zinc-100" />}>
-            <Header locale={locale} />
-          </Suspense>
+    <Providers>
+      <HtmlLangSetter locale={locale} />
+      <AnnouncementBar locale={locale} />
+      <Suspense fallback={<div className="h-16 border-b border-zinc-100" />}>
+        <Header locale={locale} />
+      </Suspense>
 
-          <main className="min-h-[70vh]">{children}</main>
+      <main className="min-h-[70vh]">{children}</main>
 
-          <Suspense fallback={<div className="h-24 border-t border-zinc-100" />}>
-            <Footer locale={locale} />
-          </Suspense>
+      <Suspense fallback={<div className="h-24 border-t border-zinc-100" />}>
+        <Footer locale={locale} />
+      </Suspense>
 
-          <FloatingLanguageSwitcher locale={locale} />
-        </Providers>
-      </body>
-    </html>
+      <FloatingLanguageSwitcher locale={locale} />
+    </Providers>
   );
 }
