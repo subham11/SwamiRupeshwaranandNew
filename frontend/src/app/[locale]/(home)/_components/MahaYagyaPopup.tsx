@@ -126,7 +126,9 @@ export default function MahaYagyaPopup({ locale }: { locale: AppLocale }) {
                 className="text-base sm:text-lg font-medium mb-3"
                 style={{ color: "var(--color-gold)" }}
               >
-                {t(content.subtitle, locale)}
+                {locale === "hi"
+                  ? <>एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो<br />एवं मेगा पर्यावरण परियोजना का शुभारंभ</>
+                  : <>&amp; Global Health and Wellness Mega Expo<br />with Launching of Mega Environmental Project</>}
               </motion.p>
 
               <motion.p

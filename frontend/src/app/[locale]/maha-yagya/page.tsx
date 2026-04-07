@@ -543,8 +543,8 @@ export default async function MahaYagyaPage({
             </span>
             <span className="block text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium mt-2 text-white/80 leading-snug">
               {locale === "hi"
-                ? "एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ"
-                : "& Global Health and Wellness Mega Expo with Launching of Mega Environmental Project"}
+                ? <>एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो<br className="hidden sm:inline" /> एवं मेगा पर्यावरण परियोजना का शुभारंभ</>
+                : <>&amp; Global Health and Wellness Mega Expo<br className="hidden sm:inline" /> with Launching of Mega Environmental Project</>}
             </span>
           </h1>
 
