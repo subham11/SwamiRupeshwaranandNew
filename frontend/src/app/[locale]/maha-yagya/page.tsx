@@ -14,6 +14,7 @@ import CMSTextBlocks from "@/components/CMSTextBlocks";
 import CountdownTimer from "./_components/CountdownTimer";
 import LeadForm from "./_components/LeadForm";
 import SpeakersCarousel from "./_components/SpeakersCarousel";
+import StallCarousel from "./_components/StallCarousel";
 import {
   FadeUp,
   StaggerContainer,
@@ -673,6 +674,26 @@ export default async function MahaYagyaPage({
               </StaggerCard>
             ))}
           </StaggerContainer>
+        </Container>
+      </section>
+
+      <SacredDivider icon="✦" />
+
+      {/* ═══ EXHIBITION STALL SHOWCASE ═══ */}
+      <section className="py-16 sm:py-20 md:py-24 relative overflow-hidden">
+        <LotusPattern />
+        <Container>
+          <FadeUp>
+            <SectionHeading
+              title={locale === "hi" ? "हमारा प्रदर्शनी अनुभव" : "Our Exhibition Experience"}
+              subtitle={locale === "hi"
+                ? "ब्रह्मवादिनी फाउंडेशन के विभिन्न प्रदर्शनी स्टॉल डिज़ाइन देखें"
+                : "Explore the various exhibition stall designs by Brahmavadini Foundation"}
+            />
+          </FadeUp>
+          <div className="mt-8 sm:mt-12">
+            <StallCarousel locale={locale} />
+          </div>
         </Container>
       </section>
 
