@@ -174,11 +174,11 @@ export default function MahaYagyaPopup({ locale }: { locale: AppLocale }) {
                 <p className="text-[10px] tracking-widest uppercase text-white/35 mb-1">
                   {locale === "hi" ? "एक पहल" : "An initiative by"}
                 </p>
-                <p className="text-[11px] sm:text-xs text-white/70 leading-relaxed">
+                <p className="text-[10px] sm:text-xs text-white/70 leading-relaxed text-center">
                   <a href="https://brahmavadini.in" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-amber-300 transition-colors border-b border-white/20 hover:border-amber-300 pb-px">
                     {locale === "hi" ? "ब्रह्मवादिनी स्पिरिचुअल सर्विसेज प्रा. लि." : "Brahmavadini Spiritual Services Pvt. Ltd."}
                   </a>
-                  <span className="mx-1.5 text-white/25">•</span>
+                  <span className="mx-1 sm:mx-1.5 text-white/25">•</span>
                   <a href="https://brahmavadini.org" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-amber-300 transition-colors border-b border-white/20 hover:border-amber-300 pb-px">
                     {locale === "hi" ? "ब्रह्मवादिनी फाउंडेशन" : "Brahmavadini Foundation"}
                   </a>

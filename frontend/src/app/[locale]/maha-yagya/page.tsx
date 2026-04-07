@@ -538,7 +538,7 @@ export default async function MahaYagyaPage({
           </span>
 
           <h1 className="font-heading text-white mb-4 leading-tight">
-            <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">
+            <span className="block text-3xl sm:text-4xl md:text-[2.75rem] lg:text-6xl font-bold">
               {locale === "hi" ? "108 कुंड विश्व शांति महायज्ञ" : "108 Kund World Peace Mahayagya"}
             </span>
             <span className="block text-xl sm:text-2xl md:text-3xl font-medium mt-2" style={{ color: "var(--color-gold)" }}>{locale === "hi" ? "एवं" : "&"}</span>
@@ -551,7 +551,7 @@ export default async function MahaYagyaPage({
             </span>
           </h1>
 
-          <p className="text-xl sm:text-2xl text-white mb-3 font-bold">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white mb-3 font-bold max-w-3xl mx-auto">
             {t(hero.subtitle, locale)}
           </p>
 
@@ -1081,7 +1081,7 @@ export default async function MahaYagyaPage({
       </section>
 
       {/* ═══ FLOATING WHATSAPP & CALL BUTTONS ═══ */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+      <div className="fixed bottom-4 right-2 sm:bottom-6 sm:right-4 md:right-6 z-50 flex flex-col gap-2 sm:gap-3">
         <a
           href={whatsappUrl}
           target="_blank"

@@ -22,7 +22,7 @@ export default function FloatingLanguageSwitcher({ locale }: { locale: AppLocale
   const nextLocale = locale === "en" ? "hi" : "en";
 
   return (
-    <div className="fixed top-24 right-6 z-[9999] flex flex-col items-end gap-3">
+    <div className="fixed top-24 right-2 sm:right-4 md:right-6 z-[9999] flex flex-col items-end gap-2 sm:gap-3">
       {/* Theme Switcher Dropdown */}
       <AnimatePresence>
         {isThemeOpen && (
@@ -65,7 +65,7 @@ export default function FloatingLanguageSwitcher({ locale }: { locale: AppLocale
       {/* Theme Toggle Button */}
       <button
         onClick={() => setIsThemeOpen(!isThemeOpen)}
-        className="w-14 h-14 rounded-full border-2 flex items-center justify-center text-xl transition-all duration-300 hover:scale-105 shadow-sacred bg-white"
+        className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full border-2 flex items-center justify-center text-base sm:text-lg md:text-xl transition-all duration-300 hover:scale-105 shadow-sacred bg-white"
         style={{ 
           borderColor: 'var(--color-primary)', 
           color: 'var(--color-primary)' 
@@ -78,7 +78,7 @@ export default function FloatingLanguageSwitcher({ locale }: { locale: AppLocale
       {/* Simple Circular Language Toggle Button */}
       <Link
         href={`/${nextLocale}${rest}`}
-        className="w-14 h-14 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all duration-300 hover:scale-105 shadow-sacred bg-white font-body"
+        className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full border-2 flex items-center justify-center text-[10px] sm:text-xs font-bold transition-all duration-300 hover:scale-105 shadow-sacred bg-white font-body"
         style={{
           borderColor: 'var(--color-primary)',
           color: 'var(--color-primary)'

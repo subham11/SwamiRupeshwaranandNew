@@ -122,7 +122,7 @@ export default function HeroSwiper({ locale, slides }: HeroSwiperProps) {
         {heroSlides.map((s, index) => (
           <SwiperSlide key={s.id}>
             {/* Responsive hero height */}
-            <div className="relative h-[60vh] sm:h-[65vh] md:h-[70vh] min-h-[400px] sm:min-h-[500px] max-h-[800px] w-full">
+            <div className="relative h-[60vh] sm:h-[65vh] md:h-[70vh] min-h-[400px] sm:min-h-[500px] max-h-[800px] w-full overflow-hidden">
               {/* Background Image */}
               <Image
                 src={s.imageUrl}
@@ -141,9 +141,9 @@ export default function HeroSwiper({ locale, slides }: HeroSwiperProps) {
                 }}
               />
               
-              {/* Mobile-friendly center gradient */}
-              <div 
-                className="absolute inset-0 md:hidden"
+              {/* Mobile/tablet-friendly center gradient */}
+              <div
+                className="absolute inset-0 lg:hidden"
                 style={{
                   background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)'
                 }}
@@ -160,16 +160,16 @@ export default function HeroSwiper({ locale, slides }: HeroSwiperProps) {
 
               <Container className="h-full">
                 {/* Responsive layout - centered on mobile, right-aligned on desktop */}
-                <div className="relative z-10 flex h-full items-end pb-16 sm:pb-20 md:items-center md:pb-0 justify-center md:justify-end">
-                  <motion.div 
-                    className="max-w-2xl text-center md:text-right px-4 sm:px-0"
+                <div className="relative z-10 flex h-full items-end pb-16 sm:pb-20 lg:items-center lg:pb-0 justify-center lg:justify-end">
+                  <motion.div
+                    className="w-full max-w-2xl text-center lg:text-right px-4 sm:px-6 lg:px-0"
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
                   >
                     {/* Decorative element above title - hidden on small mobile */}
-                    <div 
-                      className="hidden sm:flex items-center gap-3 mb-4 justify-center md:justify-end"
+                    <div
+                      className="hidden sm:flex items-center gap-3 mb-4 justify-center lg:justify-end"
                       style={{ color: 'var(--color-gold)' }}
                     >
                       <span className="text-xs sm:text-sm font-medium uppercase tracking-widest">
@@ -186,12 +186,12 @@ export default function HeroSwiper({ locale, slides }: HeroSwiperProps) {
                     </h1>
 
                     {/* Description - Responsive */}
-                    <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 leading-relaxed mb-4 sm:mb-6 md:mb-8 mx-auto md:ml-auto md:mr-0 max-w-xl">
+                    <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 leading-relaxed mb-4 sm:mb-6 md:mb-8 mx-auto lg:ml-auto lg:mr-0 max-w-xl">
                       {t(s.subtitle, locale)}
                     </p>
 
                     {/* CTA Buttons - Stack on mobile, row on larger screens */}
-                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-end">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-end">
                       <Link
                         href={`/${locale}${s.ctaLink}`}
                         className="inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-8 sm:py-4 text-sm sm:text-base font-medium rounded-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
