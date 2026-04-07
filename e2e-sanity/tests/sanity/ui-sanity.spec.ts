@@ -288,10 +288,8 @@ test.describe('UI Sanity — Maha Yagya Page', () => {
 test.describe('UI Sanity — Homepage Popup', () => {
 
   test('Maha Yagya popup appears on homepage after delay', async ({ page }) => {
-    // Clear any previous dismissal
+    // Fresh page load — module-level flag resets on full refresh
     await page.goto('/en');
-    await page.evaluate(() => sessionStorage.removeItem('mahayagya_popup_dismissed'));
-    await page.reload();
     // Wait for popup (3s delay + render)
     const popup = page.locator('text=108 Kund World Peace Mahayagya');
     await expect(popup).toBeVisible({ timeout: 10_000 });
@@ -302,8 +300,6 @@ test.describe('UI Sanity — Homepage Popup', () => {
 
   test('Popup can be dismissed', async ({ page }) => {
     await page.goto('/en');
-    await page.evaluate(() => sessionStorage.removeItem('mahayagya_popup_dismissed'));
-    await page.reload();
     const popup = page.locator('text=108 Kund World Peace Mahayagya');
     await expect(popup).toBeVisible({ timeout: 10_000 });
     // Click "Maybe Later"

@@ -5,7 +5,8 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import type { AppLocale } from "@/i18n/config";
 
-const STORAGE_KEY = "mahayagya_popup_dismissed";
+// Module-level flag: survives Next.js client navigations but resets on full browser refresh
+let popupDismissed = false;
 
 const content = {
   badge: { en: "🔥 Upcoming Grand Event", hi: "🔥 आगामी भव्य आयोजन" },
@@ -42,14 +43,14 @@ export default function MahaYagyaPopup({ locale }: { locale: AppLocale }) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (sessionStorage.getItem(STORAGE_KEY)) return;
+    if (popupDismissed) return;
     const timer = setTimeout(() => setIsVisible(true), 3000);
     return () => clearTimeout(timer);
   }, []);
 
   function dismiss() {
     setIsVisible(false);
-    sessionStorage.setItem(STORAGE_KEY, "1");
+    popupDismissed = true;
   }
 
   return (
