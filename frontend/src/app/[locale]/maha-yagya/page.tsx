@@ -127,7 +127,7 @@ const participationOptions = {
   categories: [
     {
       id: "sponsor",
-      name: { en: "Sponsor", hi: "स्पॉन्सर" },
+      name: { en: "Sponsor", hi: "प्रायोजक" },
       icon: "🏆",
       desc: { en: "Partner with us to amplify your brand at India's grandest spiritual & wellness event", hi: "भारत के सबसे भव्य आध्यात्मिक और कल्याण आयोजन में अपने ब्रांड को बढ़ाने के लिए हमारे साथ जुड़ें" },
       tiers: [
@@ -723,7 +723,7 @@ export default async function MahaYagyaPage({
                   <TierCard
                     key={tier.id}
                     popular={tier.popular}
-                    className={`relative bg-white dark:bg-zinc-800 rounded-xl shadow-sm border overflow-hidden ${
+                    className={`relative bg-white dark:bg-zinc-800 rounded-xl shadow-sm border overflow-hidden flex flex-col h-full ${
                       tier.popular
                         ? "border-orange-300 dark:border-orange-700 ring-2 ring-orange-200 dark:ring-orange-800"
                         : "border-zinc-200 dark:border-zinc-700"
@@ -737,7 +737,7 @@ export default async function MahaYagyaPage({
                         {locale === "en" ? "⭐ Recommended" : "⭐ अनुशंसित"}
                       </div>
                     )}
-                    <div className="p-5 sm:p-6">
+                    <div className="p-5 sm:p-6 flex flex-col h-full">
                       <h4 className="text-lg font-bold text-zinc-900 dark:text-white mb-1">
                         {t(tier.name, locale)}
                       </h4>
@@ -754,7 +754,7 @@ export default async function MahaYagyaPage({
                         </p>
                       )}
                       {!tier.price && <div className="mb-4" />}
-                      <ul className="space-y-2 mb-6">
+                      <ul className="space-y-2 mb-6 flex-1">
                         {tier.features.map((f, j) => (
                           <li
                             key={j}
