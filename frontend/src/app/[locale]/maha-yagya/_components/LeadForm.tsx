@@ -37,14 +37,16 @@ const tiersByCategory: Record<string, { value: string; en: string; hi: string }[
     { value: "divine-meet", en: "Divine Meet with Swamiji — ₹51,000", hi: "स्वामीजी से दिव्य भेंट — ₹51,000" },
   ],
   "business-stall": [
-    { value: "business-standard", en: "Standard Stall — ₹50,000", hi: "स्टैंडर्ड स्टॉल — ₹50,000" },
-    { value: "business-premium", en: "Premium Stall — ₹1,00,000", hi: "प्रीमियम स्टॉल — ₹1,00,000" },
-    { value: "business-elite", en: "Elite Stall — ₹2,00,000", hi: "एलीट स्टॉल — ₹2,00,000" },
+    { value: "business-standard", en: "Standard Stall (10×10 ft) — ₹50,000", hi: "स्टैंडर्ड स्टॉल (10×10 फ़ीट) — ₹50,000" },
+    { value: "business-premium", en: "Premium Pagoda (12×12 ft) — ₹1,00,000", hi: "प्रीमियम पगोडा (12×12 फ़ीट) — ₹1,00,000" },
+    { value: "business-premium-tv", en: "Premium Pagoda + TV (12×12 ft) — ₹1,50,000", hi: "प्रीमियम पगोडा + टीवी (12×12 फ़ीट) — ₹1,50,000" },
+    { value: "business-prime", en: "Prime 3D Pod Stall (6m×6m) — ₹2,00,000", hi: "प्राइम 3D पॉड स्टॉल (6m×6m) — ₹2,00,000" },
   ],
   "food-stall": [
-    { value: "food-standard", en: "Standard Food Stall — ₹50,000", hi: "स्टैंडर्ड फ़ूड स्टॉल — ₹50,000" },
-    { value: "food-premium", en: "Premium Food Stall — ₹1,00,000", hi: "प्रीमियम फ़ूड स्टॉल — ₹1,00,000" },
-    { value: "food-elite", en: "Elite Food Stall — ₹2,00,000", hi: "एलीट फ़ूड स्टॉल — ₹2,00,000" },
+    { value: "food-standard", en: "Standard Food Stall (10×10 ft) — ₹50,000", hi: "स्टैंडर्ड फ़ूड स्टॉल (10×10 फ़ीट) — ₹50,000" },
+    { value: "food-premium", en: "Premium Pagoda (12×12 ft) — ₹1,00,000", hi: "प्रीमियम पगोडा (12×12 फ़ीट) — ₹1,00,000" },
+    { value: "food-premium-tv", en: "Premium Pagoda + TV (12×12 ft) — ₹1,50,000", hi: "प्रीमियम पगोडा + टीवी (12×12 फ़ीट) — ₹1,50,000" },
+    { value: "food-prime", en: "Prime 3D Pod Stall (6m×6m) — ₹2,00,000", hi: "प्राइम 3D पॉड स्टॉल (6m×6m) — ₹2,00,000" },
   ],
 };
 
