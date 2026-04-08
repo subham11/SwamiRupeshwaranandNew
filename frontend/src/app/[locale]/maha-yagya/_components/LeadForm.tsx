@@ -10,17 +10,20 @@ interface LeadFormProps {
 }
 
 const categories = [
-  { value: "sponsor", en: "Sponsor (स्पॉन्सर)", hi: "स्पॉन्सर" },
+  { value: "sponsor", en: "Sponsor (स्पॉन्सर)", hi: "प्रायोजक" },
   { value: "yajaman", en: "Yajaman (यज्ञमान)", hi: "यज्ञमान" },
   { value: "shivirarthi", en: "Camps & Programs (शिविर और कार्यक्रम)", hi: "शिविर और कार्यक्रम" },
+  { value: "business-stall", en: "Business / Startup Stall (व्यवसाय / स्टार्टअप स्टॉल)", hi: "व्यवसाय / स्टार्टअप स्टॉल" },
+  { value: "food-stall", en: "State Food Stall (राज्य खाद्य स्टॉल)", hi: "राज्य खाद्य स्टॉल" },
 ];
 
 const tiersByCategory: Record<string, { value: string; en: string; hi: string }[]> = {
   sponsor: [
-    { value: "title-partner", en: "Title Partner — ₹50,00,000", hi: "टाइटल पार्टनर — ₹50,00,000" },
-    { value: "co-partner", en: "Co Partner — ₹25,00,000", hi: "को-पार्टनर — ₹25,00,000" },
-    { value: "associate-partner", en: "Associate Partner — ₹10,00,000", hi: "एसोसिएट पार्टनर — ₹10,00,000" },
-    { value: "prime-stall-partner", en: "Prime Stall Partner — ₹5,00,000", hi: "प्राइम स्टॉल पार्टनर — ₹5,00,000" },
+    { value: "maha-prayojak", en: "Maha Prayojak — ₹1,00,00,000", hi: "महा प्रायोजक — ₹1,00,00,000" },
+    { value: "title-sponsor", en: "Title Sponsor — ₹50,00,000", hi: "टाइटल प्रायोजक — ₹50,00,000" },
+    { value: "co-sponsor", en: "Co-Sponsor — ₹25,00,000", hi: "सह-प्रायोजक — ₹25,00,000" },
+    { value: "associate-sponsor", en: "Associate Sponsor — ₹10,00,000", hi: "एसोसिएट प्रायोजक — ₹10,00,000" },
+    { value: "stall-partner", en: "Stall Partner — ₹5,00,000", hi: "स्टॉल पार्टनर — ₹5,00,000" },
   ],
   yajaman: [
     { value: "vishisht-yajaman", en: "Vishisht Yajaman (VVIP) — ₹5,51,000", hi: "विशिष्ट यज्ञमान (VVIP) — ₹5,51,000" },
@@ -32,6 +35,16 @@ const tiersByCategory: Record<string, { value: string; en: string; hi: string }[
     { value: "shivirarthi-3day", en: "Three Days Camp — ₹21,000", hi: "3 दिवसीय शिविर — ₹21,000" },
     { value: "shivirarthi-5day", en: "Five Days Camp — ₹51,000", hi: "5 दिवसीय शिविर — ₹51,000" },
     { value: "divine-meet", en: "Divine Meet with Swamiji — ₹51,000", hi: "स्वामीजी से दिव्य भेंट — ₹51,000" },
+  ],
+  "business-stall": [
+    { value: "business-standard", en: "Standard Stall — ₹50,000", hi: "स्टैंडर्ड स्टॉल — ₹50,000" },
+    { value: "business-premium", en: "Premium Stall — ₹1,00,000", hi: "प्रीमियम स्टॉल — ₹1,00,000" },
+    { value: "business-elite", en: "Elite Stall — ₹2,00,000", hi: "एलीट स्टॉल — ₹2,00,000" },
+  ],
+  "food-stall": [
+    { value: "food-standard", en: "Standard Food Stall — ₹50,000", hi: "स्टैंडर्ड फ़ूड स्टॉल — ₹50,000" },
+    { value: "food-premium", en: "Premium Food Stall — ₹1,00,000", hi: "प्रीमियम फ़ूड स्टॉल — ₹1,00,000" },
+    { value: "food-elite", en: "Elite Food Stall — ₹2,00,000", hi: "एलीट फ़ूड स्टॉल — ₹2,00,000" },
   ],
 };
 

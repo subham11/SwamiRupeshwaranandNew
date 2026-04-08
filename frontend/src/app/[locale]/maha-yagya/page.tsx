@@ -132,11 +132,25 @@ const participationOptions = {
       desc: { en: "Partner with us to amplify your brand at India's grandest spiritual & wellness event", hi: "भारत के सबसे भव्य आध्यात्मिक और कल्याण आयोजन में अपने ब्रांड को बढ़ाने के लिए हमारे साथ जुड़ें" },
       tiers: [
         {
-          id: "title-partner",
-          name: { en: "Title Partner", hi: "टाइटल पार्टनर" },
+          id: "maha-prayojak",
+          name: { en: "Maha Prayojak", hi: "महा प्रायोजक" },
+          price: "₹1,00,00,000",
+          priceLabel: { en: "1 Crore", hi: "1 करोड़" },
+          popular: true,
+          features: [
+            { en: "Exclusive Maha Prayojak branding across all event material", hi: "सभी इवेंट सामग्री पर विशेष महा प्रायोजक ब्रांडिंग" },
+            { en: "Largest premium stall with VIP zone", hi: "VIP ज़ोन सहित सबसे बड़ा प्रीमियम स्टॉल" },
+            { en: "Complete media coverage, press conference & social media campaign", hi: "पूर्ण मीडिया कवरेज, प्रेस कॉन्फ्रेंस और सोशल मीडिया अभियान" },
+            { en: "VIP passes for 15 representatives + VIP dinner invitation", hi: "15 प्रतिनिधियों के लिए VIP पास + VIP डिनर निमंत्रण" },
+            { en: "Stage branding & speaking opportunity", hi: "स्टेज ब्रांडिंग और बोलने का अवसर" },
+          ],
+        },
+        {
+          id: "title-sponsor",
+          name: { en: "Title Sponsor", hi: "टाइटल प्रायोजक" },
           price: "₹50,00,000",
           priceLabel: { en: "50 Lakh", hi: "50 लाख" },
-          popular: true,
+          popular: false,
           features: [
             { en: "Title sponsorship branding across all event material", hi: "सभी इवेंट सामग्री पर टाइटल स्पॉन्सरशिप ब्रांडिंग" },
             { en: "Prime stall location (20×20 ft VIP zone)", hi: "प्राइम स्टॉल लोकेशन (20×20 फ़ीट VIP ज़ोन)" },
@@ -145,8 +159,8 @@ const participationOptions = {
           ],
         },
         {
-          id: "co-partner",
-          name: { en: "Co Partner", hi: "को-पार्टनर" },
+          id: "co-sponsor",
+          name: { en: "Co-Sponsor", hi: "सह-प्रायोजक" },
           price: "₹25,00,000",
           priceLabel: { en: "25 Lakh", hi: "25 लाख" },
           popular: false,
@@ -158,8 +172,8 @@ const participationOptions = {
           ],
         },
         {
-          id: "associate-partner",
-          name: { en: "Associate Partner", hi: "एसोसिएट पार्टनर" },
+          id: "associate-sponsor",
+          name: { en: "Associate Sponsor", hi: "एसोसिएट प्रायोजक" },
           price: "₹10,00,000",
           priceLabel: { en: "10 Lakh", hi: "10 लाख" },
           popular: false,
@@ -171,8 +185,8 @@ const participationOptions = {
           ],
         },
         {
-          id: "prime-stall-partner",
-          name: { en: "Prime Stall Partner", hi: "प्राइम स्टॉल पार्टनर" },
+          id: "stall-partner",
+          name: { en: "Stall Partner", hi: "स्टॉल पार्टनर" },
           price: "₹5,00,000",
           priceLabel: { en: "5 Lakh", hi: "5 लाख" },
           popular: false,
@@ -297,6 +311,98 @@ const participationOptions = {
             { en: "Personal Horoscope Analysis", hi: "व्यक्तिगत कुंडली विश्लेषण" },
             { en: "Divine Guidance", hi: "दिव्य मार्गदर्शन" },
             { en: "Yagya Participation", hi: "यज्ञ सहभागिता" },
+          ],
+        },
+      ],
+    },
+    {
+      id: "business-stall",
+      name: { en: "Business / Startup Stall", hi: "व्यवसाय / स्टार्टअप स्टॉल" },
+      icon: "🚀",
+      desc: { en: "Showcase your business, products & services at India's grandest spiritual & wellness expo", hi: "भारत के सबसे भव्य आध्यात्मिक और कल्याण एक्सपो में अपने व्यवसाय, उत्पाद और सेवाओं का प्रदर्शन करें" },
+      tiers: [
+        {
+          id: "business-standard",
+          name: { en: "Standard Stall", hi: "स्टैंडर्ड स्टॉल" },
+          price: "₹50,000",
+          priceLabel: { en: "₹50,000", hi: "₹50,000" },
+          popular: false,
+          features: [
+            { en: "Standard stall space with basic setup", hi: "बेसिक सेटअप सहित स्टैंडर्ड स्टॉल स्पेस" },
+            { en: "Listing in event directory", hi: "इवेंट डायरेक्टरी में सूचीबद्ध" },
+            { en: "Event passes for 2 representatives", hi: "2 प्रतिनिधियों के लिए इवेंट पास" },
+          ],
+        },
+        {
+          id: "business-premium",
+          name: { en: "Premium Stall", hi: "प्रीमियम स्टॉल" },
+          price: "₹1,00,000",
+          priceLabel: { en: "₹1,00,000", hi: "₹1,00,000" },
+          popular: true,
+          features: [
+            { en: "Premium stall with enhanced branding", hi: "बेहतर ब्रांडिंग सहित प्रीमियम स्टॉल" },
+            { en: "Social media mentions", hi: "सोशल मीडिया उल्लेख" },
+            { en: "Listing in event directory & website", hi: "इवेंट डायरेक्टरी और वेबसाइट पर सूचीबद्ध" },
+            { en: "Event passes for 4 representatives", hi: "4 प्रतिनिधियों के लिए इवेंट पास" },
+          ],
+        },
+        {
+          id: "business-elite",
+          name: { en: "Elite Stall", hi: "एलीट स्टॉल" },
+          price: "₹2,00,000",
+          priceLabel: { en: "₹2,00,000", hi: "₹2,00,000" },
+          popular: false,
+          features: [
+            { en: "Prime location elite stall with custom branding", hi: "कस्टम ब्रांडिंग सहित प्राइम लोकेशन एलीट स्टॉल" },
+            { en: "Full media coverage & social media promotion", hi: "पूर्ण मीडिया कवरेज और सोशल मीडिया प्रमोशन" },
+            { en: "Listing in event directory & website", hi: "इवेंट डायरेक्टरी और वेबसाइट पर सूचीबद्ध" },
+            { en: "VIP passes for 6 representatives", hi: "6 प्रतिनिधियों के लिए VIP पास" },
+          ],
+        },
+      ],
+    },
+    {
+      id: "food-stall",
+      name: { en: "State Food Stall", hi: "राज्य खाद्य स्टॉल" },
+      icon: "🍛",
+      desc: { en: "Showcase authentic state cuisine and culinary traditions at the mega expo", hi: "मेगा एक्सपो में प्रामाणिक राज्य व्यंजन और पाक परंपराओं का प्रदर्शन करें" },
+      tiers: [
+        {
+          id: "food-standard",
+          name: { en: "Standard Food Stall", hi: "स्टैंडर्ड फ़ूड स्टॉल" },
+          price: "₹50,000",
+          priceLabel: { en: "₹50,000", hi: "₹50,000" },
+          popular: false,
+          features: [
+            { en: "Standard food stall space with basic setup", hi: "बेसिक सेटअप सहित स्टैंडर्ड फ़ूड स्टॉल स्पेस" },
+            { en: "Listing in food court directory", hi: "फ़ूड कोर्ट डायरेक्टरी में सूचीबद्ध" },
+            { en: "Event passes for 2 representatives", hi: "2 प्रतिनिधियों के लिए इवेंट पास" },
+          ],
+        },
+        {
+          id: "food-premium",
+          name: { en: "Premium Food Stall", hi: "प्रीमियम फ़ूड स्टॉल" },
+          price: "₹1,00,000",
+          priceLabel: { en: "₹1,00,000", hi: "₹1,00,000" },
+          popular: true,
+          features: [
+            { en: "Premium food stall with enhanced branding", hi: "बेहतर ब्रांडिंग सहित प्रीमियम फ़ूड स्टॉल" },
+            { en: "Social media mentions", hi: "सोशल मीडिया उल्लेख" },
+            { en: "Listing in food court directory & website", hi: "फ़ूड कोर्ट डायरेक्टरी और वेबसाइट पर सूचीबद्ध" },
+            { en: "Event passes for 4 representatives", hi: "4 प्रतिनिधियों के लिए इवेंट पास" },
+          ],
+        },
+        {
+          id: "food-elite",
+          name: { en: "Elite Food Stall", hi: "एलीट फ़ूड स्टॉल" },
+          price: "₹2,00,000",
+          priceLabel: { en: "₹2,00,000", hi: "₹2,00,000" },
+          popular: false,
+          features: [
+            { en: "Prime location elite food stall with custom branding", hi: "कस्टम ब्रांडिंग सहित प्राइम लोकेशन एलीट फ़ूड स्टॉल" },
+            { en: "Full media coverage & social media promotion", hi: "पूर्ण मीडिया कवरेज और सोशल मीडिया प्रमोशन" },
+            { en: "Listing in food court directory & website", hi: "फ़ूड कोर्ट डायरेक्टरी और वेबसाइट पर सूचीबद्ध" },
+            { en: "VIP passes for 6 representatives", hi: "6 प्रतिनिधियों के लिए VIP पास" },
           ],
         },
       ],
@@ -675,7 +781,7 @@ export default async function MahaYagyaPage({
         <Container>
           <FadeUp>
             <SectionHeading
-              title={locale === "hi" ? "हमारा प्रदर्शनी अनुभव" : "Our Exhibition Experience"}
+              title={locale === "hi" ? "हमारे स्टॉल डिज़ाइन" : "Our Stall Designs"}
               subtitle={locale === "hi"
                 ? "ब्रह्मवादिनी फाउंडेशन के विभिन्न प्रदर्शनी स्टॉल डिज़ाइन देखें"
                 : "Explore the various exhibition stall designs by Brahmavadini Foundation"}
@@ -721,9 +827,25 @@ export default async function MahaYagyaPage({
                 </div>
               </FadeUp>
 
+              {/* Category Banner Image */}
+              {cat.id === "food-stall" && (
+                <FadeUp delay={0.1}>
+                  <div className="relative rounded-2xl overflow-hidden mb-8 max-w-3xl mx-auto aspect-[16/9]">
+                    <img src="/images/food-stall.jpg" alt={locale === "hi" ? "राज्य खाद्य स्टॉल" : "State Food Stall"} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4 text-white">
+                      <p className="text-lg sm:text-xl font-bold drop-shadow-lg">
+                        {locale === "hi" ? "₹50,000 से शुरू" : "Starting from ₹50,000"}
+                      </p>
+                    </div>
+                  </div>
+                </FadeUp>
+              )}
+
               {/* Tier Cards */}
               <StaggerContainer
                 className={`grid grid-cols-1 gap-6 ${
+                  cat.tiers.length === 5 ? "sm:grid-cols-2 lg:grid-cols-5" :
                   cat.tiers.length === 4 ? "sm:grid-cols-2 lg:grid-cols-4" :
                   cat.tiers.length === 3 ? "md:grid-cols-3" :
                   "md:grid-cols-2"
@@ -785,7 +907,9 @@ export default async function MahaYagyaPage({
                         data-stall={tier.id}
                       >
                         {tier.price
-                          ? (locale === "en" ? "Enquire Now" : "अभी पूछें")
+                          ? (cat.id === "yajaman"
+                              ? (locale === "en" ? "Join as Yagyamaan" : "यज्ञमान बनें")
+                              : (locale === "en" ? "Enquire Now" : "अभी पूछें"))
                           : (locale === "en" ? "Register Interest" : "रुचि दर्ज करें")}
                       </a>
                     </div>
