@@ -1026,9 +1026,9 @@ export default async function MahaYagyaPage({
           </FadeUp>
           <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6" stagger={0.12}>
             {audience.segments.map((seg, i) => (
-              <StaggerCard key={i}>
-                <SacredCard>
-                  <div className="text-center">
+              <StaggerCard key={i} className="h-full">
+                <SacredCard className="h-full">
+                  <div className="text-center h-full flex flex-col items-center justify-start">
                     <IconPop className="text-3xl mb-3 block">{seg.icon}</IconPop>
                     <h3
                       className="font-heading text-lg font-semibold mb-2"
