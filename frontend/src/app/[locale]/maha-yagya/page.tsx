@@ -13,7 +13,6 @@ import { t, type BilingualContent } from "@/content/contentProvider";
 import CMSTextBlocks from "@/components/CMSTextBlocks";
 import CountdownTimer from "./_components/CountdownTimer";
 import LeadForm from "./_components/LeadForm";
-import SpeakersCarousel from "./_components/SpeakersCarousel";
 import StallCarousel from "./_components/StallCarousel";
 import {
   FadeUp,
@@ -391,15 +390,6 @@ const cmsFallbackSections = [
     },
   },
 ];
-
-const speakersSection = {
-  title: { en: "Our Speakers", hi: "हमारे वक्ता" },
-  subtitle: {
-    en: "Renowned spiritual leaders, wellness experts & scholars gracing the event",
-    hi: "इस आयोजन की शोभा बढ़ाने वाले प्रसिद्ध आध्यात्मिक नेता, कल्याण विशेषज्ञ और विद्वान",
-  },
-  comingSoon: { en: "Full speaker lineup coming soon!", hi: "संपूर्ण वक्ता सूची जल्द आ रही है!" },
-};
 
 const finalCTA = {
   title: { en: "Don't Miss This Opportunity!", hi: "इस अवसर को न चूकें!" },
@@ -843,31 +833,6 @@ export default async function MahaYagyaPage({
               </StaggerCard>
             ))}
           </StaggerContainer>
-        </Container>
-      </section>
-
-      <SacredDivider icon="🎤" />
-
-      {/* ═══ SPEAKERS CAROUSEL ═══ */}
-      <section className="py-16 sm:py-20 md:py-24">
-        <Container>
-          <FadeUp>
-            <SectionHeading
-              title={t(speakersSection.title, locale)}
-              subtitle={t(speakersSection.subtitle, locale)}
-            />
-          </FadeUp>
-          <FadeUp delay={0.2}>
-            <SpeakersCarousel locale={locale} />
-          </FadeUp>
-          <FadeUp delay={0.35}>
-            <p
-              className="text-center mt-6 text-sm font-medium animate-pulse"
-              style={{ color: "var(--color-accent)" }}
-            >
-              {t(speakersSection.comingSoon, locale)}
-            </p>
-          </FadeUp>
         </Container>
       </section>
 
