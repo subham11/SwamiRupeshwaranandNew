@@ -11,16 +11,20 @@ let popupDismissed = false;
 const content = {
   badge: { en: "🔥 Upcoming Grand Event", hi: "🔥 आगामी भव्य आयोजन" },
   title: {
-    en: "108 Kund World Peace Mahayagya",
-    hi: "108 कुंड विश्व शांति महायज्ञ",
+    en: "108 Kund World Peace Maha Yagya",
+    hi: "108 कुंड विश्व शांति महा यज्ञ",
   },
   subtitle: {
     en: "& Global Health and Wellness Mega Expo with Launching of Mega Environmental Project",
     hi: "एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ",
   },
+  yantraHighlight: {
+    en: "✨ Shri Baglamukhi Yantra — Real Gold / Silver / Copper Made",
+    hi: "✨ श्री बगलामुखी यंत्र — असली स्वर्ण / रजत / ताम्र निर्मित",
+  },
   location: {
-    en: "📍 Varanasi, UP • 10–14 June 2026",
-    hi: "📍 वाराणसी, UP • 10–14 जून 2026",
+    en: "📍 Varanasi, UP • 3–7 June 2026",
+    hi: "📍 वाराणसी, UP • 3–7 जून 2026",
   },
   highlights: [
     { en: "25,000+ Daily Visitors", hi: "25,000+ दैनिक आगंतुक" },
@@ -109,6 +113,21 @@ export default function MahaYagyaPopup({ locale }: { locale: AppLocale }) {
               >
                 {t(content.badge, locale)}
               </motion.span>
+
+              {/* Yantra Highlight — first prominent line */}
+              <motion.div
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.18 }}
+                className="mb-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold text-center"
+                style={{
+                  background: "linear-gradient(135deg, rgba(255,183,77,0.18), rgba(255,140,0,0.12))",
+                  border: "1px solid rgba(255,183,77,0.4)",
+                  color: "var(--color-gold)",
+                }}
+              >
+                {t(content.yantraHighlight, locale)}
+              </motion.div>
 
               {/* Title */}
               <motion.h3

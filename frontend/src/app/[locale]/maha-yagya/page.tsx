@@ -25,7 +25,7 @@ import {
 } from "./_components/ScrollAnimations";
 
 // ─── Constants ───────────────────────────────────────────────
-const EVENT_DATE = "2026-06-10T06:00:00+05:30"; // June 10, 2026
+const EVENT_DATE = "2026-06-03T06:00:00+05:30"; // June 3, 2026
 const WHATSAPP_NUMBER = "919876543210"; // Update with actual number
 const PHONE_NUMBER = "+91-9876543210";
 const EMAIL_ADDRESS = "yagya@swamirupeshwaranand.org";
@@ -35,12 +35,12 @@ const EMAIL_ADDRESS = "yagya@swamirupeshwaranand.org";
 const hero = {
   badge: { en: "Limited Stalls Available", hi: "सीमित स्टॉल उपलब्ध" },
   title: {
-    en: "108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project",
-    hi: "108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ",
+    en: "108 Kund World Peace Maha Yagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project",
+    hi: "108 कुंड विश्व शांति महा यज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ",
   },
   subtitle: {
-    en: "The Holy City of Varanasi, Uttar Pradesh • June 10, 2026",
-    hi: "पवित्र नगरी वाराणसी, उत्तर प्रदेश • 10 जून 2026",
+    en: "The Holy City of Varanasi, Uttar Pradesh • 3–7 June 2026",
+    hi: "पवित्र नगरी वाराणसी, उत्तर प्रदेश • 3–7 जून 2026",
   },
   cta: { en: "Book Your Stall Now", hi: "अभी अपना स्टॉल बुक करें" },
   ctaCall: { en: "Call Now", hi: "अभी कॉल करें" },
@@ -55,7 +55,7 @@ const hero = {
 };
 
 const keyBenefits = {
-  title: { en: "Why This Mahayagya Is Unmissable", hi: "यह महायज्ञ क्यों अनूठा है" },
+  title: { en: "Why This Maha Yagya Is Unmissable", hi: "यह महा यज्ञ क्यों अनूठा है" },
   subtitle: {
     en: "Four compelling reasons to be a part of this grand event",
     hi: "इस भव्य आयोजन का हिस्सा बनने के चार प्रमुख कारण",
@@ -111,7 +111,7 @@ const whyParticipate = {
     { icon: "👥", title: { en: "Targeted Audience", hi: "लक्षित दर्शक" }, desc: { en: "Health-conscious families, spiritual seekers & wellness enthusiasts", hi: "स्वास्थ्य-जागरूक परिवार, आध्यात्मिक साधक और कल्याण प्रेमी" } },
     { icon: "📺", title: { en: "Media Coverage", hi: "मीडिया कवरेज" }, desc: { en: "National & regional media, live streaming, social media promotion", hi: "राष्ट्रीय और क्षेत्रीय मीडिया, लाइव स्ट्रीमिंग, सोशल मीडिया प्रचार" } },
     { icon: "🤝", title: { en: "Networking", hi: "नेटवर्किंग" }, desc: { en: "Connect with VIPs, government officials & industry leaders", hi: "VIP, सरकारी अधिकारियों और उद्योग जगत से जुड़ें" } },
-    { icon: "🙏", title: { en: "Spiritual Merit", hi: "आध्यात्मिक लाभ" }, desc: { en: "Be part of a sacred 108 Kundiya Yagya — a rare spiritual event", hi: "108 कुंडीय महायज्ञ का हिस्सा बनें — एक दुर्लभ आध्यात्मिक आयोजन" } },
+    { icon: "🙏", title: { en: "Spiritual Merit", hi: "आध्यात्मिक लाभ" }, desc: { en: "Be part of a sacred 108 Kundiya Yagya — a rare spiritual event", hi: "108 कुंडीय महा यज्ञ का हिस्सा बनें — एक दुर्लभ आध्यात्मिक आयोजन" } },
     { icon: "💊", title: { en: "Pharma & Startup Showcase", hi: "फार्मा और स्टार्टअप प्रदर्शन" }, desc: { en: "Ideal platform for medical, pharma companies, startups & other business sectors", hi: "मेडिकल, फार्मा कंपनियों, स्टार्टअप और अन्य व्यापार क्षेत्रों के लिए आदर्श मंच" } },
     { icon: "💚", title: { en: "CSR Opportunity", hi: "CSR अवसर" }, desc: { en: "Align your brand with wellness, peace & community service", hi: "अपने ब्रांड को कल्याण, शांति और समाज सेवा से जोड़ें" } },
     { icon: "🌍", title: { en: "Cultural Significance", hi: "सांस्कृतिक महत्व" }, desc: { en: "Varanasi — the spiritual capital of India, global recognition", hi: "वाराणसी — भारत की आध्यात्मिक राजधानी, वैश्विक पहचान" } },
@@ -202,7 +202,7 @@ const participationOptions = {
       id: "yajaman",
       name: { en: "Yajaman", hi: "यज्ञमान" },
       icon: "🔱",
-      desc: { en: "Become a Yajaman and earn the sacred merit of performing the Maha Yagya", hi: "यज्ञमान बनें और महायज्ञ करने का पवित्र पुण्य अर्जित करें" },
+      desc: { en: "Become a Yajaman and earn the sacred merit of performing the Maha Yagya", hi: "यज्ञमान बनें और महा यज्ञ करने का पवित्र पुण्य अर्जित करें" },
       tiers: [
         {
           id: "vishisht-yajaman",
@@ -211,13 +211,13 @@ const participationOptions = {
           priceLabel: { en: "VVIP Category", hi: "VVIP श्रेणी" },
           popular: true,
           features: [
+            { en: "Shri Baglamukhi Yantra — Real Gold Made", hi: "श्री बगलामुखी यंत्र — असली स्वर्ण निर्मित" },
             { en: "VVIP Category", hi: "VVIP श्रेणी" },
             { en: "Free Accommodation & Meals", hi: "निःशुल्क आवास और भोजन" },
             { en: "Free Health Checkup", hi: "निःशुल्क स्वास्थ्य जांच" },
-            { en: "Yagya Participation", hi: "यज्ञ सहभागिता" },
+            { en: "Maha Yagya Participation", hi: "महा यज्ञ सहभागिता" },
             { en: "Divine Meet with Saints", hi: "संतों से दिव्य भेंट" },
             { en: "Sankalp for Family Wellness", hi: "परिवार कल्याण हेतु संकल्प" },
-            { en: "Shri Pitambara Yantra (Gold)", hi: "श्री पीताम्बरा यंत्र (स्वर्ण)" },
           ],
         },
         {
@@ -227,13 +227,13 @@ const participationOptions = {
           priceLabel: { en: "VIP Category", hi: "VIP श्रेणी" },
           popular: false,
           features: [
+            { en: "Shri Baglamukhi Yantra — Real Silver Made", hi: "श्री बगलामुखी यंत्र — असली रजत निर्मित" },
             { en: "VIP Category", hi: "VIP श्रेणी" },
             { en: "Free Accommodation & Meals", hi: "निःशुल्क आवास और भोजन" },
             { en: "Free Health Checkup", hi: "निःशुल्क स्वास्थ्य जांच" },
-            { en: "Yagya Participation", hi: "यज्ञ सहभागिता" },
+            { en: "Maha Yagya Participation", hi: "महा यज्ञ सहभागिता" },
             { en: "Divine Meet with Saints", hi: "संतों से दिव्य भेंट" },
             { en: "Sankalp for Family Wellness", hi: "परिवार कल्याण हेतु संकल्प" },
-            { en: "Shri Pitambara Yantra (Silver)", hi: "श्री पीताम्बरा यंत्र (रजत)" },
           ],
         },
         {
@@ -243,13 +243,13 @@ const participationOptions = {
           priceLabel: { en: "VIP Category", hi: "VIP श्रेणी" },
           popular: false,
           features: [
+            { en: "Shri Baglamukhi Yantra — Real Copper Made", hi: "श्री बगलामुखी यंत्र — असली ताम्र निर्मित" },
             { en: "VIP Category", hi: "VIP श्रेणी" },
             { en: "Free Accommodation & Meals", hi: "निःशुल्क आवास और भोजन" },
             { en: "Free Health Checkup", hi: "निःशुल्क स्वास्थ्य जांच" },
-            { en: "Yagya Participation", hi: "यज्ञ सहभागिता" },
+            { en: "Maha Yagya Participation", hi: "महा यज्ञ सहभागिता" },
             { en: "Divine Meet with Saints", hi: "संतों से दिव्य भेंट" },
             { en: "Sankalp for Family Wellness", hi: "परिवार कल्याण हेतु संकल्प" },
-            { en: "Shri Pitambara Yantra (Copper)", hi: "श्री पीताम्बरा यंत्र (ताम्र)" },
           ],
         },
       ],
@@ -521,7 +521,7 @@ const trust = {
   },
   quote: {
     en: "This Maha Yagya is not just a spiritual event — it is a movement for world peace, holistic health, and cultural unity.",
-    hi: "यह महायज्ञ सिर्फ एक आध्यात्मिक आयोजन नहीं है — यह विश्व शांति, समग्र स्वास्थ्य और सांस्कृतिक एकता का आंदोलन है।",
+    hi: "यह महा यज्ञ सिर्फ एक आध्यात्मिक आयोजन नहीं है — यह विश्व शांति, समग्र स्वास्थ्य और सांस्कृतिक एकता का आंदोलन है।",
   },
   quoteAuthor: { en: "Swami Rupeshwaranand Ji Maharaj", hi: "स्वामी रूपेश्वरानंद जी महाराज" },
 };
@@ -533,16 +533,16 @@ const cmsFallbackSections = [
     id: "about-event",
     title: { en: "About the Event", hi: "कार्यक्रम के बारे में" },
     content: {
-      en: "The 108 Kund World Peace Mahayagya is a grand spiritual ceremony performed with 108 sacred fire pits (kunds) simultaneously. This rare and auspicious event brings together thousands of devotees, spiritual leaders, and wellness practitioners for 5 days of prayers, rituals, health expo, and cultural programs in the holy city of Varanasi.",
-      hi: "108 कुंड विश्व शांति महायज्ञ एक भव्य आध्यात्मिक समारोह है जो एक साथ 108 पवित्र अग्नि कुंडों के साथ किया जाता है। यह दुर्लभ और शुभ आयोजन हजारों भक्तों, आध्यात्मिक नेताओं और कल्याण साधकों को पवित्र वाराणसी में 5 दिनों की प्रार्थना, अनुष्ठान, स्वास्थ्य एक्सपो और सांस्कृतिक कार्यक्रमों के लिए एक साथ लाता है।",
+      en: "The 108 Kund World Peace Maha Yagya is a grand spiritual ceremony performed with 108 sacred fire pits (kunds) simultaneously. This rare and auspicious event brings together thousands of devotees, spiritual leaders, and wellness practitioners for 5 days of prayers, rituals, health expo, and cultural programs in the holy city of Varanasi.",
+      hi: "108 कुंड विश्व शांति महा यज्ञ एक भव्य आध्यात्मिक समारोह है जो एक साथ 108 पवित्र अग्नि कुंडों के साथ किया जाता है। यह दुर्लभ और शुभ आयोजन हजारों भक्तों, आध्यात्मिक नेताओं और कल्याण साधकों को पवित्र वाराणसी में 5 दिनों की प्रार्थना, अनुष्ठान, स्वास्थ्य एक्सपो और सांस्कृतिक कार्यक्रमों के लिए एक साथ लाता है।",
     },
   },
   {
     id: "venue-info",
     title: { en: "Venue & Location", hi: "स्थान और लोकेशन" },
     content: {
-      en: "📍 Varanasi, Uttar Pradesh, India\n🕐 June 10–14, 2026\n🏛️ A sprawling venue with dedicated zones for yagya, exhibition stalls, cultural stage, food court, and VIP seating.",
-      hi: "📍 वाराणसी, उत्तर प्रदेश, भारत\n🕐 10–14 जून 2026\n🏛️ यज्ञ, प्रदर्शनी स्टॉल, सांस्कृतिक मंच, फूड कोर्ट और VIP बैठक के लिए समर्पित क्षेत्रों के साथ विशाल स्थान।",
+      en: "📍 Varanasi, Uttar Pradesh, India\n🕐 June 3–7, 2026\n🏛️ A sprawling venue with dedicated zones for yagya, exhibition stalls, cultural stage, food court, and VIP seating.",
+      hi: "📍 वाराणसी, उत्तर प्रदेश, भारत\n🕐 3–7 जून 2026\n🏛️ यज्ञ, प्रदर्शनी स्टॉल, सांस्कृतिक मंच, फूड कोर्ट और VIP बैठक के लिए समर्पित क्षेत्रों के साथ विशाल स्थान।",
     },
   },
 ];
@@ -560,8 +560,8 @@ const finalCTA = {
 
 const floating = {
   whatsappMsg: {
-    en: "Hi, I'm interested in booking a stall at the 108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project in Varanasi. Please share details.",
-    hi: "नमस्ते, मैं वाराणसी में 108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ में स्टॉल बुक करने में रुचि रखता/रखती हूं। कृपया विवरण साझा करें।",
+    en: "Hi, I'm interested in booking a stall at the 108 Kund World Peace Maha Yagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project in Varanasi. Please share details.",
+    hi: "नमस्ते, मैं वाराणसी में 108 कुंड विश्व शांति महा यज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ में स्टॉल बुक करने में रुचि रखता/रखती हूं। कृपया विवरण साझा करें।",
   },
 };
 
@@ -575,13 +575,13 @@ export async function generateMetadata({
   const { locale } = await params;
 
   const titles: Record<AppLocale, string> = {
-    en: "108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project — Book Your Stall",
-    hi: "108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ — अपना स्टॉल बुक करें",
+    en: "108 Kund World Peace Maha Yagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project — Book Your Stall",
+    hi: "108 कुंड विश्व शांति महा यज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ — अपना स्टॉल बुक करें",
   };
 
   const descriptions: Record<AppLocale, string> = {
-    en: "Book your exhibition stall at the 108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project in Varanasi. 25,000+ daily visitors, 5 days, 300+ stalls. Standard ₹50K, Premium ₹1L, Prime ₹2L.",
-    hi: "वाराणसी में 108 कुंड विश्व शांति महायज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ में अपना प्रदर्शनी स्टॉल बुक करें। 25,000+ दैनिक आगंतुक, 5 दिन, 300+ स्टॉल।",
+    en: "Book your exhibition stall at the 108 Kund World Peace Maha Yagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project in Varanasi. 25,000+ daily visitors, 5 days, 300+ stalls. Standard ₹50K, Premium ₹1L, Prime ₹2L.",
+    hi: "वाराणसी में 108 कुंड विश्व शांति महा यज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ में अपना प्रदर्शनी स्टॉल बुक करें। 25,000+ दैनिक आगंतुक, 5 दिन, 300+ स्टॉल।",
   };
 
   return {
@@ -629,7 +629,7 @@ export default async function MahaYagyaPage({
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Event",
-            name: "108 Kund World Peace Mahayagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project",
+            name: "108 Kund World Peace Maha Yagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project",
             description: t(hero.tagline, "en"),
             startDate: EVENT_DATE,
             endDate: "2026-06-14T20:00:00+05:30",
@@ -686,7 +686,7 @@ export default async function MahaYagyaPage({
 
           <h1 className="font-heading text-white mb-4 leading-tight">
             <span className="block text-3xl sm:text-4xl md:text-[2.75rem] lg:text-6xl font-bold">
-              {locale === "hi" ? "108 कुंड विश्व शांति महायज्ञ" : "108 Kund World Peace Mahayagya"}
+              {locale === "hi" ? "108 कुंड विश्व शांति महा यज्ञ" : "108 Kund World Peace Maha Yagya"}
             </span>
             <span className="block text-xl sm:text-2xl md:text-3xl font-medium mt-2" style={{ color: "var(--color-gold)" }}>{locale === "hi" ? "एवं" : "&"}</span>
             <span className="block text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-white/80">
