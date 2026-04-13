@@ -19,10 +19,10 @@ const categories = [
 
 const tiersByCategory: Record<string, { value: string; en: string; hi: string }[]> = {
   sponsor: [
-    { value: "maha-prayojak", en: "Maha Prayojak — ₹1,00,00,000", hi: "महा प्रायोजक — ₹1,00,00,000" },
-    { value: "title-sponsor", en: "Title Sponsor — ₹50,00,000", hi: "टाइटल प्रायोजक — ₹50,00,000" },
-    { value: "co-sponsor", en: "Co-Sponsor — ₹25,00,000", hi: "सह-प्रायोजक — ₹25,00,000" },
-    { value: "associate-sponsor", en: "Associate Sponsor — ₹10,00,000", hi: "एसोसिएट प्रायोजक — ₹10,00,000" },
+    { value: "lead-csr-partner", en: "Lead CSR Partner — ₹1,00,00,000", hi: "लीड CSR पार्टनर — ₹1,00,00,000" },
+    { value: "green-partner", en: "Green Partner — ₹50,00,000", hi: "ग्रीन पार्टनर — ₹50,00,000" },
+    { value: "health-partner", en: "Health Partner — ₹25,00,000", hi: "हेल्थ पार्टनर — ₹25,00,000" },
+    { value: "empact-partner", en: "Empact Partner — ₹10,00,000", hi: "एम्पैक्ट पार्टनर — ₹10,00,000" },
     { value: "stall-partner", en: "Stall Partner — ₹5,00,000", hi: "स्टॉल पार्टनर — ₹5,00,000" },
   ],
   yajaman: [
@@ -38,15 +38,15 @@ const tiersByCategory: Record<string, { value: string; en: string; hi: string }[
   ],
   "business-stall": [
     { value: "business-standard", en: "Standard Stall (10×10 ft) — ₹50,000", hi: "स्टैंडर्ड स्टॉल (10×10 फ़ीट) — ₹50,000" },
-    { value: "business-premium", en: "Premium Pagoda (12×12 ft) — ₹1,00,000", hi: "प्रीमियम पगोडा (12×12 फ़ीट) — ₹1,00,000" },
-    { value: "business-premium-tv", en: "Premium Pagoda + TV (12×12 ft) — ₹1,50,000", hi: "प्रीमियम पगोडा + टीवी (12×12 फ़ीट) — ₹1,50,000" },
-    { value: "business-prime", en: "Prime 3D Pod Stall (6m×6m) — ₹2,00,000", hi: "प्राइम 3D पॉड स्टॉल (6m×6m) — ₹2,00,000" },
+    { value: "business-premium", en: "Premium Stall (12×12 ft) — ₹1,00,000", hi: "प्रीमियम स्टॉल (12×12 फ़ीट) — ₹1,00,000" },
+    { value: "business-premium-tv", en: "Luxury Premium Stall + TV (12×12 ft) — ₹1,50,000", hi: "लक्ज़री प्रीमियम स्टॉल + टीवी (12×12 फ़ीट) — ₹1,50,000" },
+    { value: "business-prime", en: "Prime Stall (6m×6m) — ₹2,00,000", hi: "प्राइम स्टॉल (6m×6m) — ₹2,00,000" },
   ],
   "food-stall": [
     { value: "food-standard", en: "Standard Food Stall (10×10 ft) — ₹50,000", hi: "स्टैंडर्ड फ़ूड स्टॉल (10×10 फ़ीट) — ₹50,000" },
-    { value: "food-premium", en: "Premium Pagoda (12×12 ft) — ₹1,00,000", hi: "प्रीमियम पगोडा (12×12 फ़ीट) — ₹1,00,000" },
-    { value: "food-premium-tv", en: "Premium Pagoda + TV (12×12 ft) — ₹1,50,000", hi: "प्रीमियम पगोडा + टीवी (12×12 फ़ीट) — ₹1,50,000" },
-    { value: "food-prime", en: "Prime 3D Pod Stall (6m×6m) — ₹2,00,000", hi: "प्राइम 3D पॉड स्टॉल (6m×6m) — ₹2,00,000" },
+    { value: "food-premium", en: "Premium Stall (12×12 ft) — ₹1,00,000", hi: "प्रीमियम स्टॉल (12×12 फ़ीट) — ₹1,00,000" },
+    { value: "food-premium-tv", en: "Luxury Premium Stall + TV (12×12 ft) — ₹1,50,000", hi: "लक्ज़री प्रीमियम स्टॉल + टीवी (12×12 फ़ीट) — ₹1,50,000" },
+    { value: "food-prime", en: "Prime Stall (6m×6m) — ₹2,00,000", hi: "प्राइम स्टॉल (6m×6m) — ₹2,00,000" },
   ],
 };
 

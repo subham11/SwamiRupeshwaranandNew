@@ -42,15 +42,15 @@ const hero = {
     en: "The Holy City of Varanasi, Uttar Pradesh • 3–7 June 2026",
     hi: "पवित्र नगरी वाराणसी, उत्तर प्रदेश • 3–7 जून 2026",
   },
-  cta: { en: "Book Your Stall Now", hi: "अभी अपना स्टॉल बुक करें" },
+  cta: { en: "Enquire Now", hi: "अभी पूछताछ करें" },
   ctaCall: { en: "Call Now", hi: "अभी कॉल करें" },
   tagline: {
     en: "A sacred confluence of spirituality, wellness & commerce — 25,000+ daily footfall, 5 divine days",
     hi: "अध्यात्म, स्वास्थ्य और व्यापार का पवित्र संगम — 25,000+ दैनिक उपस्थिति, 5 दिव्य दिन",
   },
   initiative: {
-    en: "An initiative by Brahmavadini Spiritual Services Pvt. Ltd. & Brahmavadini Foundation & Swami Rupeshwaranand Ashram",
-    hi: "ब्रह्मवादिनी स्पिरिचुअल सर्विसेज प्रा. लि. एवं ब्रह्मवादिनी फाउंडेशन एवं स्वामी रूपेश्वरानंद आश्रम की एक पहल",
+    en: "An initiative by Brahmavadini Foundation, Brahmavadini Spiritual Services Pvt. Ltd., Swami Rupeshwaranand Ashram & Youth4Nation",
+    hi: "ब्रह्मवादिनी फाउंडेशन, ब्रह्मवादिनी स्पिरिचुअल सर्विसेज प्रा. लि., स्वामी रूपेश्वरानंद आश्रम एवं Youth4Nation की एक पहल",
   },
 };
 
@@ -90,12 +90,70 @@ const keyBenefits = {
     },
     {
       icon: "🤝",
-      value: { en: "Invest", hi: "निवेश" },
-      title: { en: "Investment & Coordination Opportunity", hi: "निवेश और समन्वय का अवसर" },
+      value: { en: "CSR", hi: "CSR" },
+      title: { en: "CSR Certification & Coordination", hi: "CSR प्रमाणन और समन्वय" },
       desc: {
-        en: "Unique opportunity to invest in a sacred event and coordinate with VIPs, government officials & industry leaders",
-        hi: "एक पवित्र आयोजन में निवेश और VIP, सरकारी अधिकारियों व उद्योग जगत के नेताओं के साथ समन्वय का अनूठा अवसर",
+        en: "Unique opportunity for CSR certification through a sacred event and coordination with VIPs, government officials & industry leaders",
+        hi: "एक पवित्र आयोजन के माध्यम से CSR प्रमाणन और VIP, सरकारी अधिकारियों व उद्योग जगत के नेताओं के साथ समन्वय का अनूठा अवसर",
       },
+    },
+  ],
+};
+
+const participants = {
+  title: { en: "Who Will Be the Participants?", hi: "प्रतिभागी कौन होंगे?" },
+  subtitle: {
+    en: "Diverse participation across spiritual, health, business, and environmental impact",
+    hi: "आध्यात्मिक, स्वास्थ्य, व्यापार और पर्यावरणीय प्रभाव में विविध भागीदारी",
+  },
+  categories: [
+    {
+      icon: "🏢",
+      tag: { en: "CSR PARTNERS", hi: "CSR पार्टनर" },
+      title: { en: "Corporate Participation", hi: "कॉर्पोरेट भागीदारी" },
+      tagline: { en: "Driving National Impact through CSR Collaboration", hi: "CSR सहयोग के माध्यम से राष्ट्रीय प्रभाव" },
+      points: [
+        { en: "Environment + Health initiatives", hi: "पर्यावरण + स्वास्थ्य पहल" },
+        { en: "National impact contribution", hi: "राष्ट्रीय प्रभाव योगदान" },
+        { en: "Mega Environment Project (MEP) — 750+ Cr Trees Plantation", hi: "मेगा पर्यावरण परियोजना (MEP) — 750+ करोड़ वृक्षारोपण" },
+        { en: "CSR Certification", hi: "CSR प्रमाणन" },
+      ],
+    },
+    {
+      icon: "🔱",
+      tag: { en: "YAGYAMAN PARTICIPANTS", hi: "यज्ञमान प्रतिभागी" },
+      title: { en: "Spiritual Participation", hi: "आध्यात्मिक भागीदारी" },
+      tagline: { en: "Spiritual Participation for Peace, Prosperity & Well-being", hi: "शांति, समृद्धि और कल्याण के लिए आध्यात्मिक भागीदारी" },
+      points: [
+        { en: "Individuals / Families", hi: "व्यक्ति / परिवार" },
+        { en: "Devotees", hi: "भक्तगण" },
+        { en: "Yagya Participation", hi: "यज्ञ सहभागिता" },
+        { en: "Sankalp for Family Well-being", hi: "परिवार कल्याण हेतु संकल्प" },
+      ],
+    },
+    {
+      icon: "🧘",
+      tag: { en: "CAMP PARTICIPANTS", hi: "शिविर प्रतिभागी" },
+      title: { en: "Health & Wellness and Yoga Participation", hi: "स्वास्थ्य, कल्याण और योग भागीदारी" },
+      tagline: { en: "Holistic Health & Wellness Experience", hi: "समग्र स्वास्थ्य और कल्याण अनुभव" },
+      points: [
+        { en: "General Public & Health Seekers", hi: "सामान्य जनता और स्वास्थ्य साधक" },
+        { en: "Yoga Camps", hi: "योग शिविर" },
+        { en: "Ayurveda Consultation", hi: "आयुर्वेद परामर्श" },
+        { en: "Free Health Check-up", hi: "निःशुल्क स्वास्थ्य जांच" },
+      ],
+    },
+    {
+      icon: "🚀",
+      tag: { en: "STALL PARTNERS", hi: "स्टॉल पार्टनर" },
+      title: { en: "Business Participation", hi: "व्यापार भागीदारी" },
+      tagline: { en: "Business Growth through Direct Market Access", hi: "सीधी बाजार पहुंच के माध्यम से व्यापार वृद्धि" },
+      points: [
+        { en: "Brands & Startups", hi: "ब्रांड और स्टार्टअप" },
+        { en: "Ayurveda, FMCG & Pharma Companies", hi: "आयुर्वेद, FMCG और फार्मा कंपनियां" },
+        { en: "Product Display & Sales", hi: "उत्पाद प्रदर्शन और बिक्री" },
+        { en: "Brand Promotion", hi: "ब्रांड प्रमोशन" },
+      ],
     },
   ],
 };
@@ -132,13 +190,13 @@ const participationOptions = {
       desc: { en: "Partner with us to amplify your brand at India's grandest spiritual & wellness event", hi: "भारत के सबसे भव्य आध्यात्मिक और कल्याण आयोजन में अपने ब्रांड को बढ़ाने के लिए हमारे साथ जुड़ें" },
       tiers: [
         {
-          id: "maha-prayojak",
-          name: { en: "Maha Prayojak", hi: "महा प्रायोजक" },
+          id: "lead-csr-partner",
+          name: { en: "Lead CSR Partner", hi: "लीड CSR पार्टनर" },
           price: "₹1,00,00,000",
           priceLabel: { en: "1 Crore", hi: "1 करोड़" },
           popular: true,
           features: [
-            { en: "Exclusive Maha Prayojak branding across all event material", hi: "सभी इवेंट सामग्री पर विशेष महा प्रायोजक ब्रांडिंग" },
+            { en: "Exclusive Lead CSR Partner branding across all event material", hi: "सभी इवेंट सामग्री पर विशेष लीड CSR पार्टनर ब्रांडिंग" },
             { en: "Largest premium stall with VIP zone", hi: "VIP ज़ोन सहित सबसे बड़ा प्रीमियम स्टॉल" },
             { en: "Complete media coverage, press conference & social media campaign", hi: "पूर्ण मीडिया कवरेज, प्रेस कॉन्फ्रेंस और सोशल मीडिया अभियान" },
             { en: "VIP passes for 15 representatives + VIP dinner invitation", hi: "15 प्रतिनिधियों के लिए VIP पास + VIP डिनर निमंत्रण" },
@@ -146,21 +204,21 @@ const participationOptions = {
           ],
         },
         {
-          id: "title-sponsor",
-          name: { en: "Title Sponsor", hi: "टाइटल प्रायोजक" },
+          id: "green-partner",
+          name: { en: "Green Partner", hi: "ग्रीन पार्टनर" },
           price: "₹50,00,000",
           priceLabel: { en: "50 Lakh", hi: "50 लाख" },
           popular: false,
           features: [
-            { en: "Title sponsorship branding across all event material", hi: "सभी इवेंट सामग्री पर टाइटल स्पॉन्सरशिप ब्रांडिंग" },
+            { en: "Green Partner branding across all event material", hi: "सभी इवेंट सामग्री पर ग्रीन पार्टनर ब्रांडिंग" },
             { en: "Prime stall location (20×20 ft VIP zone)", hi: "प्राइम स्टॉल लोकेशन (20×20 फ़ीट VIP ज़ोन)" },
             { en: "Full media coverage, press mentions & social media promotion", hi: "पूर्ण मीडिया कवरेज, प्रेस उल्लेख और सोशल मीडिया प्रमोशन" },
             { en: "VIP passes for 10 representatives + VIP dinner invitation", hi: "10 प्रतिनिधियों के लिए VIP पास + VIP डिनर निमंत्रण" },
           ],
         },
         {
-          id: "co-sponsor",
-          name: { en: "Co-Sponsor", hi: "सह-प्रायोजक" },
+          id: "health-partner",
+          name: { en: "Health Partner", hi: "हेल्थ पार्टनर" },
           price: "₹25,00,000",
           priceLabel: { en: "25 Lakh", hi: "25 लाख" },
           popular: false,
@@ -172,8 +230,8 @@ const participationOptions = {
           ],
         },
         {
-          id: "associate-sponsor",
-          name: { en: "Associate Sponsor", hi: "एसोसिएट प्रायोजक" },
+          id: "empact-partner",
+          name: { en: "Empact Partner", hi: "एम्पैक्ट पार्टनर" },
           price: "₹10,00,000",
           priceLabel: { en: "10 Lakh", hi: "10 लाख" },
           popular: false,
@@ -338,7 +396,7 @@ const participationOptions = {
         },
         {
           id: "business-premium",
-          name: { en: "Premium Pagoda (12×12 ft)", hi: "प्रीमियम पगोडा (12×12 फ़ीट)" },
+          name: { en: "Premium Stall (12×12 ft)", hi: "प्रीमियम स्टॉल (12×12 फ़ीट)" },
           price: "₹1,00,000",
           priceLabel: { en: "Without TV", hi: "बिना टीवी" },
           popular: false,
@@ -353,7 +411,7 @@ const participationOptions = {
         },
         {
           id: "business-premium-tv",
-          name: { en: "Premium Pagoda + TV (12×12 ft)", hi: "प्रीमियम पगोडा + टीवी (12×12 फ़ीट)" },
+          name: { en: "Luxury Premium Stall + TV (12×12 ft)", hi: "लक्ज़री प्रीमियम स्टॉल + टीवी (12×12 फ़ीट)" },
           price: "₹1,50,000",
           priceLabel: { en: "With Plasma TV", hi: "प्लाज़्मा टीवी सहित" },
           popular: true,
@@ -368,7 +426,7 @@ const participationOptions = {
         },
         {
           id: "business-prime",
-          name: { en: "Prime 3D Pod Stall (6m × 6m)", hi: "प्राइम 3D पॉड स्टॉल (6m × 6m)" },
+          name: { en: "Prime Stall (6m × 6m)", hi: "प्राइम स्टॉल (6m × 6m)" },
           price: "₹2,00,000",
           priceLabel: { en: "Premium 3D Wooden Stall", hi: "प्रीमियम 3D वुडन स्टॉल" },
           popular: false,
@@ -409,7 +467,7 @@ const participationOptions = {
         },
         {
           id: "food-premium",
-          name: { en: "Premium Pagoda (12×12 ft)", hi: "प्रीमियम पगोडा (12×12 फ़ीट)" },
+          name: { en: "Premium Stall (12×12 ft)", hi: "प्रीमियम स्टॉल (12×12 फ़ीट)" },
           price: "₹1,00,000",
           priceLabel: { en: "Without TV", hi: "बिना टीवी" },
           popular: false,
@@ -424,7 +482,7 @@ const participationOptions = {
         },
         {
           id: "food-premium-tv",
-          name: { en: "Premium Pagoda + TV (12×12 ft)", hi: "प्रीमियम पगोडा + टीवी (12×12 फ़ीट)" },
+          name: { en: "Luxury Premium Stall + TV (12×12 ft)", hi: "लक्ज़री प्रीमियम स्टॉल + टीवी (12×12 फ़ीट)" },
           price: "₹1,50,000",
           priceLabel: { en: "With Plasma TV", hi: "प्लाज़्मा टीवी सहित" },
           popular: true,
@@ -439,7 +497,7 @@ const participationOptions = {
         },
         {
           id: "food-prime",
-          name: { en: "Prime 3D Pod Stall (6m × 6m)", hi: "प्राइम 3D पॉड स्टॉल (6m × 6m)" },
+          name: { en: "Prime Stall (6m × 6m)", hi: "प्राइम स्टॉल (6m × 6m)" },
           price: "₹2,00,000",
           priceLabel: { en: "Premium 3D Wooden Stall", hi: "प्रीमियम 3D वुडन स्टॉल" },
           popular: false,
@@ -497,7 +555,7 @@ const urgency = {
 };
 
 const formSection = {
-  title: { en: "Book Your Stall", hi: "अपना स्टॉल बुक करें" },
+  title: { en: "Enquire Now", hi: "अभी पूछताछ करें" },
   subtitle: {
     en: "Fill in your details and our team will get back to you within 24 hours",
     hi: "अपना विवरण भरें, हमारी टीम 24 घंटे में आपसे संपर्क करेगी",
@@ -575,8 +633,8 @@ export async function generateMetadata({
   const { locale } = await params;
 
   const titles: Record<AppLocale, string> = {
-    en: "108 Kund World Peace Maha Yagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project — Book Your Stall",
-    hi: "108 कुंड विश्व शांति महा यज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ — अपना स्टॉल बुक करें",
+    en: "108 Kund World Peace Maha Yagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project — Enquire Now",
+    hi: "108 कुंड विश्व शांति महा यज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ — अभी पूछताछ करें",
   };
 
   const descriptions: Record<AppLocale, string> = {
@@ -632,7 +690,7 @@ export default async function MahaYagyaPage({
             name: "108 Kund World Peace Maha Yagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project",
             description: t(hero.tagline, "en"),
             startDate: EVENT_DATE,
-            endDate: "2026-06-14T20:00:00+05:30",
+            endDate: "2026-06-07T20:00:00+05:30",
             eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
             eventStatus: "https://schema.org/EventScheduled",
             location: {
@@ -685,15 +743,15 @@ export default async function MahaYagyaPage({
           </span>
 
           <h1 className="font-heading text-white mb-4 leading-tight">
-            <span className="block text-3xl sm:text-4xl md:text-[2.75rem] lg:text-6xl font-bold">
+            <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
               {locale === "hi" ? "108 कुंड विश्व शांति महा यज्ञ" : "108 Kund World Peace Maha Yagya"}
             </span>
             <span className="block text-xl sm:text-2xl md:text-3xl font-medium mt-2" style={{ color: "var(--color-gold)" }}>{locale === "hi" ? "एवं" : "&"}</span>
-            <span className="block text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-white/80">
+            <span className="block text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-white/90">
               {locale === "hi" ? "वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो" : "Global Health and Wellness Mega Expo"}
             </span>
             <span className="block text-xl sm:text-2xl md:text-3xl font-medium mt-1" style={{ color: "var(--color-gold)" }}>{locale === "hi" ? "एवं" : "&"}</span>
-            <span className="block text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-white/80">
+            <span className="block text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-white/90">
               {locale === "hi" ? "मेगा पर्यावरण परियोजना का शुभारंभ" : "Launching of Mega Environmental Project"}
             </span>
           </h1>
@@ -711,16 +769,20 @@ export default async function MahaYagyaPage({
               {locale === "hi" ? "एक पहल" : "An initiative by"}
             </p>
             <p className="text-sm sm:text-base text-white/80 font-medium leading-relaxed">
-              <a href="https://brahmavadini.in" target="_blank" rel="noopener noreferrer" className="text-white hover:text-amber-300 transition-colors border-b border-white/30 hover:border-amber-300 pb-px">
-                {locale === "hi" ? "ब्रह्मवादिनी स्पिरिचुअल सर्विसेज प्रा. लि." : "Brahmavadini Spiritual Services Pvt. Ltd."}
-              </a>
-              <span className="mx-2 text-white/30">•</span>
               <a href="https://brahmavadini.org" target="_blank" rel="noopener noreferrer" className="text-white hover:text-amber-300 transition-colors border-b border-white/30 hover:border-amber-300 pb-px">
                 {locale === "hi" ? "ब्रह्मवादिनी फाउंडेशन" : "Brahmavadini Foundation"}
               </a>
               <span className="mx-2 text-white/30">•</span>
+              <a href="https://brahmavadini.in" target="_blank" rel="noopener noreferrer" className="text-white hover:text-amber-300 transition-colors border-b border-white/30 hover:border-amber-300 pb-px">
+                {locale === "hi" ? "ब्रह्मवादिनी स्पिरिचुअल सर्विसेज प्रा. लि." : "Brahmavadini Spiritual Services Pvt. Ltd."}
+              </a>
+              <span className="mx-2 text-white/30">•</span>
               <a href="https://swamirupeshwaranand.in" target="_blank" rel="noopener noreferrer" className="text-white hover:text-amber-300 transition-colors border-b border-white/30 hover:border-amber-300 pb-px">
                 {locale === "hi" ? "स्वामी रूपेश्वरानंद आश्रम" : "Swami Rupeshwaranand Ashram"}
+              </a>
+              <span className="mx-2 text-white/30">•</span>
+              <a href="https://youth4nation.in" target="_blank" rel="noopener noreferrer" className="text-white hover:text-amber-300 transition-colors border-b border-white/30 hover:border-amber-300 pb-px">
+                Youth4Nation
               </a>
             </p>
           </div>
@@ -790,6 +852,59 @@ export default async function MahaYagyaPage({
       </section>
 
       <SacredDivider icon="🙏" />
+
+      {/* ═══ WHO WILL BE THE PARTICIPANTS ═══ */}
+      <section className="py-16 sm:py-20 md:py-24">
+        <Container>
+          <FadeUp>
+            <SectionHeading
+              title={t(participants.title, locale)}
+              subtitle={t(participants.subtitle, locale)}
+            />
+          </FadeUp>
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-5xl mx-auto" stagger={0.15}>
+            {participants.categories.map((cat, i) => (
+              <StaggerCard key={i}>
+                <SacredCard>
+                  <div className="h-full flex flex-col">
+                    <div className="flex items-center gap-3 mb-3">
+                      <IconPop className="text-3xl shrink-0">{cat.icon}</IconPop>
+                      <span
+                        className="text-xs font-bold tracking-widest uppercase px-2 py-0.5 rounded"
+                        style={{ backgroundColor: "rgba(234,179,8,0.12)", color: "var(--color-primary)" }}
+                      >
+                        {t(cat.tag, locale)}
+                      </span>
+                    </div>
+                    <h3
+                      className="font-heading text-lg font-semibold mb-1"
+                      style={{ color: "var(--color-primary)" }}
+                    >
+                      {t(cat.title, locale)}
+                    </h3>
+                    <ul className="text-sm space-y-1.5 mb-3 flex-1" style={{ color: "var(--color-muted)" }}>
+                      {cat.points.map((p, j) => (
+                        <li key={j} className="flex items-start gap-2">
+                          <span className="text-amber-500 mt-0.5">👉</span>
+                          <span>{t(p, locale)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <p
+                      className="text-sm font-semibold italic mt-auto pt-2 border-t border-zinc-200 dark:border-zinc-700"
+                      style={{ color: "var(--color-primary)" }}
+                    >
+                      &ldquo;{t(cat.tagline, locale)}&rdquo;
+                    </p>
+                  </div>
+                </SacredCard>
+              </StaggerCard>
+            ))}
+          </StaggerContainer>
+        </Container>
+      </section>
+
+      <SacredDivider icon="✦" />
 
       {/* ═══ SECTION 2: WHY PARTICIPATE ═══ */}
       <section className="py-16 sm:py-20 md:py-24">
