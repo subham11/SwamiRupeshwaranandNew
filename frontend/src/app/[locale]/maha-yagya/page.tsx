@@ -791,12 +791,9 @@ export default async function MahaYagyaPage({
             <GoldenButton href="#stall-options" className="text-lg px-8 py-4">
               {t(hero.cta, locale)}
             </GoldenButton>
-            <a
-              href={`tel:${PHONE_NUMBER}`}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-md font-medium text-white border border-white/30 hover:bg-white/10 transition-colors"
-            >
+            <GoldenButton href={`tel:${PHONE_NUMBER}`} className="text-lg px-8 py-4">
               📞 {t(hero.ctaCall, locale)}
-            </a>
+            </GoldenButton>
           </div>
         </Container>
       </section>
@@ -854,50 +851,56 @@ export default async function MahaYagyaPage({
       <SacredDivider icon="🙏" />
 
       {/* ═══ WHO WILL BE THE PARTICIPANTS ═══ */}
-      <section className="py-16 sm:py-20 md:py-24">
-        <Container>
+      <section
+        className="py-16 sm:py-20 md:py-24 relative overflow-hidden"
+        style={{ background: "linear-gradient(135deg, var(--color-primary), #1a0a00)" }}
+      >
+        <LotusPattern />
+        <Container className="relative z-10">
           <FadeUp>
-            <SectionHeading
-              title={t(participants.title, locale)}
-              subtitle={t(participants.subtitle, locale)}
-            />
+            <div className="flex flex-col text-center items-center mb-12">
+              <h2 className="font-heading text-3xl sm:text-4xl md:text-heading font-semibold mb-3 text-white">
+                {t(participants.title, locale)}
+              </h2>
+              <p className="text-lg max-w-2xl text-white/70">
+                {t(participants.subtitle, locale)}
+              </p>
+            </div>
           </FadeUp>
           <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-5xl mx-auto" stagger={0.15}>
             {participants.categories.map((cat, i) => (
               <StaggerCard key={i}>
-                <SacredCard>
-                  <div className="h-full flex flex-col">
-                    <div className="flex items-center gap-3 mb-3">
-                      <IconPop className="text-3xl shrink-0">{cat.icon}</IconPop>
-                      <span
-                        className="text-xs font-bold tracking-widest uppercase px-2 py-0.5 rounded"
-                        style={{ backgroundColor: "rgba(234,179,8,0.12)", color: "var(--color-primary)" }}
-                      >
-                        {t(cat.tag, locale)}
-                      </span>
-                    </div>
-                    <h3
-                      className="font-heading text-lg font-semibold mb-1"
-                      style={{ color: "var(--color-primary)" }}
+                <div
+                  className="relative rounded-2xl p-6 sm:p-8 border border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/25 hover:shadow-[0_8px_30px_rgba(234,179,8,0.15)] h-full flex flex-col"
+                  style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))" }}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <IconPop delay={i * 0.08} className="text-4xl sm:text-5xl shrink-0">{cat.icon}</IconPop>
+                    <span
+                      className="text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full"
+                      style={{ backgroundColor: "rgba(234,179,8,0.15)", color: "var(--color-gold)", border: "1px solid rgba(234,179,8,0.3)" }}
                     >
-                      {t(cat.title, locale)}
-                    </h3>
-                    <ul className="text-sm space-y-1.5 mb-3 flex-1" style={{ color: "var(--color-muted)" }}>
-                      {cat.points.map((p, j) => (
-                        <li key={j} className="flex items-start gap-2">
-                          <span className="text-amber-500 mt-0.5">👉</span>
-                          <span>{t(p, locale)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <p
-                      className="text-sm font-semibold italic mt-auto pt-2 border-t border-zinc-200 dark:border-zinc-700"
-                      style={{ color: "var(--color-primary)" }}
-                    >
-                      &ldquo;{t(cat.tagline, locale)}&rdquo;
-                    </p>
+                      {t(cat.tag, locale)}
+                    </span>
                   </div>
-                </SacredCard>
+                  <h3 className="text-lg sm:text-xl font-semibold text-white mb-3">
+                    {t(cat.title, locale)}
+                  </h3>
+                  <ul className="text-sm sm:text-base space-y-2 mb-4 flex-1 text-white/60">
+                    {cat.points.map((p, j) => (
+                      <li key={j} className="flex items-start gap-2">
+                        <span className="mt-0.5" style={{ color: "var(--color-gold)" }}>✦</span>
+                        <span>{t(p, locale)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p
+                    className="text-sm font-semibold italic mt-auto pt-3 border-t border-white/10"
+                    style={{ color: "var(--color-gold)" }}
+                  >
+                    &ldquo;{t(cat.tagline, locale)}&rdquo;
+                  </p>
+                </div>
               </StaggerCard>
             ))}
           </StaggerContainer>
