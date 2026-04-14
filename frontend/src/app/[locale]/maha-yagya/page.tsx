@@ -572,7 +572,7 @@ const formSection = {
 
 const trust = {
   title: { en: "Inspired By", hi: "प्रेरणास्रोत" },
-  orgName: { en: "Swami Rupeshwaranand Ji Maharaj Ashram", hi: "स्वामी रूपेश्वरानंद जी महाराज आश्रम" },
+  orgName: { en: "Swami Rupeshwaranand Ji Maharaj", hi: "स्वामी रूपेश्वरानंद जी महाराज" },
   orgDesc: {
     en: "With decades of experience organizing large-scale spiritual events, yagyas, and community gatherings across India, the ashram is committed to preserving Vedic traditions while creating meaningful platforms for cultural and commercial exchange.",
     hi: "पूरे भारत में बड़े पैमाने पर आध्यात्मिक कार्यक्रमों, यज्ञों और सामुदायिक सभाओं के आयोजन के दशकों के अनुभव के साथ, आश्रम वैदिक परंपराओं को संरक्षित करते हुए सांस्कृतिक और व्यावसायिक आदान-प्रदान के लिए सार्थक मंच बनाने के लिए प्रतिबद्ध है।",
@@ -871,7 +871,7 @@ export default async function MahaYagyaPage({
           <FadeUp>
             <a
               href="#stall-options"
-              className="block max-w-5xl mx-auto mb-10 rounded-2xl overflow-hidden shadow-2xl border border-white/10 hover:border-white/25 transition-all duration-300"
+              className="block max-w-2xl mx-auto mb-10 rounded-2xl overflow-hidden shadow-2xl border border-white/10 hover:border-white/25 transition-all duration-300"
             >
               <img
                 src="/images/csr-partner-banner.jpg"
@@ -1293,8 +1293,8 @@ export default async function MahaYagyaPage({
             <div className="max-w-3xl mx-auto text-center mb-10">
               <div className="flex justify-center mb-6">
                 <div
-                  className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full overflow-hidden shadow-xl"
-                  style={{ border: "4px solid var(--color-gold)" }}
+                  className="relative w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 rounded-full overflow-hidden shadow-xl"
+                  style={{ border: "5px solid var(--color-gold)" }}
                 >
                   <img
                     src="/images/swamiji-portrait.jpg"
