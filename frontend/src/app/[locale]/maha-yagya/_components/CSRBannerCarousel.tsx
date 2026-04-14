@@ -20,7 +20,7 @@ const banners = [
 
 export default function CSRBannerCarousel({ locale }: { locale: AppLocale }) {
   return (
-    <div className="csr-banner-carousel max-w-md mx-auto">
+    <div className="csr-banner-carousel max-w-2xl mx-auto">
       <Swiper
         modules={[Autoplay, Pagination, EffectFade]}
         effect="fade"
@@ -35,7 +35,7 @@ export default function CSRBannerCarousel({ locale }: { locale: AppLocale }) {
             <a
               href="#stall-options"
               className="block relative w-full"
-              style={{ aspectRatio: "2 / 3", background: "linear-gradient(135deg, #1a0a00, var(--color-primary))" }}
+              style={{ aspectRatio: "3 / 2", background: "linear-gradient(135deg, #1a0a00, var(--color-primary))" }}
             >
               <img
                 src={b.src}
