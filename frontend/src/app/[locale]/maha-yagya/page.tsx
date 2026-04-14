@@ -571,7 +571,7 @@ const formSection = {
 };
 
 const trust = {
-  title: { en: "Organized By", hi: "आयोजक" },
+  title: { en: "Inspired By", hi: "प्रेरणास्रोत" },
   orgName: { en: "Swami Rupeshwaranand Ji Maharaj Ashram", hi: "स्वामी रूपेश्वरानंद जी महाराज आश्रम" },
   orgDesc: {
     en: "With decades of experience organizing large-scale spiritual events, yagyas, and community gatherings across India, the ashram is committed to preserving Vedic traditions while creating meaningful platforms for cultural and commercial exchange.",
@@ -1277,6 +1277,18 @@ export default async function MahaYagyaPage({
           </FadeUp>
           <FadeUp delay={0.15}>
             <div className="max-w-3xl mx-auto text-center mb-10">
+              <div className="flex justify-center mb-6">
+                <div
+                  className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full overflow-hidden shadow-xl"
+                  style={{ border: "4px solid var(--color-gold)" }}
+                >
+                  <img
+                    src="/images/swamiji-portrait.jpg"
+                    alt={t(trust.orgName, locale)}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
               <h3
                 className="font-heading text-2xl font-semibold mb-4"
                 style={{ color: "var(--color-primary)" }}
