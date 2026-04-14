@@ -14,6 +14,7 @@ import CMSTextBlocks from "@/components/CMSTextBlocks";
 import CountdownTimer from "./_components/CountdownTimer";
 import LeadForm from "./_components/LeadForm";
 import StallCarousel from "./_components/StallCarousel";
+import CSRBannerCarousel from "./_components/CSRBannerCarousel";
 import {
   FadeUp,
   StaggerContainer,
@@ -867,18 +868,11 @@ export default async function MahaYagyaPage({
               </p>
             </div>
           </FadeUp>
-          {/* CSR Partner Banner */}
+          {/* CSR Partner Banner Carousel */}
           <FadeUp>
-            <a
-              href="#stall-options"
-              className="block max-w-2xl mx-auto mb-10 rounded-2xl overflow-hidden shadow-2xl border border-white/10 hover:border-white/25 transition-all duration-300"
-            >
-              <img
-                src="/images/csr-partner-banner.jpg"
-                alt={locale === "hi" ? "CSR पार्टनर बनें" : "Become Our CSR Partner"}
-                className="w-full h-auto block"
-              />
-            </a>
+            <div className="mb-10">
+              <CSRBannerCarousel locale={locale} />
+            </div>
           </FadeUp>
 
           <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-5xl mx-auto" stagger={0.15}>
