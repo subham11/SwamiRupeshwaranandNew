@@ -867,6 +867,20 @@ export default async function MahaYagyaPage({
               </p>
             </div>
           </FadeUp>
+          {/* CSR Partner Banner */}
+          <FadeUp>
+            <a
+              href="#stall-options"
+              className="block max-w-5xl mx-auto mb-10 rounded-2xl overflow-hidden shadow-2xl border border-white/10 hover:border-white/25 transition-all duration-300"
+            >
+              <img
+                src="/images/csr-partner-banner.jpg"
+                alt={locale === "hi" ? "CSR पार्टनर बनें" : "Become Our CSR Partner"}
+                className="w-full h-auto block"
+              />
+            </a>
+          </FadeUp>
+
           <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-5xl mx-auto" stagger={0.15}>
             {participants.categories.map((cat, i) => (
               <StaggerCard key={i}>
