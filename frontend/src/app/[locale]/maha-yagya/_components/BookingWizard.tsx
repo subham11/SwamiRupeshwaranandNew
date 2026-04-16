@@ -36,24 +36,33 @@ const STEPS = [
 ];
 
 // ─── Progress Bar ─────────────────────────────────────────────
-function ProgressBar({ step, locale }: { step: Step; locale: AppLocale }) {
+function ProgressBar({
+  step,
+  locale,
+  onStepClick,
+}: {
+  step: Step;
+  locale: AppLocale;
+  onStepClick: (i: number) => void;
+}) {
   if (step === 4) return null;
   return (
     <div className="flex items-center gap-0 mb-8">
       {STEPS.map((s, i) => {
         const active = i === step;
         const done = i < step;
+        // Steps 0 & 1 are always clickable; steps 2 & 3 only if already reached
+        const clickable = i <= 1 || i <= step;
         return (
           <div key={i} className="flex items-center flex-1">
             <div className="flex flex-col items-center">
-              <div
+              <button
+                type="button"
+                onClick={() => clickable && onStepClick(i)}
+                disabled={!clickable}
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
-                  done
-                    ? "text-white"
-                    : active
-                    ? "text-white scale-110 shadow-lg"
-                    : "text-zinc-400 dark:text-zinc-500"
-                }`}
+                  done ? "text-white" : active ? "text-white scale-110 shadow-lg" : "text-zinc-400 dark:text-zinc-500"
+                } ${clickable ? "cursor-pointer hover:opacity-80" : "cursor-default"}`}
                 style={{
                   background: done
                     ? "var(--color-primary)"
@@ -64,7 +73,7 @@ function ProgressBar({ step, locale }: { step: Step; locale: AppLocale }) {
                 }}
               >
                 {done ? "✓" : i + 1}
-              </div>
+              </button>
               <span
                 className="text-[10px] mt-1 font-medium hidden sm:block"
                 style={{ color: active ? "var(--color-primary)" : "var(--color-muted)" }}
@@ -92,7 +101,6 @@ function EnquiryStep({
   onChange,
   onCategoryChange,
   onSubmit,
-  onSkip,
   submitting,
 }: {
   locale: AppLocale;
@@ -100,7 +108,6 @@ function EnquiryStep({
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   onCategoryChange: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
-  onSkip: () => void;
   submitting: boolean;
 }) {
   const availableTiers = formData.category ? (tiersByCategory[formData.category] || []) : [];
@@ -185,31 +192,21 @@ function EnquiryStep({
         <textarea name="message" rows={3} value={formData.message} onChange={onChange} className={`${inputClass} resize-none`} />
       </div>
 
-      <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={onSkip}
-          className="flex-1 py-3 rounded-lg font-semibold border transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800 text-sm"
-          style={{ borderColor: "var(--color-border)", color: "var(--color-muted)" }}
-        >
-          {locale === "hi" ? "छोड़ें →" : "Skip →"}
-        </button>
-        <button
-          type="submit"
-          disabled={submitting}
-          className="flex-[2] py-3 rounded-lg font-semibold text-white transition-all hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed"
-          style={{ background: "linear-gradient(135deg, var(--color-gold), var(--color-accent))" }}
-        >
-          {submitting ? (
-            <span className="flex items-center justify-center gap-2">
-              <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-              {locale === "hi" ? "सबमिट हो रहा है..." : "Submitting..."}
-            </span>
-          ) : (
-            <>{locale === "hi" ? "आगे बढ़ें →" : "Submit & Proceed →"}</>
-          )}
-        </button>
-      </div>
+      <button
+        type="submit"
+        disabled={submitting}
+        className="w-full py-3 rounded-lg font-semibold text-white transition-all hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed"
+        style={{ background: "linear-gradient(135deg, var(--color-gold), var(--color-accent))" }}
+      >
+        {submitting ? (
+          <span className="flex items-center justify-center gap-2">
+            <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+            {locale === "hi" ? "सबमिट हो रहा है..." : "Submitting..."}
+          </span>
+        ) : (
+          <>{locale === "hi" ? "आगे बढ़ें →" : "Submit & Proceed →"}</>
+        )}
+      </button>
     </form>
   );
 }
@@ -220,13 +217,11 @@ function SummaryStep({
   formData,
   onBack,
   onNext,
-  onSkip,
 }: {
   locale: AppLocale;
   formData: FormData;
   onBack: () => void;
   onNext: () => void;
-  onSkip: () => void;
 }) {
   const cat = categories.find((c) => c.value === formData.category);
   const tier = getTier(formData.category, formData.tier);
@@ -316,13 +311,6 @@ function SummaryStep({
           style={{ borderColor: "var(--color-border)", color: "var(--color-muted)" }}
         >
           ← {locale === "hi" ? "वापस" : "Back"}
-        </button>
-        <button
-          onClick={onSkip}
-          className="flex-1 py-3 rounded-lg font-semibold border transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800 text-sm"
-          style={{ borderColor: "var(--color-border)", color: "var(--color-muted)" }}
-        >
-          {locale === "hi" ? "छोड़ें →" : "Skip →"}
         </button>
         <button
           onClick={onNext}
@@ -601,7 +589,7 @@ export default function BookingWizard({ locale }: { locale: AppLocale }) {
   const [termsAgreed, setTermsAgreed] = useState(false);
   const [bookingId, setBookingId] = useState("");
 
-  // Pre-fill from tier card "Enquire Now" buttons
+  // Pre-fill from tier card buttons and jump to target step
   useEffect(() => {
     function handleSelectStall(e: Event) {
       const detail = (e as CustomEvent).detail;
@@ -610,7 +598,8 @@ export default function BookingWizard({ locale }: { locale: AppLocale }) {
       } else if (detail?.category) {
         setFormData((prev) => ({ ...prev, category: detail.category, tier: "" }));
       }
-      // Scroll to form
+      const targetStep = typeof detail?.targetStep === "number" ? detail.targetStep : 0;
+      setStep(targetStep as Step);
       document.getElementById("book-stall")?.scrollIntoView({ behavior: "smooth" });
     }
     window.addEventListener("selectStall", handleSelectStall);
@@ -669,42 +658,19 @@ export default function BookingWizard({ locale }: { locale: AppLocale }) {
     setStep(4);
   }
 
-  // Skip step 0: need at least name + category + tier to proceed to payment
-  const [skipError, setSkipError] = useState<string | null>(null);
-  function handleStep0Skip() {
-    if (!formData.name || !formData.category || !formData.tier) {
-      setSkipError(
-        locale === "hi"
-          ? "छोड़ने के लिए कृपया नाम, श्रेणी और स्तर दर्ज करें।"
-          : "To skip, please fill in Name, Category, and Tier."
-      );
-      return;
-    }
-    setSkipError(null);
-    setStep(2); // Jump straight to T&C
-  }
-
   return (
     <div className="bg-white dark:bg-zinc-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-sm border border-zinc-100 dark:border-zinc-700">
-      <ProgressBar step={step} locale={locale} />
+      <ProgressBar step={step} locale={locale} onStepClick={(i) => setStep(i as Step)} />
 
       {step === 0 && (
-        <>
-          {skipError && (
-            <div className="mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 text-sm">
-              {skipError}
-            </div>
-          )}
-          <EnquiryStep
-            locale={locale}
-            formData={formData}
-            onChange={handleChange}
-            onCategoryChange={(v) => setFormData((prev) => ({ ...prev, category: v, tier: "" }))}
-            onSubmit={handleEnquirySubmit}
-            onSkip={handleStep0Skip}
-            submitting={submitting}
-          />
-        </>
+        <EnquiryStep
+          locale={locale}
+          formData={formData}
+          onChange={handleChange}
+          onCategoryChange={(v) => setFormData((prev) => ({ ...prev, category: v, tier: "" }))}
+          onSubmit={handleEnquirySubmit}
+          submitting={submitting}
+        />
       )}
 
       {step === 1 && (
@@ -713,7 +679,6 @@ export default function BookingWizard({ locale }: { locale: AppLocale }) {
           formData={formData}
           onBack={() => setStep(0)}
           onNext={() => setStep(2)}
-          onSkip={() => setStep(2)}
         />
       )}
 

@@ -13,6 +13,7 @@ import { t, type BilingualContent } from "@/content/contentProvider";
 import CMSTextBlocks from "@/components/CMSTextBlocks";
 import CountdownTimer from "./_components/CountdownTimer";
 import BookingWizard from "./_components/BookingWizard";
+import TierActions from "./_components/TierActions";
 import StallCarousel from "./_components/StallCarousel";
 import CSRBannerCarousel from "./_components/CSRBannerCarousel";
 import {
@@ -1068,20 +1069,13 @@ export default async function MahaYagyaPage({
                           </li>
                         ))}
                       </ul>
-                      <a
-                        href="#book-stall"
-                        className={`group/btn block w-full py-3 rounded-lg font-semibold text-center transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.15)] ${
-                          tier.price ? "yagya-cta-btn" : "yagya-cta-btn-grey"
-                        }`}
-                        data-category={cat.id}
-                        data-stall={tier.id}
-                      >
-                        {tier.price
-                          ? (cat.id === "yajaman"
-                              ? (locale === "en" ? "Join as Yagyaman" : "यज्ञमान बनें")
-                              : (locale === "en" ? "Enquire Now" : "अभी पूछें"))
-                          : (locale === "en" ? "Register Interest" : "रुचि दर्ज करें")}
-                      </a>
+                      <TierActions
+                        locale={locale}
+                        categoryId={cat.id}
+                        tierId={tier.id}
+                        hasPrice={!!tier.price}
+                        isYajaman={cat.id === "yajaman"}
+                      />
                     </div>
                   </TierCard>
                 ))}
