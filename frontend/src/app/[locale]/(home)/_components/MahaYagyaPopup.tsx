@@ -205,6 +205,10 @@ export default function MahaYagyaPopup({ locale }: { locale: AppLocale }) {
                   <a href="https://swamirupeshwaranand.in" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-amber-300 transition-colors border-b border-white/20 hover:border-amber-300 pb-px">
                     {locale === "hi" ? "स्वामी रूपेश्वरानंद आश्रम" : "Swami Rupeshwaranand Ashram"}
                   </a>
+                  <span className="mx-1.5 text-white/25">•</span>
+                  <a href="https://youth4nation.in" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-amber-300 transition-colors border-b border-white/20 hover:border-amber-300 pb-px">
+                    Youth4Nation
+                  </a>
                 </p>
               </motion.div>
 
