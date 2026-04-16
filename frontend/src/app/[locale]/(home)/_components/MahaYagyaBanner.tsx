@@ -56,19 +56,21 @@ export default function MahaYagyaBanner({ locale }: { locale: AppLocale }) {
 
             {/* ── LEFT: Titles ── */}
             <div className="flex-1 min-w-0">
-              {/* Badge */}
-              <span
-                className="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3"
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.12)",
-                  color: "var(--color-gold)",
-                  border: "1px solid rgba(255,183,77,0.3)",
-                }}
-              >
-                {t(content.badge, locale)}
-              </span>
+              {/* Badge — line 1 */}
+              <div className="mb-2">
+                <span
+                  className="inline-block px-3 py-1 rounded-full text-xs font-semibold"
+                  style={{
+                    backgroundColor: "rgba(255,255,255,0.12)",
+                    color: "var(--color-gold)",
+                    border: "1px solid rgba(255,183,77,0.3)",
+                  }}
+                >
+                  {t(content.badge, locale)}
+                </span>
+              </div>
 
-              {/* Yantra highlight */}
+              {/* Yantra highlight — line 2 */}
               <div
                 className="inline-block mb-3 px-3 py-1.5 rounded-lg text-xs font-semibold"
                 style={{
