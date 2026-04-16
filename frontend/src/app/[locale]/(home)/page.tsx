@@ -6,6 +6,7 @@ import HomeSections from "@/app/[locale]/(home)/_components/HomeSections";
 import FeaturedProducts from "@/app/[locale]/(home)/_components/FeaturedProducts";
 import SeoSchema from "@/app/[locale]/(home)/_components/SeoSchema";
 import MahaYagyaPopup from "@/app/[locale]/(home)/_components/MahaYagyaPopup";
+import MahaYagyaBanner from "@/app/[locale]/(home)/_components/MahaYagyaBanner";
 import { getHomeContent } from "@/content/contentProvider";
 
 export default async function Page({ params }: { params: Promise<{ locale: AppLocale }> }) {
@@ -18,6 +19,7 @@ export default async function Page({ params }: { params: Promise<{ locale: AppLo
     <div>
       <SeoSchema locale={locale} />
       <HeroSwiper locale={locale} slides={content.heroSlides} />
+      <MahaYagyaBanner locale={locale} />
       <SacredTeachings locale={locale} content={content.sacredTeachings} />
       <WordsOfWisdom locale={locale} quotes={content.quotes} />
       <FeaturedProducts locale={locale} />
