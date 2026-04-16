@@ -51,7 +51,7 @@ export default function TierActions({
         {enquireLabel}
       </button>
       <button
-        onClick={() => dispatch(categoryId, tierId, 2)}
+        onClick={() => dispatch(categoryId, tierId, 1)}
         className="flex-1 yagya-cta-btn py-2.5 rounded-lg font-semibold text-center text-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.15)]"
       >
         {bookLabel}

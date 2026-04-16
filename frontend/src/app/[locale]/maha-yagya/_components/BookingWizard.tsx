@@ -215,21 +215,34 @@ function EnquiryStep({
 function SummaryStep({
   locale,
   formData,
+  onChange,
   onBack,
   onNext,
 }: {
   locale: AppLocale;
   formData: FormData;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   onBack: () => void;
   onNext: () => void;
 }) {
+  const [error, setError] = useState<string | null>(null);
   const cat = categories.find((c) => c.value === formData.category);
   const tier = getTier(formData.category, formData.tier);
   const deposit = tier ? Math.round(tier.amount / 2) : 0;
+  const availableTiers = formData.category ? (tiersByCategory[formData.category] || []) : [];
+
+  function handleNext() {
+    if (!formData.name || !formData.mobile || !formData.email || !formData.category || !formData.tier) {
+      setError(locale === "hi" ? "कृपया सभी आवश्यक फ़ील्ड भरें।" : "Please fill in all required fields.");
+      return;
+    }
+    setError(null);
+    onNext();
+  }
 
   return (
     <div className="space-y-6">
-      {/* Booking details card */}
+      {/* Contact + selection fields — always editable */}
       <div
         className="rounded-xl p-5 sm:p-6 space-y-4"
         style={{ backgroundColor: "var(--color-secondary)", border: "1px solid var(--color-border)" }}
@@ -238,38 +251,110 @@ function SummaryStep({
           {locale === "hi" ? "बुकिंग विवरण" : "Booking Details"}
         </h3>
 
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span style={{ color: "var(--color-muted)" }}>{locale === "hi" ? "नाम" : "Name"}</span>
-            <span className="font-medium text-zinc-800 dark:text-zinc-100">{formData.name}</span>
+        {error && (
+          <div className="px-3 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
+            {error}
           </div>
-          {formData.company && (
-            <div className="flex justify-between">
-              <span style={{ color: "var(--color-muted)" }}>{locale === "hi" ? "कंपनी" : "Company"}</span>
-              <span className="font-medium text-zinc-800 dark:text-zinc-100">{formData.company}</span>
-            </div>
-          )}
-          <div className="flex justify-between">
-            <span style={{ color: "var(--color-muted)" }}>{locale === "hi" ? "मोबाइल" : "Mobile"}</span>
-            <span className="font-medium text-zinc-800 dark:text-zinc-100">{formData.mobile}</span>
+        )}
+
+        <div className="space-y-3">
+          {/* Name */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+            <span className="text-sm w-28 shrink-0" style={{ color: "var(--color-muted)" }}>
+              {locale === "hi" ? "पूरा नाम" : "Full Name"} *
+            </span>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={onChange}
+              placeholder={locale === "hi" ? "अपना नाम दर्ज करें" : "Enter your name"}
+              className={`${inputClass} flex-1 text-sm py-2`}
+            />
           </div>
-          <div className="flex justify-between">
-            <span style={{ color: "var(--color-muted)" }}>{locale === "hi" ? "ईमेल" : "Email"}</span>
-            <span className="font-medium text-zinc-800 dark:text-zinc-100">{formData.email}</span>
+
+          {/* Company */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+            <span className="text-sm w-28 shrink-0" style={{ color: "var(--color-muted)" }}>
+              {locale === "hi" ? "कंपनी" : "Company"}
+            </span>
+            <input
+              type="text"
+              name="company"
+              value={formData.company}
+              onChange={onChange}
+              placeholder={locale === "hi" ? "वैकल्पिक" : "Optional"}
+              className={`${inputClass} flex-1 text-sm py-2`}
+            />
           </div>
-          <div className="border-t pt-3 mt-3" style={{ borderColor: "var(--color-border)" }}>
-            <div className="flex justify-between">
-              <span style={{ color: "var(--color-muted)" }}>{locale === "hi" ? "श्रेणी" : "Category"}</span>
-              <span className="font-medium text-zinc-800 dark:text-zinc-100">
-                {cat ? (locale === "hi" ? cat.hi : cat.en.split(" (")[0]) : formData.category}
-              </span>
-            </div>
-            <div className="flex justify-between mt-1">
-              <span style={{ color: "var(--color-muted)" }}>{locale === "hi" ? "स्तर" : "Tier"}</span>
-              <span className="font-medium text-zinc-800 dark:text-zinc-100">
-                {tier ? (locale === "hi" ? tier.hi : tier.en) : formData.tier}
-              </span>
-            </div>
+
+          {/* Mobile */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+            <span className="text-sm w-28 shrink-0" style={{ color: "var(--color-muted)" }}>
+              {locale === "hi" ? "मोबाइल" : "Mobile"} *
+            </span>
+            <input
+              type="tel"
+              name="mobile"
+              value={formData.mobile}
+              onChange={onChange}
+              placeholder="+91"
+              className={`${inputClass} flex-1 text-sm py-2`}
+            />
+          </div>
+
+          {/* Email */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+            <span className="text-sm w-28 shrink-0" style={{ color: "var(--color-muted)" }}>
+              {locale === "hi" ? "ईमेल" : "Email"} *
+            </span>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={onChange}
+              placeholder="you@example.com"
+              className={`${inputClass} flex-1 text-sm py-2`}
+            />
+          </div>
+
+          <div className="border-t pt-3" style={{ borderColor: "var(--color-border)" }} />
+
+          {/* Category */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+            <span className="text-sm w-28 shrink-0" style={{ color: "var(--color-muted)" }}>
+              {locale === "hi" ? "श्रेणी" : "Category"} *
+            </span>
+            <select
+              name="category"
+              value={formData.category}
+              onChange={onChange}
+              className={`${inputClass} flex-1 text-sm py-2`}
+            >
+              <option value="">{locale === "hi" ? "श्रेणी चुनें" : "Select Category"}</option>
+              {categories.map((c) => (
+                <option key={c.value} value={c.value}>{locale === "en" ? c.en : c.hi}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Tier */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+            <span className="text-sm w-28 shrink-0" style={{ color: "var(--color-muted)" }}>
+              {locale === "hi" ? "स्तर" : "Tier"} *
+            </span>
+            <select
+              name="tier"
+              value={formData.tier}
+              onChange={onChange}
+              disabled={!formData.category}
+              className={`${inputClass} flex-1 text-sm py-2`}
+            >
+              <option value="">{locale === "hi" ? "स्तर चुनें" : "Select Tier"}</option>
+              {availableTiers.map((t) => (
+                <option key={t.value} value={t.value}>{locale === "en" ? t.en : t.hi}</option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
@@ -313,7 +398,7 @@ function SummaryStep({
           ← {locale === "hi" ? "वापस" : "Back"}
         </button>
         <button
-          onClick={onNext}
+          onClick={handleNext}
           className="flex-[2] py-3 rounded-lg font-semibold text-white transition-all hover:brightness-110"
           style={{ background: "linear-gradient(135deg, var(--color-gold), var(--color-accent))" }}
         >
@@ -677,6 +762,7 @@ export default function BookingWizard({ locale }: { locale: AppLocale }) {
         <SummaryStep
           locale={locale}
           formData={formData}
+          onChange={handleChange}
           onBack={() => setStep(0)}
           onNext={() => setStep(2)}
         />
