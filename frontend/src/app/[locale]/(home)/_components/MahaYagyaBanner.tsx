@@ -55,7 +55,7 @@ export default function MahaYagyaBanner({ locale }: { locale: AppLocale }) {
           <div className="relative px-6 py-8 sm:px-10 sm:py-10 flex flex-col lg:flex-row lg:items-center gap-8">
 
             {/* ── LEFT: Titles ── */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 text-center lg:text-center">
               {/* Badge — line 1 */}
               <div className="mb-2">
                 <span
