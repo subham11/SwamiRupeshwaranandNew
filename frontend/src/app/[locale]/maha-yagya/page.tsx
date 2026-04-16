@@ -12,7 +12,7 @@ import {
 import { t, type BilingualContent } from "@/content/contentProvider";
 import CMSTextBlocks from "@/components/CMSTextBlocks";
 import CountdownTimer from "./_components/CountdownTimer";
-import LeadForm from "./_components/LeadForm";
+import BookingWizard from "./_components/BookingWizard";
 import StallCarousel from "./_components/StallCarousel";
 import CSRBannerCarousel from "./_components/CSRBannerCarousel";
 import {
@@ -1266,13 +1266,9 @@ export default async function MahaYagyaPage({
               </div>
             </FadeUp>
 
-            {/* Right: Lead Form */}
+            {/* Right: Booking Wizard */}
             <SlideRight delay={0.2}>
-              <div
-                className="bg-white dark:bg-zinc-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-sm border border-zinc-100 dark:border-zinc-700"
-              >
-                <LeadForm locale={locale} />
-              </div>
+              <BookingWizard locale={locale} />
             </SlideRight>
           </div>
         </Container>
