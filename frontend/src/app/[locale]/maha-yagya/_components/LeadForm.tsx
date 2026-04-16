@@ -10,8 +10,8 @@ interface LeadFormProps {
 }
 
 const categories = [
-  { value: "sponsor", en: "Sponsor (स्पॉन्सर)", hi: "प्रायोजक" },
-  { value: "yajaman", en: "Yajaman (यज्ञमान)", hi: "यज्ञमान" },
+  { value: "sponsor", en: "Partners (पार्टनर्स)", hi: "पार्टनर्स" },
+  { value: "yajaman", en: "Yagyaman (यज्ञमान)", hi: "यज्ञमान" },
   { value: "shivirarthi", en: "Camps & Programs (शिविर और कार्यक्रम)", hi: "शिविर और कार्यक्रम" },
   { value: "business-stall", en: "Business / Startup Stall (व्यवसाय / स्टार्टअप स्टॉल)", hi: "व्यवसाय / स्टार्टअप स्टॉल" },
   { value: "food-stall", en: "State Food Stall (राज्य खाद्य स्टॉल)", hi: "राज्य खाद्य स्टॉल" },
@@ -26,9 +26,9 @@ const tiersByCategory: Record<string, { value: string; en: string; hi: string }[
     { value: "stall-partner", en: "Stall Partner — ₹5,00,000", hi: "स्टॉल पार्टनर — ₹5,00,000" },
   ],
   yajaman: [
-    { value: "vishisht-yajaman", en: "Vishisht Yajaman (VVIP) — ₹5,51,000", hi: "विशिष्ट यज्ञमान (VVIP) — ₹5,51,000" },
-    { value: "mukhya-yajaman", en: "Mukhya Yajaman (VIP) — ₹2,51,000", hi: "मुख्य यज्ञमान (VIP) — ₹2,51,000" },
-    { value: "sahyogi-yajaman", en: "Sahayogi Yajaman (VIP) — ₹1,51,000", hi: "सहयोगी यज्ञमान (VIP) — ₹1,51,000" },
+    { value: "vishisht-yajaman", en: "Vishisht Yagyaman (VVIP) — ₹5,51,000", hi: "विशिष्ट यज्ञमान (VVIP) — ₹5,51,000" },
+    { value: "mukhya-yajaman", en: "Mukhya Yagyaman (VIP) — ₹2,51,000", hi: "मुख्य यज्ञमान (VIP) — ₹2,51,000" },
+    { value: "sahyogi-yajaman", en: "Sahayogi Yagyaman (VIP) — ₹1,51,000", hi: "सहयोगी यज्ञमान (VIP) — ₹1,51,000" },
   ],
   shivirarthi: [
     { value: "shivirarthi-1day", en: "One Day Camp — ₹11,000", hi: "एक दिवसीय शिविर — ₹11,000" },
