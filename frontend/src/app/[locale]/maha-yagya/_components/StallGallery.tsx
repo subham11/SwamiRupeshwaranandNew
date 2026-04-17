@@ -6,22 +6,22 @@ import type { AppLocale } from "@/i18n/config";
 
 const IMAGES = [
   {
-    src: "/images/stall-1.jpg",
+    src: "/images/food-fest-1.jpg",
     alt: { en: "Food Stall Booking Open – All India Food Festival Varanasi 2026", hi: "फूड स्टॉल बुकिंग खुली – ऑल इंडिया फूड फेस्टिवल वाराणसी 2026" },
     label: { en: "All India Food Festival", hi: "ऑल इंडिया फूड फेस्टिवल" },
   },
   {
-    src: "/images/stall-2.jpg",
+    src: "/images/food-fest-2.jpg",
     alt: { en: "Standard Food Stall – ₹50,000", hi: "स्टैंडर्ड फूड स्टॉल – ₹50,000" },
     label: { en: "Standard Food Stall", hi: "स्टैंडर्ड फूड स्टॉल" },
   },
   {
-    src: "/images/stall-3.jpg",
+    src: "/images/food-fest-3.jpg",
     alt: { en: "State-wise Food Stall Booking", hi: "राज्यवार फूड स्टॉल बुकिंग" },
     label: { en: "State-wise Booking", hi: "राज्यवार बुकिंग" },
   },
   {
-    src: "/images/stall-4.jpg",
+    src: "/images/food-fest-4.jpg",
     alt: { en: "Prime Food Stall – ₹5 Lakh", hi: "प्राइम फूड स्टॉल – ₹5 लाख" },
     label: { en: "Prime Food Stall", hi: "प्राइम फूड स्टॉल" },
   },
