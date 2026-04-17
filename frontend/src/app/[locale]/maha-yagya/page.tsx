@@ -16,6 +16,7 @@ import BookingWizard from "./_components/BookingWizard";
 import TierActions from "./_components/TierActions";
 import StallCarousel from "./_components/StallCarousel";
 import CSRBannerCarousel from "./_components/CSRBannerCarousel";
+import StallGallery from "./_components/StallGallery";
 import {
   FadeUp,
   StaggerContainer,
@@ -1082,6 +1083,25 @@ export default async function MahaYagyaPage({
               </StaggerContainer>
             </div>
           ))}
+        </Container>
+      </section>
+
+      <SacredDivider icon="🍽️" />
+
+      {/* ═══ STALL GALLERY ═══ */}
+      <section className="py-16 sm:py-20 md:py-24">
+        <Container>
+          <FadeUp>
+            <SectionHeading
+              title={locale === "hi" ? "स्टॉल झलकियाँ" : "Stall Showcase"}
+              subtitle={
+                locale === "hi"
+                  ? "ऑल इंडिया फूड फेस्टिवल – वाराणसी 2026 में अपने राज्य का व्यंजन प्रस्तुत करें"
+                  : "Represent your state cuisine at the All India Food Festival – Varanasi 2026"
+              }
+            />
+          </FadeUp>
+          <StallGallery locale={locale} />
         </Container>
       </section>
 
