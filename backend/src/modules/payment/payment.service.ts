@@ -559,14 +559,15 @@ export class PaymentService {
 
   /**
    * Determine which Razorpay account to use based on yagya category.
-   * sponsor (CSR partners)          → Foundation account
+   * sponsor (CSR partners)          → Foundation account  (default)
    * food-stall, business-stall      → Spiritual account
    * shivirarthi, yajaman            → Ashram account
+   * anything else / unknown         → Foundation account  (default)
    */
   private getYagyaAccountType(category: string): 'ashram' | 'foundation' | 'spiritual' {
-    if (category === 'sponsor') return 'foundation';
     if (category === 'food-stall' || category === 'business-stall') return 'spiritual';
-    return 'ashram'; // shivirarthi, yajaman, anything else
+    if (category === 'shivirarthi' || category === 'yajaman') return 'ashram';
+    return 'foundation'; // sponsor, unknown, default
   }
 
   /**

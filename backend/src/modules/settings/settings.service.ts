@@ -256,12 +256,25 @@ export class SettingsService {
   /**
    * Get current Razorpay configuration.
    * Returns keys needed for Razorpay SDK initialization.
+   * Default account = Brahmavadini Foundation.
    */
   async getRazorpayConfig(): Promise<{
     keyId: string;
     keySecret: string;
     webhookSecret: string;
   }> {
+    // Try Foundation keys first (default account)
+    const [foundationKeyId, foundationKeySecret, foundationWebhook] = await Promise.all([
+      this.get('RAZORPAY_FOUNDATION_KEY_ID'),
+      this.get('RAZORPAY_FOUNDATION_KEY_SECRET'),
+      this.get('RAZORPAY_FOUNDATION_WEBHOOK_SECRET'),
+    ]);
+
+    if (foundationKeyId && foundationKeySecret) {
+      return { keyId: foundationKeyId, keySecret: foundationKeySecret, webhookSecret: foundationWebhook };
+    }
+
+    // Fallback to legacy RAZORPAY_KEY_* (ashram) if Foundation not configured
     const [keyId, keySecret, webhookSecret] = await Promise.all([
       this.get('RAZORPAY_KEY_ID'),
       this.get('RAZORPAY_KEY_SECRET'),
@@ -273,7 +286,7 @@ export class SettingsService {
 
   /**
    * Get Razorpay Foundation configuration (Brahmavadini Foundation account).
-   * Used for Sponsor and Yajaman payments.
+   * Used for Sponsor and default/unknown category payments.
    * Falls back to primary Razorpay config if foundation keys are not set.
    */
   async getRazorpayFoundationConfig(): Promise<{
