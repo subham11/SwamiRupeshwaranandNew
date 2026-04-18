@@ -1662,6 +1662,69 @@ export async function fetchPaymentFailures(accessToken: string, limit?: number):
 }
 
 // ============================================
+// Admin Transactions API
+// ============================================
+
+export interface PaymentRecord {
+  id: string;
+  type: 'subscription' | 'donation' | 'yagya';
+  userId?: string;
+  userEmail?: string;
+  entityId: string;
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  amount: number;
+  currency: string;
+  status: 'created' | 'authorized' | 'captured' | 'failed' | 'refunded';
+  failureReason?: string;
+  name?: string;
+  phone?: string;
+  category?: string;
+  tier?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminTransactionsResponse {
+  items: PaymentRecord[];
+  cursor?: string;
+  total: number;
+}
+
+/**
+ * Fetch all payments/transactions (admin only)
+ */
+export async function fetchAdminTransactions(
+  accessToken: string,
+  params?: { limit?: number; cursor?: string; type?: string; status?: string }
+): Promise<AdminTransactionsResponse> {
+  const qs = new URLSearchParams();
+  if (params?.limit) qs.set("limit", String(params.limit));
+  if (params?.cursor) qs.set("cursor", params.cursor);
+  if (params?.type) qs.set("type", params.type);
+  if (params?.status) qs.set("status", params.status);
+  const query = qs.toString() ? `?${qs.toString()}` : "";
+  return apiRequest(`/payments/admin/all${query}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+/**
+ * Initiate a refund for a payment (admin only)
+ */
+export async function initiateAdminRefund(
+  paymentId: string,
+  data: { amount?: number; reason?: string },
+  accessToken: string
+): Promise<any> {
+  return apiRequest(`/payments/admin/refund/${paymentId}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+// ============================================
 // Support Tickets API
 // ============================================
 
@@ -2634,6 +2697,8 @@ export default {
   verifyYagyaPayment,
   fetchMyPayments,
   fetchPaymentFailures,
+  fetchAdminTransactions,
+  initiateAdminRefund,
   // Products
   fetchProductsAdmin,
   createProduct,

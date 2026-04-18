@@ -29,6 +29,7 @@ const ADMIN_LINKS = [
   { href: '/admin/monthly-schedule', label: 'Monthly Schedule', icon: '🗓️', description: 'Assign content to months per plan' },
   { href: '/admin/newsletter', label: 'Newsletter', icon: '📧', description: 'Manage subscribers & campaigns' },
   { href: '/admin/donations', label: 'Donations', icon: '🙏', description: 'View donations & configure' },
+  { href: '/admin/transactions', label: 'Transactions', icon: '💰', description: 'All payments, bookings & refunds' },
   { href: '/admin/support', label: 'Support Tickets', icon: '🎫', description: 'Handle user queries' },
   { href: '/admin/media', label: 'Media Library', icon: '🖼️', description: 'Manage uploaded files' },
   { href: '/admin/products', label: 'Products', icon: '🛒', description: 'Manage products & categories' },

@@ -56,6 +56,10 @@ interface PaymentRecordEntity {
   failureReason?: string;
   errorCode?: string;
   method?: string; // upi, card, netbanking, etc.
+  name?: string;
+  phone?: string;
+  category?: string;
+  tier?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -610,6 +614,10 @@ export class PaymentService {
       amount: dto.amount * 100,
       currency: 'INR',
       status: 'created',
+      name: dto.name,
+      phone: dto.phone,
+      category: dto.category,
+      tier: dto.tierId,
     });
 
     return {
@@ -919,6 +927,10 @@ export class PaymentService {
     amount: number;
     currency: string;
     status: string;
+    name?: string;
+    phone?: string;
+    category?: string;
+    tier?: string;
   }): Promise<PaymentRecordEntity> {
     const id = uuidv4();
     const now = new Date().toISOString();
@@ -943,6 +955,10 @@ export class PaymentService {
       amount: data.amount,
       currency: data.currency,
       status: data.status as any,
+      name: data.name,
+      phone: data.phone,
+      category: data.category,
+      tier: data.tier,
       createdAt: now,
       updatedAt: now,
     };
@@ -1001,6 +1017,142 @@ export class PaymentService {
       expressionAttributeNames,
       expressionAttributeValues,
     });
+  }
+
+  // ============================================
+  // Admin — List all payments with pagination
+  // ============================================
+
+  async getAllPaymentsAdmin(params: {
+    limit?: number;
+    cursor?: string;
+    type?: string;
+    status?: string;
+  }): Promise<{ items: PaymentRecordEntity[]; cursor?: string; total: number }> {
+    const limit = Math.min(params.limit || 50, 200);
+
+    let filterExpression: string | undefined;
+    const expressionAttributeValues: Record<string, any> = {
+      ':pk': this.paymentEntityType,
+    };
+    const expressionAttributeNames: Record<string, string> = {};
+
+    const filterParts: string[] = [];
+
+    if (params.type) {
+      filterParts.push('#type = :type');
+      expressionAttributeNames['#type'] = 'type';
+      expressionAttributeValues[':type'] = params.type;
+    }
+
+    if (params.status) {
+      filterParts.push('#status = :status');
+      expressionAttributeNames['#status'] = 'status';
+      expressionAttributeValues[':status'] = params.status;
+    }
+
+    if (filterParts.length > 0) {
+      filterExpression = filterParts.join(' AND ');
+    }
+
+    const queryParams: any = {
+      indexName: 'GSI1',
+      keyConditionExpression: 'GSI1PK = :pk',
+      filterExpression,
+      expressionAttributeValues,
+      scanIndexForward: false,
+      limit,
+    };
+
+    if (Object.keys(expressionAttributeNames).length > 0) {
+      queryParams.expressionAttributeNames = expressionAttributeNames;
+    }
+
+    if (params.cursor) {
+      try {
+        queryParams.exclusiveStartKey = JSON.parse(
+          Buffer.from(params.cursor, 'base64').toString('utf8'),
+        );
+      } catch {
+        // ignore invalid cursor
+      }
+    }
+
+    const result = await this.db.query<PaymentRecordEntity>(this.paymentEntityType, queryParams);
+
+    const nextCursor = result.lastKey
+      ? Buffer.from(JSON.stringify(result.lastKey)).toString('base64')
+      : undefined;
+
+    return {
+      items: result.items,
+      cursor: nextCursor,
+      total: result.items.length,
+    };
+  }
+
+  // ============================================
+  // Admin — Initiate refund for a payment
+  // ============================================
+
+  async initiateRefund(
+    paymentId: string,
+    amount?: number,
+    reason?: string,
+  ): Promise<any> {
+    // Fetch payment record by PK using direct get
+    const pk = `${this.paymentEntityType}#${paymentId}`;
+    const payment = await this.db.get<PaymentRecordEntity>(pk, pk);
+
+    if (!payment) {
+      throw new BadRequestException(`Payment record not found: ${paymentId}`);
+    }
+
+    if (payment.status !== 'captured') {
+      throw new BadRequestException(
+        `Refund only allowed for captured payments. Current status: ${payment.status}`,
+      );
+    }
+
+    if (!payment.razorpayPaymentId) {
+      throw new BadRequestException('Payment has no Razorpay payment ID — cannot refund.');
+    }
+
+    // Determine correct Razorpay account from category
+    const accountType = this.getYagyaAccountType(payment.category || '');
+    const config = await this.settingsService.getRazorpayConfigForAccount(accountType);
+
+    const Razorpay = require('razorpay');
+    const rzpInstance = new Razorpay({
+      key_id: config.keyId,
+      key_secret: config.keySecret,
+    });
+
+    const refundAmount = amount || payment.amount; // in paise
+
+    const refundResponse = await rzpInstance.payments.refund(payment.razorpayPaymentId, {
+      amount: refundAmount,
+      notes: { reason: reason || 'Admin refund' },
+    });
+
+    // Update record status to refunded
+    await this.db.update<PaymentRecordEntity>(this.paymentEntityType, {
+      key: { PK: payment.PK, SK: payment.SK },
+      updateExpression: 'SET #status = :status, updatedAt = :updatedAt',
+      expressionAttributeNames: { '#status': 'status' },
+      expressionAttributeValues: {
+        ':status': 'refunded',
+        ':updatedAt': new Date().toISOString(),
+      },
+    });
+
+    return {
+      success: true,
+      refundId: refundResponse.id,
+      paymentId: payment.razorpayPaymentId,
+      amount: refundAmount,
+      status: refundResponse.status,
+    };
   }
 
   private async recordPaymentFailure(

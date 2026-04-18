@@ -6,6 +6,7 @@ import {
   UseGuards,
   Headers,
   Query,
+  Param,
   HttpCode,
   HttpStatus,
   Logger,
@@ -212,6 +213,41 @@ export class PaymentController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   async getPaymentFailures(@Query('limit') limit?: number): Promise<any[]> {
     return this.paymentService.getPaymentFailures({ limit });
+  }
+
+  @Get('admin/all')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @AdminOnly()
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'List all payments (Admin)' })
+  @ApiQuery({ name: 'limit', required: false })
+  @ApiQuery({ name: 'cursor', required: false })
+  @ApiQuery({ name: 'type', required: false, enum: ['subscription', 'donation', 'yagya'] })
+  @ApiQuery({ name: 'status', required: false })
+  async getAllPayments(
+    @Query('limit') limit?: string,
+    @Query('cursor') cursor?: string,
+    @Query('type') type?: string,
+    @Query('status') status?: string,
+  ): Promise<any> {
+    return this.paymentService.getAllPaymentsAdmin({
+      limit: limit ? parseInt(limit, 10) : undefined,
+      cursor,
+      type,
+      status,
+    });
+  }
+
+  @Post('admin/refund/:paymentId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @AdminOnly()
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Initiate refund (Admin)' })
+  async initiateRefund(
+    @Param('paymentId') paymentId: string,
+    @Body() body: { amount?: number; reason?: string },
+  ): Promise<any> {
+    return this.paymentService.initiateRefund(paymentId, body.amount, body.reason);
   }
 
   @Get('user-payments')
