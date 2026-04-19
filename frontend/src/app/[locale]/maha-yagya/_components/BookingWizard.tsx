@@ -837,7 +837,7 @@ export default function BookingWizard({ locale }: { locale: AppLocale }) {
         ]
           .filter(Boolean)
           .join("\n"),
-        category: `yagya-${formData.category}`,
+        category: "yagya",
         name: formData.name,
         email: formData.email,
       });

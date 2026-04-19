@@ -25,6 +25,7 @@ export enum TicketCategory {
   SUBSCRIPTION = 'subscription',
   DONATION = 'donation',
   EVENT = 'event',
+  YAGYA = 'yagya',
   TECHNICAL = 'technical',
   SPIRITUAL_GUIDANCE = 'spiritual_guidance',
   FEEDBACK = 'feedback',
