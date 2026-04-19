@@ -1697,7 +1697,7 @@ export interface PaymentRecord {
   razorpayPaymentId?: string;
   amount: number;
   currency: string;
-  status: 'created' | 'authorized' | 'captured' | 'failed' | 'refunded';
+  status: 'created' | 'authorized' | 'captured' | 'failed' | 'refunded' | 'cancelled';
   failureReason?: string;
   name?: string;
   phone?: string;

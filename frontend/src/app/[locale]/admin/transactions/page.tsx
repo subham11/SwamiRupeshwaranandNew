@@ -344,8 +344,8 @@ export default function AdminTransactionsPage() {
 
   // Stats derived from loaded items
   const capturedItems = payments.filter((p) => p.status === 'captured');
-  const failedCount = payments.filter((p) => p.status === 'failed').length;
-  const cancelledCount = payments.filter((p) => p.status === 'cancelled').length;
+  const failedCount = payments.filter((p) => p.status === 'failed' && p.failureReason !== 'Cancelled by user').length;
+  const cancelledCount = payments.filter((p) => p.status === 'cancelled' || (p.status === 'failed' && p.failureReason === 'Cancelled by user')).length;
   const refundedCount = payments.filter((p) => p.status === 'refunded').length;
   const totalCaptured = capturedItems.reduce((sum, p) => sum + p.amount, 0);
 
@@ -512,11 +512,15 @@ export default function AdminTransactionsPage() {
 
                     {/* Status badge */}
                     <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[payment.status] || 'bg-zinc-100 text-zinc-700'}`}
-                      >
-                        {payment.status}
-                      </span>
+                      {(() => {
+                        const isCancelledByUser = payment.status === 'failed' && payment.failureReason === 'Cancelled by user';
+                        const displayStatus = isCancelledByUser ? 'cancelled' : payment.status;
+                        return (
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[displayStatus] || 'bg-zinc-100 text-zinc-700'}`}>
+                            {isCancelledByUser ? 'cancelled' : payment.status}
+                          </span>
+                        );
+                      })()}
                     </td>
 
                     {/* Razorpay ID */}
