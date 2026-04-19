@@ -680,7 +680,7 @@ function PaymentStep({
   onBack: () => void;
 }) {
   const [paymentData, setPaymentData] = useState<YagyaPaymentResponse | null>(null);
-  const [initiating, setInitiating] = useState(true);
+  const [initiating, setInitiating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const tier = getTier(formData.category, formData.tier);
@@ -689,6 +689,10 @@ function PaymentStep({
   const MIN_BOOKING = 500000;
   const chargeAmount = Math.min(deposit, MIN_BOOKING);
   const isMinBooking = deposit > MIN_BOOKING;
+  const cat = categories.find((c) => c.value === formData.category);
+
+  // For high-value partners show info screen first; for others jump straight to Razorpay
+  const [partnerInfoConfirmed, setPartnerInfoConfirmed] = useState(!isMinBooking);
 
   const initiate = useCallback(async () => {
     setInitiating(true);
@@ -712,10 +716,129 @@ function PaymentStep({
     }
   }, [chargeAmount, formData]);
 
+  // Only initiate once partner info is confirmed (or immediately for non-min-booking)
   useEffect(() => {
-    initiate();
-  }, [initiate]);
+    if (partnerInfoConfirmed) {
+      initiate();
+    }
+  }, [partnerInfoConfirmed, initiate]);
 
+  // ── Partner Info Screen (high-value partners only) ──────────
+  if (!partnerInfoConfirmed) {
+    return (
+      <div className="space-y-5">
+        {/* Header */}
+        <div
+          className="rounded-xl p-5"
+          style={{ background: "linear-gradient(135deg, var(--color-primary), #1a0a00)" }}
+        >
+          <div className="flex items-start gap-3">
+            <div className="text-3xl mt-0.5">✅</div>
+            <div>
+              <p className="font-bold text-white text-lg">
+                {locale === "hi" ? "आपकी रुचि दर्ज की गई!" : "Interest Registered!"}
+              </p>
+              <p className="text-white/70 text-sm mt-1">
+                {locale === "en"
+                  ? `${cat?.en || formData.category} — ${tier?.en || formData.tier}`
+                  : `${cat?.hi || formData.category} — ${tier?.hi || formData.tier}`}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Next Steps + Contact */}
+        <div
+          className="rounded-xl p-5 space-y-4"
+          style={{ backgroundColor: "var(--color-secondary)", border: "1px solid var(--color-border)" }}
+        >
+          <p className="font-semibold" style={{ color: "var(--color-primary)" }}>
+            {locale === "hi" ? "अगले चरण" : "Next Steps"}
+          </p>
+          <ol className="space-y-2 text-sm" style={{ color: "var(--color-text)" }}>
+            <li className="flex gap-2">
+              <span className="font-bold" style={{ color: "var(--color-gold)" }}>1.</span>
+              <span>
+                {locale === "hi"
+                  ? "₹5,00,000 की न्यूनतम बुकिंग राशि अभी ऑनलाइन भुगतान करें।"
+                  : "Pay ₹5,00,000 minimum booking amount now via Razorpay."}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="font-bold" style={{ color: "var(--color-gold)" }}>2.</span>
+              <span>
+                {locale === "hi"
+                  ? "हमारी टीम 24 घंटों के भीतर आपसे संपर्क करेगी।"
+                  : "Our team will contact you within 24 hours to confirm your partnership."}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="font-bold" style={{ color: "var(--color-gold)" }}>3.</span>
+              <span>
+                {locale === "hi"
+                  ? "MOU / अनुबंध पर हस्ताक्षर के बाद शेष राशि का भुगतान किया जाएगा।"
+                  : "After MOU / agreement signing, remaining balance will be settled."}
+              </span>
+            </li>
+          </ol>
+
+          {/* Contact Box */}
+          <div
+            className="rounded-lg p-4 flex flex-col gap-3"
+            style={{ backgroundColor: "var(--color-bg)", border: "1px solid var(--color-border)" }}
+          >
+            <p className="text-xs uppercase tracking-wider font-semibold" style={{ color: "var(--color-muted)" }}>
+              {locale === "hi" ? "संपर्क करें" : "Contact Us"}
+            </p>
+            <div>
+              <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-muted)" }}>
+                📞 {locale === "hi" ? "कॉलिंग नंबर" : "Calling"}
+              </p>
+              <div className="flex flex-col gap-1">
+                {["63890 28881", "63890 28886", "63890 28887"].map((num) => (
+                  <a key={num} href={`tel:+91${num.replace(/\s/g, "")}`} className="font-bold text-base" style={{ color: "var(--color-primary)" }}>
+                    +91 {num}
+                  </a>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-muted)" }}>💬 WhatsApp</p>
+              <a href="https://wa.me/919565119993" target="_blank" rel="noopener noreferrer" className="font-bold text-base" style={{ color: "var(--color-primary)" }}>
+                +91 95651 19993
+              </a>
+            </div>
+            <div>
+              <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-muted)" }}>✉️ {locale === "hi" ? "ईमेल" : "Email"}</p>
+              <a href="mailto:swamirupeshwar@gmail.com" className="text-sm underline" style={{ color: "var(--color-muted)" }}>
+                swamirupeshwar@gmail.com
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          <button
+            onClick={onBack}
+            className="flex-1 py-3 rounded-lg font-semibold border transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            style={{ borderColor: "var(--color-border)", color: "var(--color-muted)" }}
+          >
+            ← {locale === "hi" ? "वापस" : "Back"}
+          </button>
+          <button
+            onClick={() => setPartnerInfoConfirmed(true)}
+            className="flex-[2] py-3 rounded-lg font-semibold text-white transition-all hover:brightness-110"
+            style={{ background: "linear-gradient(135deg, var(--color-gold), var(--color-accent))" }}
+          >
+            {locale === "hi" ? "₹5,00,000 भुगतान करें →" : "Proceed to Pay ₹5,00,000 →"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Razorpay Screen ─────────────────────────────────────────
   return (
     <div className="space-y-6">
       {/* Amount reminder */}
@@ -726,17 +849,12 @@ function PaymentStep({
         <div>
           <p className="text-white/70 text-sm">
             {isMinBooking
-              ? (locale === "hi" ? "न्यूनतम बुकिंग राशि (टोकन)" : "Min. Booking Amount (Token)")
+              ? (locale === "hi" ? "न्यूनतम बुकिंग राशि" : "Min. Booking Amount")
               : (locale === "hi" ? "अभी देय (50% अग्रिम)" : "Payable Now (50% Advance)")}
           </p>
           <p className="font-bold text-2xl" style={{ color: "var(--color-gold)" }}>
             {formatINR(chargeAmount)}
           </p>
-          {isMinBooking && (
-            <p className="text-white/50 text-xs mt-0.5">
-              {locale === "hi" ? `कुल: ${formatINR(tier?.amount || 0)}` : `Total: ${formatINR(tier?.amount || 0)}`}
-            </p>
-          )}
         </div>
         <div className="text-3xl">🔐</div>
       </div>
@@ -754,10 +872,7 @@ function PaymentStep({
       {error && (
         <div className="rounded-lg p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-sm space-y-3">
           <p>{error}</p>
-          <button
-            onClick={initiate}
-            className="font-semibold underline hover:no-underline"
-          >
+          <button onClick={initiate} className="font-semibold underline hover:no-underline">
             {locale === "hi" ? "पुनः प्रयास करें" : "Retry"}
           </button>
         </div>
@@ -771,15 +886,15 @@ function PaymentStep({
           onSuccess={onSuccess}
           onFailure={(e) => { setPaymentData(null); setError(e.message); }}
           onDismiss={() => {
-              setPaymentData(null); // unmount checkout so autoOpen doesn't re-trigger
-              setError(locale === "hi" ? "भुगतान रद्द किया गया। पुनः प्रयास करें।" : "Payment was cancelled. You can retry below.");
-            }}
+            setPaymentData(null);
+            setError(locale === "hi" ? "भुगतान रद्द किया गया। पुनः प्रयास करें।" : "Payment was cancelled. You can retry below.");
+          }}
           autoOpen
         />
       )}
 
       <button
-        onClick={onBack}
+        onClick={isMinBooking ? () => setPartnerInfoConfirmed(false) : onBack}
         className="w-full py-2.5 rounded-lg font-medium border transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800 text-sm"
         style={{ borderColor: "var(--color-border)", color: "var(--color-muted)" }}
       >
