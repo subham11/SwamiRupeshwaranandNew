@@ -671,18 +671,19 @@ function PaymentStep({
   onSuccess: (res: { bookingId: string; message: string }) => void;
   onBack: () => void;
 }) {
-  // Sponsor = high-value corporate deals (₹5L–₹1Cr). Razorpay per-order cap exceeded.
-  // Show contact/bank-transfer flow instead.
-  if (formData.category === "sponsor") {
-    return <SponsorContactStep locale={locale} formData={formData} onBack={onBack} />;
-  }
-
   const [paymentData, setPaymentData] = useState<YagyaPaymentResponse | null>(null);
   const [initiating, setInitiating] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const tier = getTier(formData.category, formData.tier);
   const deposit = tier ? Math.round(tier.amount / 2) : 0;
+
+  // Razorpay per-order cap = ₹5,00,000. If deposit exceeds this, show contact/bank flow.
+  // Empact Partner (₹5L deposit) and Stall Partner (₹2.5L deposit) can use Razorpay.
+  // Health Partner (₹12.5L deposit) and above → contact flow.
+  if (deposit > 500000) {
+    return <SponsorContactStep locale={locale} formData={formData} onBack={onBack} />;
+  }
 
   const initiate = useCallback(async () => {
     setInitiating(true);
