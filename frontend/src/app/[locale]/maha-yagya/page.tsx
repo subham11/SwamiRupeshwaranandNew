@@ -559,10 +559,10 @@ const urgency = {
 };
 
 const formSection = {
-  title: { en: "Enquire Now", hi: "अभी पूछताछ करें" },
+  title: { en: "Enquire & Book", hi: "पूछताछ और बुकिंग" },
   subtitle: {
-    en: "Fill in your details and our team will get back to you within 24 hours",
-    hi: "अपना विवरण भरें, हमारी टीम 24 घंटे में आपसे संपर्क करेगी",
+    en: "Fill in your details to enquire or book your participation slot",
+    hi: "अपना विवरण भरें — पूछताछ या स्लॉट बुक करें",
   },
   infoTitle: { en: "Why Book Now?", hi: "अभी क्यों बुक करें?" },
   reasons: [

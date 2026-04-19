@@ -15,6 +15,8 @@ export enum YagyaCategory {
   SPONSOR = 'sponsor',
   YAJAMAN = 'yajaman',
   SHIVIRARTHI = 'shivirarthi',
+  BUSINESS_STALL = 'business-stall',
+  FOOD_STALL = 'food-stall',
 }
 
 /**
