@@ -857,6 +857,102 @@ Swami Rupeshwaranand Ashram
     return this.sendEmail({ to, subject, text, html });
   }
 
+  // ─── Sponsor Interest Notification ──────────────────────────────────
+
+  async sendSponsorInterestEmail(params: {
+    coordinatorEmail: string;
+    customerEmail?: string;
+    name: string;
+    mobile?: string;
+    company?: string;
+    category: string;
+    tier: string;
+    message?: string;
+  }): Promise<void> {
+    const date = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+    // ── Coordinator notification ──
+    const coordBodyHtml = `
+      <h2 style="color:#1f2937;margin:0 0 8px;font-size:22px;font-weight:700;">New Sponsor Enquiry</h2>
+      <p style="color:#6b7280;font-size:15px;line-height:1.6;margin:0 0 24px;">
+        A new sponsor interest has been registered on the Maha Yagya booking form.
+      </p>
+      <table role="presentation" style="width:100%;border-collapse:collapse;margin:0 0 24px;">
+        <tr><td style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border:1px solid #FDBA74;border-radius:12px;padding:20px;">
+          <table role="presentation" style="width:100%;border-collapse:collapse;">
+            ${[
+              ['Name', params.name],
+              ['Mobile', params.mobile || '—'],
+              ['Email', params.customerEmail || '—'],
+              ['Company', params.company || '—'],
+              ['Category', params.category],
+              ['Tier', params.tier],
+              ['Message', params.message || '—'],
+              ['Received at', date],
+            ].map(([k, v]) => `
+              <tr>
+                <td style="padding:6px 0;color:#6b7280;font-size:14px;width:110px;">${k}</td>
+                <td style="padding:6px 0;color:#1f2937;font-size:14px;font-weight:600;">${v}</td>
+              </tr>`).join('')}
+          </table>
+        </td></tr>
+      </table>
+      ${this.ctaButton('View Bookings', `${this.baseUrl}/admin/transactions`)}
+    `;
+
+    await this.sendEmail({
+      to: params.coordinatorEmail,
+      subject: `[Maha Yagya] New Sponsor Enquiry — ${params.name} (${params.tier})`,
+      html: this.emailShell('Sponsor Enquiry', 'New Sponsor Enquiry', 'Maha Yagya 2025', coordBodyHtml),
+      text: `New Sponsor Enquiry\nName: ${params.name}\nMobile: ${params.mobile || '—'}\nEmail: ${params.customerEmail || '—'}\nCompany: ${params.company || '—'}\nCategory: ${params.category}\nTier: ${params.tier}\nMessage: ${params.message || '—'}\nReceived: ${date}`,
+    });
+
+    // ── Customer confirmation ──
+    if (params.customerEmail) {
+      const custBodyHtml = `
+        <h2 style="color:#1f2937;margin:0 0 8px;font-size:22px;font-weight:700;">Namaste, ${params.name}!</h2>
+        <p style="color:#6b7280;font-size:15px;line-height:1.7;margin:0 0 20px;">
+          Thank you for registering your interest in the <strong>Maha Yagya 2025</strong> as a sponsor.
+          We have received your enquiry and our team will get in touch with you within <strong>24 hours</strong>.
+        </p>
+        <table role="presentation" style="width:100%;border-collapse:collapse;margin:0 0 24px;">
+          <tr><td style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border:1px solid #FDBA74;border-radius:12px;padding:20px;">
+            <table role="presentation" style="width:100%;border-collapse:collapse;">
+              ${(
+              [
+                ['Category', params.category],
+                ['Tier', params.tier],
+                params.company ? ['Company', params.company] : null,
+              ].filter((x): x is [string, string] => x !== null)
+            ).map(([k, v]) => `
+                <tr>
+                  <td style="padding:6px 0;color:#6b7280;font-size:14px;width:110px;">${k}</td>
+                  <td style="padding:6px 0;color:#1f2937;font-size:14px;font-weight:600;">${v}</td>
+                </tr>`).join('')}
+            </table>
+          </td></tr>
+        </table>
+        <table role="presentation" style="width:100%;border-collapse:collapse;margin:0 0 24px;">
+          <tr><td style="background:#f9fafb;border-radius:8px;padding:18px;">
+            <p style="color:#1f2937;font-size:14px;font-weight:600;margin:0 0 10px;">For immediate assistance:</p>
+            <p style="margin:4px 0;font-size:14px;color:#374151;">📞 Calling: <strong>63890 28881 / 63890 28886 / 63890 28887</strong></p>
+            <p style="margin:4px 0;font-size:14px;color:#374151;">💬 WhatsApp: <strong>9565119993</strong></p>
+            <p style="margin:4px 0;font-size:14px;color:#374151;">✉️ Email: <strong>swamirupeshwar@gmail.com</strong></p>
+          </td></tr>
+        </table>
+        ${this.ctaButton('Visit Maha Yagya Page', `${this.baseUrl}/maha-yagya`)}
+      `;
+
+      await this.sendEmail({
+        to: params.customerEmail,
+        toName: params.name,
+        subject: 'Maha Yagya 2025 — Sponsor Enquiry Received',
+        html: this.emailShell('Sponsor Enquiry Confirmation', 'Interest Registered!', 'Maha Yagya 2025', custBodyHtml),
+        text: `Dear ${params.name},\n\nThank you for your interest in sponsoring Maha Yagya 2025.\nCategory: ${params.category}\nTier: ${params.tier}\n\nOur team will contact you within 24 hours.\n\nFor assistance:\nPhone: 63890 28881 / 28886 / 28887\nWhatsApp: 9565119993\nEmail: swamirupeshwar@gmail.com`,
+      });
+    }
+  }
+
   // ─── Admin Invite Email ─────────────────────────────────────────────
 
   /**

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import type { AppLocale } from "@/i18n/config";
-import { createSupportTicket, initiateYagyaPayment, type YagyaPaymentResponse } from "@/lib/api";
+import { createSupportTicket, initiateYagyaPayment, notifySponsorInterest, type YagyaPaymentResponse } from "@/lib/api";
 import RazorpayYagyaCheckout from "@/components/payment/RazorpayYagyaCheckout";
 import { categories, tiersByCategory, getTier, formatINR } from "./tierData";
 
@@ -519,6 +519,20 @@ function SponsorContactStep({
   const tier = getTier(formData.category, formData.tier);
   const cat = categories.find((c) => c.value === formData.category);
 
+  // Fire-and-forget email notification on mount
+  useEffect(() => {
+    notifySponsorInterest({
+      name: formData.name,
+      email: formData.email || undefined,
+      mobile: formData.mobile || undefined,
+      company: formData.company || undefined,
+      category: cat?.en || formData.category,
+      tier: tier?.en || formData.tier,
+      message: formData.message || undefined,
+    }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="space-y-5">
       {/* Confirmation card */}
@@ -577,26 +591,61 @@ function SponsorContactStep({
         </ol>
 
         <div
-          className="rounded-lg p-4 mt-2 flex flex-col gap-2"
+          className="rounded-lg p-4 mt-2 flex flex-col gap-3"
           style={{ backgroundColor: "var(--color-bg)", border: "1px solid var(--color-border)" }}
         >
           <p className="text-xs uppercase tracking-wider font-semibold" style={{ color: "var(--color-muted)" }}>
-            {locale === "hi" ? "संपर्क" : "Contact"}
+            {locale === "hi" ? "संपर्क करें" : "Contact Us"}
           </p>
-          <a
-            href="tel:+919826010000"
-            className="font-bold text-lg"
-            style={{ color: "var(--color-primary)" }}
-          >
-            📞 +91 98260 10000
-          </a>
-          <a
-            href="mailto:partnerships@swamirupeshwaranand.com"
-            className="text-sm underline"
-            style={{ color: "var(--color-muted)" }}
-          >
-            partnerships@swamirupeshwaranand.com
-          </a>
+
+          {/* Calling numbers */}
+          <div>
+            <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-muted)" }}>
+              {locale === "hi" ? "📞 कॉलिंग नंबर" : "📞 Calling"}
+            </p>
+            <div className="flex flex-col gap-1">
+              {["63890 28881", "63890 28886", "63890 28887"].map((num) => (
+                <a
+                  key={num}
+                  href={`tel:+91${num.replace(/\s/g, "")}`}
+                  className="font-bold text-base"
+                  style={{ color: "var(--color-primary)" }}
+                >
+                  +91 {num}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* WhatsApp */}
+          <div>
+            <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-muted)" }}>
+              💬 WhatsApp
+            </p>
+            <a
+              href="https://wa.me/919565119993"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-base"
+              style={{ color: "var(--color-primary)" }}
+            >
+              +91 95651 19993
+            </a>
+          </div>
+
+          {/* Email */}
+          <div>
+            <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-muted)" }}>
+              ✉️ {locale === "hi" ? "ईमेल" : "Email"}
+            </p>
+            <a
+              href="mailto:swamirupeshwar@gmail.com"
+              className="text-sm underline"
+              style={{ color: "var(--color-muted)" }}
+            >
+              swamirupeshwar@gmail.com
+            </a>
+          </div>
         </div>
       </div>
 

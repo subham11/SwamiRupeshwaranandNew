@@ -186,6 +186,43 @@ export class VerifyYagyaPaymentDto {
 }
 
 /**
+ * Notify sponsor interest (sends emails to coordinator + customer)
+ */
+export class NotifySponsorInterestDto {
+  @ApiProperty({ description: 'Sponsor name' })
+  @IsString()
+  name!: string;
+
+  @ApiPropertyOptional({ description: 'Sponsor email' })
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @ApiPropertyOptional({ description: 'Sponsor mobile' })
+  @IsOptional()
+  @IsString()
+  mobile?: string;
+
+  @ApiPropertyOptional({ description: 'Company / Organization' })
+  @IsOptional()
+  @IsString()
+  company?: string;
+
+  @ApiProperty({ description: 'Selected category' })
+  @IsString()
+  category!: string;
+
+  @ApiProperty({ description: 'Selected tier' })
+  @IsString()
+  tier!: string;
+
+  @ApiPropertyOptional({ description: 'Additional message' })
+  @IsOptional()
+  @IsString()
+  message?: string;
+}
+
+/**
  * Yagya payment response
  */
 export class YagyaPaymentResponseDto {

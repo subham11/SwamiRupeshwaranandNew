@@ -1647,6 +1647,24 @@ export async function cancelYagyaPayment(bookingId: string): Promise<{ success: 
 }
 
 /**
+ * Send sponsor interest notification emails (coordinator + customer confirmation)
+ */
+export async function notifySponsorInterest(data: {
+  name: string;
+  email?: string;
+  mobile?: string;
+  company?: string;
+  category: string;
+  tier: string;
+  message?: string;
+}): Promise<{ success: boolean }> {
+  return apiRequest("/payments/yagya/sponsor-notify", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+/**
  * Get current user's payment history
  */
 export async function fetchMyPayments(accessToken: string): Promise<any[]> {

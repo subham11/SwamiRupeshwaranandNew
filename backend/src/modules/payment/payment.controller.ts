@@ -21,6 +21,7 @@ import {
   VerifyDonationPaymentDto,
   InitiateYagyaPaymentDto,
   VerifyYagyaPaymentDto,
+  NotifySponsorInterestDto,
   SubscriptionPaymentResponseDto,
   DonationPaymentResponseDto,
   YagyaPaymentResponseDto,
@@ -181,6 +182,18 @@ export class PaymentController {
   @ApiOperation({ summary: 'Cancel a yagya payment', description: 'Marks payment as failed when user dismisses Razorpay modal.' })
   async cancelYagyaPayment(@Param('bookingId') bookingId: string): Promise<{ success: boolean }> {
     await this.paymentService.cancelYagyaPayment(bookingId);
+    return { success: true };
+  }
+
+  @Post('yagya/sponsor-notify')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Notify sponsor interest',
+    description: 'Sends email notification to coordinator and confirmation to customer when sponsor Interest Registered screen is shown.',
+  })
+  async notifySponsorInterest(@Body() dto: NotifySponsorInterestDto): Promise<{ success: boolean }> {
+    await this.paymentService.notifySponsorInterest(dto);
     return { success: true };
   }
 

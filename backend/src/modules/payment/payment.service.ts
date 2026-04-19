@@ -677,6 +677,29 @@ export class PaymentService {
     this.logger.log(`Yagya payment cancelled by user: ${bookingId}`);
   }
 
+  async notifySponsorInterest(dto: {
+    name: string;
+    email?: string;
+    mobile?: string;
+    company?: string;
+    category: string;
+    tier: string;
+    message?: string;
+  }): Promise<void> {
+    const COORDINATOR_EMAIL = 'swamirupeshwar@gmail.com';
+    await this.emailService.sendSponsorInterestEmail({
+      coordinatorEmail: COORDINATOR_EMAIL,
+      customerEmail: dto.email,
+      name: dto.name,
+      mobile: dto.mobile,
+      company: dto.company,
+      category: dto.category,
+      tier: dto.tier,
+      message: dto.message,
+    });
+    this.logger.log(`Sponsor interest notification sent for: ${dto.name} (${dto.tier})`);
+  }
+
   // ============================================
   // Webhook Handler
   // ============================================
