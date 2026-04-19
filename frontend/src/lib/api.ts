@@ -1642,6 +1642,10 @@ export async function verifyYagyaPayment(
   });
 }
 
+export async function cancelYagyaPayment(bookingId: string): Promise<{ success: boolean }> {
+  return apiRequest(`/payments/yagya/cancel/${bookingId}`, { method: "POST" });
+}
+
 /**
  * Get current user's payment history
  */

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { verifyYagyaPayment, type YagyaPaymentResponse } from '@/lib/api';
+import { verifyYagyaPayment, cancelYagyaPayment, type YagyaPaymentResponse } from '@/lib/api';
 
 declare global {
   interface Window {
@@ -95,6 +95,8 @@ export default function RazorpayYagyaCheckout({
         modal: {
           ondismiss: () => {
             setIsLoading(false);
+            // Mark payment as failed/cancelled in DB (fire-and-forget)
+            cancelYagyaPayment(paymentData.bookingId).catch(() => {});
             onDismiss?.();
           },
           escape: true,

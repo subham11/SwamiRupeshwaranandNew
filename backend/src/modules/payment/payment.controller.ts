@@ -175,6 +175,15 @@ export class PaymentController {
     return this.paymentService.verifyYagyaPayment(dto);
   }
 
+  @Post('yagya/cancel/:bookingId')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Cancel a yagya payment', description: 'Marks payment as failed when user dismisses Razorpay modal.' })
+  async cancelYagyaPayment(@Param('bookingId') bookingId: string): Promise<{ success: boolean }> {
+    await this.paymentService.cancelYagyaPayment(bookingId);
+    return { success: true };
+  }
+
   // ============================================
   // Razorpay Webhook
   // ============================================

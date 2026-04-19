@@ -23,6 +23,7 @@ const STATUS_COLORS: Record<string, string> = {
   refunded: 'bg-purple-100 text-purple-800',
   created: 'bg-yellow-100 text-yellow-800',
   authorized: 'bg-blue-100 text-blue-800',
+  cancelled: 'bg-zinc-100 text-zinc-600',
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -68,6 +69,58 @@ function TableSkeleton() {
       {[...Array(8)].map((_, i) => (
         <div key={i} className="h-12 bg-zinc-100 rounded-lg" />
       ))}
+    </div>
+  );
+}
+
+// ============================================
+// Detail modal
+// ============================================
+
+function DetailModal({ payment, onClose }: { payment: PaymentRecord; onClose: () => void }) {
+  const rows: { label: string; value: string | undefined }[] = [
+    { label: 'Booking ID', value: payment.id },
+    { label: 'Name', value: payment.name },
+    { label: 'Email', value: payment.userEmail },
+    { label: 'Phone', value: payment.phone },
+    { label: 'Type', value: payment.type },
+    { label: 'Category', value: payment.category },
+    { label: 'Tier', value: payment.tier },
+    { label: 'Amount', value: formatAmount(payment.amount) },
+    { label: 'Status', value: payment.status },
+    { label: 'Razorpay Order ID', value: payment.razorpayOrderId },
+    { label: 'Razorpay Payment ID', value: payment.razorpayPaymentId },
+    { label: 'Failure Reason', value: payment.failureReason },
+    { label: 'Created', value: formatDate(payment.createdAt) },
+    { label: 'Updated', value: formatDate(payment.updatedAt) },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200">
+          <h2 className="text-lg font-bold text-gray-900">Booking Details</h2>
+          <button onClick={onClose} className="text-zinc-400 hover:text-zinc-600 text-2xl leading-none">✕</button>
+        </div>
+        <div className="px-6 py-4 space-y-3">
+          {rows.map(({ label, value }) =>
+            value ? (
+              <div key={label} className="flex gap-3 text-sm">
+                <span className="w-40 flex-shrink-0 font-medium text-zinc-500">{label}</span>
+                <span className="text-gray-900 break-all">{value}</span>
+              </div>
+            ) : null
+          )}
+        </div>
+        <div className="px-6 py-4 border-t border-zinc-100">
+          <button
+            onClick={onClose}
+            className="w-full py-2 rounded-lg bg-zinc-100 text-zinc-700 hover:bg-zinc-200 font-medium text-sm"
+          >
+            Close
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -208,6 +261,7 @@ export default function AdminTransactionsPage() {
   // Refund modal
   const [refundPayment, setRefundPayment] = useState<PaymentRecord | null>(null);
   const [refundLoading, setRefundLoading] = useState(false);
+  const [detailPayment, setDetailPayment] = useState<PaymentRecord | null>(null);
 
   // Auth redirect
   useEffect(() => {
@@ -420,14 +474,19 @@ export default function AdminTransactionsPage() {
                       {formatDate(payment.createdAt)}
                     </td>
 
-                    {/* Name / Email */}
+                    {/* Name / Email — click to open detail */}
                     <td className="px-4 py-3">
-                      <div className="font-medium text-gray-900 truncate max-w-[160px]">
-                        {payment.name || '—'}
-                      </div>
-                      <div className="text-xs text-zinc-400 truncate max-w-[160px]">
-                        {payment.userEmail || '—'}
-                      </div>
+                      <button
+                        onClick={() => setDetailPayment(payment)}
+                        className="text-left hover:underline cursor-pointer group"
+                      >
+                        <div className="font-medium text-gray-900 truncate max-w-[160px] group-hover:text-orange-600">
+                          {payment.name || '—'}
+                        </div>
+                        <div className="text-xs text-zinc-400 truncate max-w-[160px]">
+                          {payment.userEmail || '—'}
+                        </div>
+                      </button>
                     </td>
 
                     {/* Type badge */}
@@ -507,6 +566,11 @@ export default function AdminTransactionsPage() {
           </div>
         )}
       </div>
+
+      {/* Detail modal */}
+      {detailPayment && (
+        <DetailModal payment={detailPayment} onClose={() => setDetailPayment(null)} />
+      )}
 
       {/* Refund modal */}
       {refundPayment && (

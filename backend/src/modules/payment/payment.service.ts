@@ -665,6 +665,18 @@ export class PaymentService {
     };
   }
 
+  /**
+   * Cancel a yagya payment (user dismissed Razorpay modal).
+   * Marks the payment record status as 'failed'.
+   */
+  async cancelYagyaPayment(bookingId: string): Promise<void> {
+    await this.updatePaymentByEntity(bookingId, {
+      status: 'failed',
+      failureReason: 'Cancelled by user',
+    });
+    this.logger.log(`Yagya payment cancelled by user: ${bookingId}`);
+  }
+
   // ============================================
   // Webhook Handler
   // ============================================
