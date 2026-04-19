@@ -263,18 +263,20 @@ export class SettingsService {
     keySecret: string;
     webhookSecret: string;
   }> {
-    // Try Foundation keys first (default account)
-    const [foundationKeyId, foundationKeySecret, foundationWebhook] = await Promise.all([
-      this.get('RAZORPAY_FOUNDATION_KEY_ID'),
-      this.get('RAZORPAY_FOUNDATION_KEY_SECRET'),
-      this.get('RAZORPAY_FOUNDATION_WEBHOOK_SECRET'),
-    ]);
+    // Default account = Ashram (RAZORPAY_KEY_*)
+    return this.getRazorpayAshramConfig();
+  }
 
-    if (foundationKeyId && foundationKeySecret) {
-      return { keyId: foundationKeyId, keySecret: foundationKeySecret, webhookSecret: foundationWebhook };
-    }
-
-    // Fallback to legacy RAZORPAY_KEY_* (ashram) if Foundation not configured
+  /**
+   * Get Razorpay Ashram configuration (Swami Rupeshwaranand Ashram account).
+   * Used for Shivirarthi and Yajaman payments.
+   * Reads RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET directly — never falls back to Foundation.
+   */
+  async getRazorpayAshramConfig(): Promise<{
+    keyId: string;
+    keySecret: string;
+    webhookSecret: string;
+  }> {
     const [keyId, keySecret, webhookSecret] = await Promise.all([
       this.get('RAZORPAY_KEY_ID'),
       this.get('RAZORPAY_KEY_SECRET'),
@@ -300,10 +302,10 @@ export class SettingsService {
       this.get('RAZORPAY_FOUNDATION_WEBHOOK_SECRET'),
     ]);
 
-    // Fall back to primary Razorpay config if foundation keys are not configured
+    // Fall back to Ashram config if Foundation keys are not configured
     if (!keyId || !keySecret) {
-      this.logger.warn('Foundation Razorpay keys not configured, falling back to primary keys');
-      return this.getRazorpayConfig();
+      this.logger.warn('Foundation Razorpay keys not configured, falling back to Ashram keys');
+      return this.getRazorpayAshramConfig();
     }
 
     return { keyId, keySecret, webhookSecret };
@@ -312,7 +314,7 @@ export class SettingsService {
   /**
    * Get Razorpay Spiritual configuration (Spiritual / Wellness account).
    * Used for Food Stall and Business Stall payments.
-   * Falls back to primary Razorpay config if spiritual keys are not set.
+   * Falls back to Ashram config if spiritual keys are not set.
    */
   async getRazorpaySpirtualConfig(): Promise<{
     keyId: string;
@@ -326,8 +328,8 @@ export class SettingsService {
     ]);
 
     if (!keyId || !keySecret) {
-      this.logger.warn('Spiritual Razorpay keys not configured, falling back to primary keys');
-      return this.getRazorpayConfig();
+      this.logger.warn('Spiritual Razorpay keys not configured, falling back to Ashram keys');
+      return this.getRazorpayAshramConfig();
     }
 
     return { keyId, keySecret, webhookSecret };
@@ -344,7 +346,7 @@ export class SettingsService {
   }> {
     if (account === 'foundation') return this.getRazorpayFoundationConfig();
     if (account === 'spiritual') return this.getRazorpaySpirtualConfig();
-    return this.getRazorpayConfig();
+    return this.getRazorpayAshramConfig();
   }
 
   /**
