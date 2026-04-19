@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import type { AppLocale } from "@/i18n/config";
 import { createSupportTicket, initiateYagyaPayment, notifySponsorInterest, type YagyaPaymentResponse } from "@/lib/api";
@@ -826,6 +826,7 @@ function SuccessStep({
 export default function BookingWizard({ locale }: { locale: AppLocale }) {
   const [step, setStep] = useState<Step>(0);
   const [submitting, setSubmitting] = useState(false);
+  const ticketFired = useRef(false); // prevent duplicate tickets (Enquire Now AND Book Now paths)
   const [formData, setFormData] = useState<FormData>({
     name: "",
     company: "",
@@ -860,46 +861,60 @@ export default function BookingWizard({ locale }: { locale: AppLocale }) {
   ) {
     const { name, value } = e.target;
     if (name === "category") {
+      ticketFired.current = false; // new category = new enquiry
       setFormData((prev) => ({ ...prev, category: value, tier: "" }));
+    } else if (name === "tier") {
+      ticketFired.current = false; // new tier = new enquiry
+      setFormData((prev) => ({ ...prev, tier: value }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  }
+
+  // Shared: fire support ticket once regardless of which button (Enquire/Book Now) was used
+  async function fireTicket(data: FormData) {
+    if (ticketFired.current) return; // already sent
+    ticketFired.current = true;
+    const cat = categories.find((c) => c.value === data.category);
+    const tier = getTier(data.category, data.tier);
+    const catLabel = cat?.en || data.category;
+    const tierLabel = tier?.en || data.tier;
+    try {
+      await createSupportTicket({
+        subject: `Maha Yagya Enquiry — ${catLabel} — ${tierLabel} — ${data.name}`,
+        message: [
+          `Name: ${data.name}`,
+          data.company ? `Company: ${data.company}` : "",
+          `Mobile: ${data.mobile}`,
+          `Email: ${data.email}`,
+          `Category: ${catLabel}`,
+          `Tier: ${tierLabel}`,
+          data.message ? `Message: ${data.message}` : "",
+        ]
+          .filter(Boolean)
+          .join("\n"),
+        category: "yagya",
+        name: data.name,
+        email: data.email,
+      });
+    } catch {
+      // Non-blocking
     }
   }
 
   async function handleEnquirySubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
-
-    const cat = categories.find((c) => c.value === formData.category);
-    const tier = getTier(formData.category, formData.tier);
-    const catLabel = cat?.en || formData.category;
-    const tierLabel = tier?.en || formData.tier;
-
-    // Fire-and-forget support ticket
-    try {
-      await createSupportTicket({
-        subject: `Maha Yagya Enquiry — ${catLabel} — ${tierLabel} — ${formData.name}`,
-        message: [
-          `Name: ${formData.name}`,
-          formData.company ? `Company: ${formData.company}` : "",
-          `Mobile: ${formData.mobile}`,
-          `Email: ${formData.email}`,
-          `Category: ${catLabel}`,
-          `Tier: ${tierLabel}`,
-          formData.message ? `Message: ${formData.message}` : "",
-        ]
-          .filter(Boolean)
-          .join("\n"),
-        category: "yagya",
-        name: formData.name,
-        email: formData.email,
-      });
-    } catch {
-      // Non-blocking — proceed to booking regardless
-    }
-
+    await fireTicket(formData); // path: Enquire Now → step 0 submit
     setSubmitting(false);
     setStep(1);
+  }
+
+  // Called when user advances from Summary (step 1) → Terms (step 2)
+  // Covers "Book Now" path which skips step 0 entirely
+  async function handleSummaryNext() {
+    await fireTicket(formData); // no-op if already fired via Enquire Now
+    setStep(2);
   }
 
   function handleSuccess(res: { bookingId: string; message: string }) {
@@ -928,7 +943,7 @@ export default function BookingWizard({ locale }: { locale: AppLocale }) {
           formData={formData}
           onChange={handleChange}
           onBack={() => setStep(0)}
-          onNext={() => setStep(2)}
+          onNext={handleSummaryNext}
         />
       )}
 
