@@ -506,6 +506,111 @@ function TermsStep({
 }
 
 // ─── Step 3: Payment ─────────────────────────────────────────
+// Sponsor amounts exceed Razorpay per-order limits (₹5L+). Show contact flow instead.
+function SponsorContactStep({
+  locale,
+  formData,
+  onBack,
+}: {
+  locale: AppLocale;
+  formData: FormData;
+  onBack: () => void;
+}) {
+  const tier = getTier(formData.category, formData.tier);
+  const cat = categories.find((c) => c.value === formData.category);
+
+  return (
+    <div className="space-y-5">
+      {/* Confirmation card */}
+      <div
+        className="rounded-xl p-5"
+        style={{ background: "linear-gradient(135deg, var(--color-primary), #1a0a00)" }}
+      >
+        <div className="flex items-start gap-3">
+          <div className="text-3xl mt-0.5">✅</div>
+          <div>
+            <p className="font-bold text-white text-lg">
+              {locale === "hi" ? "आपकी रुचि दर्ज की गई!" : "Interest Registered!"}
+            </p>
+            <p className="text-white/70 text-sm mt-1">
+              {locale === "hi"
+                ? `${cat?.hi || formData.category} — ${tier?.hi || formData.tier}`
+                : `${cat?.en || formData.category} — ${tier?.en || formData.tier}`}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Instructions */}
+      <div
+        className="rounded-xl p-5 space-y-4"
+        style={{ backgroundColor: "var(--color-secondary)", border: "1px solid var(--color-border)" }}
+      >
+        <p className="font-semibold" style={{ color: "var(--color-primary)" }}>
+          {locale === "hi" ? "अगले चरण" : "Next Steps"}
+        </p>
+        <ol className="space-y-2 text-sm" style={{ color: "var(--color-text)" }}>
+          <li className="flex gap-2">
+            <span className="font-bold" style={{ color: "var(--color-gold)" }}>1.</span>
+            <span>
+              {locale === "hi"
+                ? "हमारी टीम 24 घंटों के भीतर आपसे संपर्क करेगी।"
+                : "Our team will contact you within 24 hours to confirm your partnership."}
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <span className="font-bold" style={{ color: "var(--color-gold)" }}>2.</span>
+            <span>
+              {locale === "hi"
+                ? "MOU / अनुबंध पर हस्ताक्षर के बाद भुगतान लिंक या बैंक विवरण साझा किया जाएगा।"
+                : "After MOU / agreement signing, we'll share a payment link or bank transfer details."}
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <span className="font-bold" style={{ color: "var(--color-gold)" }}>3.</span>
+            <span>
+              {locale === "hi"
+                ? "तत्काल सहायता के लिए नीचे दिए नंबर पर संपर्क करें।"
+                : "For immediate assistance, contact us on the number below."}
+            </span>
+          </li>
+        </ol>
+
+        <div
+          className="rounded-lg p-4 mt-2 flex flex-col gap-2"
+          style={{ backgroundColor: "var(--color-bg)", border: "1px solid var(--color-border)" }}
+        >
+          <p className="text-xs uppercase tracking-wider font-semibold" style={{ color: "var(--color-muted)" }}>
+            {locale === "hi" ? "संपर्क" : "Contact"}
+          </p>
+          <a
+            href="tel:+919826010000"
+            className="font-bold text-lg"
+            style={{ color: "var(--color-primary)" }}
+          >
+            📞 +91 98260 10000
+          </a>
+          <a
+            href="mailto:partnerships@swamirupeshwaranand.com"
+            className="text-sm underline"
+            style={{ color: "var(--color-muted)" }}
+          >
+            partnerships@swamirupeshwaranand.com
+          </a>
+        </div>
+      </div>
+
+      <button
+        onClick={onBack}
+        className="w-full py-2.5 rounded-lg font-medium border transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800 text-sm"
+        style={{ borderColor: "var(--color-border)", color: "var(--color-muted)" }}
+      >
+        ← {locale === "hi" ? "वापस" : "Back"}
+      </button>
+    </div>
+  );
+}
+
 function PaymentStep({
   locale,
   formData,
@@ -517,6 +622,12 @@ function PaymentStep({
   onSuccess: (res: { bookingId: string; message: string }) => void;
   onBack: () => void;
 }) {
+  // Sponsor = high-value corporate deals (₹5L–₹1Cr). Razorpay per-order cap exceeded.
+  // Show contact/bank-transfer flow instead.
+  if (formData.category === "sponsor") {
+    return <SponsorContactStep locale={locale} formData={formData} onBack={onBack} />;
+  }
+
   const [paymentData, setPaymentData] = useState<YagyaPaymentResponse | null>(null);
   const [initiating, setInitiating] = useState(true);
   const [error, setError] = useState<string | null>(null);
