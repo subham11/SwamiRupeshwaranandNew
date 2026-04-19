@@ -370,14 +370,10 @@ function SummaryStep({
         <h3 className="font-heading text-base font-semibold text-white/80 uppercase tracking-wide text-sm">
           {locale === "hi" ? "मूल्य विवरण" : "Price Breakdown"}
         </h3>
-        <div className="flex justify-between items-center">
-          <span className="text-white/70 text-sm">{locale === "hi" ? "कुल मूल्य" : "Total Amount"}</span>
-          <span className="text-white font-semibold">{tier ? formatINR(tier.amount) : "—"}</span>
-        </div>
-        {isMinBooking && (
+        {!isMinBooking && (
           <div className="flex justify-between items-center">
-            <span className="text-white/70 text-sm">{locale === "hi" ? "50% अग्रिम" : "50% Advance"}</span>
-            <span className="text-white/60 line-through text-sm">{tier ? formatINR(deposit) : "—"}</span>
+            <span className="text-white/70 text-sm">{locale === "hi" ? "कुल मूल्य" : "Total Amount"}</span>
+            <span className="text-white font-semibold">{tier ? formatINR(tier.amount) : "—"}</span>
           </div>
         )}
         <div className="border-t border-white/15 pt-3">
@@ -385,7 +381,7 @@ function SummaryStep({
             <div>
               <span className="text-white font-bold text-lg">
                 {isMinBooking
-                  ? (locale === "hi" ? "न्यूनतम बुकिंग (टोकन)" : "Min. Booking (Token)")
+                  ? (locale === "hi" ? "अभी बुक करें" : "Book Now")
                   : (locale === "hi" ? "अभी देय (50%)" : "Payable Now (50%)")}
               </span>
               <p className="text-white/50 text-xs mt-0.5">
@@ -394,10 +390,7 @@ function SummaryStep({
                   : (locale === "hi" ? "शेष 50% आयोजन स्थल पर देय" : "Remaining 50% payable on-site")}
               </p>
             </div>
-            <span
-              className="font-bold text-2xl"
-              style={{ color: "var(--color-gold)" }}
-            >
+            <span className="font-bold text-2xl" style={{ color: "var(--color-gold)" }}>
               {tier ? formatINR(chargeAmount) : "—"}
             </span>
           </div>
