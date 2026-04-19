@@ -229,6 +229,9 @@ function SummaryStep({
   const cat = categories.find((c) => c.value === formData.category);
   const tier = getTier(formData.category, formData.tier);
   const deposit = tier ? Math.round(tier.amount / 2) : 0;
+  const MIN_BOOKING = 500000; // Foundation Razorpay cap = ₹5,00,000
+  const chargeAmount = Math.min(deposit, MIN_BOOKING);
+  const isMinBooking = deposit > MIN_BOOKING;
   const availableTiers = formData.category ? (tiersByCategory[formData.category] || []) : [];
 
   function handleNext() {
@@ -371,19 +374,31 @@ function SummaryStep({
           <span className="text-white/70 text-sm">{locale === "hi" ? "कुल मूल्य" : "Total Amount"}</span>
           <span className="text-white font-semibold">{tier ? formatINR(tier.amount) : "—"}</span>
         </div>
+        {isMinBooking && (
+          <div className="flex justify-between items-center">
+            <span className="text-white/70 text-sm">{locale === "hi" ? "50% अग्रिम" : "50% Advance"}</span>
+            <span className="text-white/60 line-through text-sm">{tier ? formatINR(deposit) : "—"}</span>
+          </div>
+        )}
         <div className="border-t border-white/15 pt-3">
           <div className="flex justify-between items-center">
             <div>
-              <span className="text-white font-bold text-lg">{locale === "hi" ? "अभी देय (50%)" : "Payable Now (50%)"}</span>
+              <span className="text-white font-bold text-lg">
+                {isMinBooking
+                  ? (locale === "hi" ? "न्यूनतम बुकिंग (टोकन)" : "Min. Booking (Token)")
+                  : (locale === "hi" ? "अभी देय (50%)" : "Payable Now (50%)")}
+              </span>
               <p className="text-white/50 text-xs mt-0.5">
-                {locale === "hi" ? "शेष 50% आयोजन स्थल पर देय" : "Remaining 50% payable on-site"}
+                {isMinBooking
+                  ? (locale === "hi" ? "शेष राशि समन्वयक के साथ तय की जाएगी" : "Balance to be settled with our coordinator")
+                  : (locale === "hi" ? "शेष 50% आयोजन स्थल पर देय" : "Remaining 50% payable on-site")}
               </p>
             </div>
             <span
               className="font-bold text-2xl"
               style={{ color: "var(--color-gold)" }}
             >
-              {tier ? formatINR(deposit) : "—"}
+              {tier ? formatINR(chargeAmount) : "—"}
             </span>
           </div>
         </div>
@@ -677,13 +692,10 @@ function PaymentStep({
 
   const tier = getTier(formData.category, formData.tier);
   const deposit = tier ? Math.round(tier.amount / 2) : 0;
-
-  // Razorpay per-order cap = ₹5,00,000. If deposit exceeds this, show contact/bank flow.
-  // Empact Partner (₹5L deposit) and Stall Partner (₹2.5L deposit) can use Razorpay.
-  // Health Partner (₹12.5L deposit) and above → contact flow.
-  if (deposit > 500000) {
-    return <SponsorContactStep locale={locale} formData={formData} onBack={onBack} />;
-  }
+  // Cap at ₹5,00,000 — Foundation Razorpay limit. High-value partners pay ₹5L as token.
+  const MIN_BOOKING = 500000;
+  const chargeAmount = Math.min(deposit, MIN_BOOKING);
+  const isMinBooking = deposit > MIN_BOOKING;
 
   const initiate = useCallback(async () => {
     setInitiating(true);
@@ -691,7 +703,7 @@ function PaymentStep({
     setPaymentData(null);
     try {
       const data = await initiateYagyaPayment({
-        amount: deposit,
+        amount: chargeAmount,
         category: formData.category,
         tierId: formData.tier,
         name: formData.name,
@@ -705,7 +717,7 @@ function PaymentStep({
     } finally {
       setInitiating(false);
     }
-  }, [deposit, formData]);
+  }, [chargeAmount, formData]);
 
   useEffect(() => {
     initiate();
@@ -719,10 +731,19 @@ function PaymentStep({
         style={{ background: "linear-gradient(135deg, var(--color-primary), #1a0a00)" }}
       >
         <div>
-          <p className="text-white/70 text-sm">{locale === "hi" ? "अभी देय (50% अग्रिम)" : "Payable Now (50% Advance)"}</p>
-          <p className="font-bold text-2xl" style={{ color: "var(--color-gold)" }}>
-            {formatINR(deposit)}
+          <p className="text-white/70 text-sm">
+            {isMinBooking
+              ? (locale === "hi" ? "न्यूनतम बुकिंग राशि (टोकन)" : "Min. Booking Amount (Token)")
+              : (locale === "hi" ? "अभी देय (50% अग्रिम)" : "Payable Now (50% Advance)")}
           </p>
+          <p className="font-bold text-2xl" style={{ color: "var(--color-gold)" }}>
+            {formatINR(chargeAmount)}
+          </p>
+          {isMinBooking && (
+            <p className="text-white/50 text-xs mt-0.5">
+              {locale === "hi" ? `कुल: ${formatINR(tier?.amount || 0)}` : `Total: ${formatINR(tier?.amount || 0)}`}
+            </p>
+          )}
         </div>
         <div className="text-3xl">🔐</div>
       </div>
