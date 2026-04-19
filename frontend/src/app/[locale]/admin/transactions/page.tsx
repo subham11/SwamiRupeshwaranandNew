@@ -15,7 +15,7 @@ import {
 // ============================================
 
 type TypeFilter = 'all' | 'yagya' | 'subscription' | 'donation';
-type StatusFilter = 'all' | 'created' | 'authorized' | 'captured' | 'failed' | 'refunded';
+type StatusFilter = 'all' | 'created' | 'authorized' | 'captured' | 'failed' | 'refunded' | 'cancelled';
 
 const STATUS_COLORS: Record<string, string> = {
   captured: 'bg-green-100 text-green-800',
@@ -39,7 +39,7 @@ const TYPE_TABS: { value: TypeFilter; label: string }[] = [
   { value: 'donation', label: 'Donation' },
 ];
 
-const STATUS_OPTIONS: StatusFilter[] = ['all', 'created', 'authorized', 'captured', 'failed', 'refunded'];
+const STATUS_OPTIONS: StatusFilter[] = ['all', 'created', 'authorized', 'captured', 'failed', 'refunded', 'cancelled'];
 
 function formatAmount(paise: number): string {
   return `₹${(paise / 100).toLocaleString('en-IN')}`;
@@ -345,6 +345,7 @@ export default function AdminTransactionsPage() {
   // Stats derived from loaded items
   const capturedItems = payments.filter((p) => p.status === 'captured');
   const failedCount = payments.filter((p) => p.status === 'failed').length;
+  const cancelledCount = payments.filter((p) => p.status === 'cancelled').length;
   const refundedCount = payments.filter((p) => p.status === 'refunded').length;
   const totalCaptured = capturedItems.reduce((sum, p) => sum + p.amount, 0);
 
@@ -394,9 +395,9 @@ export default function AdminTransactionsPage() {
             <p className="text-xs text-zinc-400">{capturedItems.length} payments</p>
           </div>
           <div className="bg-white border border-zinc-200 rounded-xl p-4">
-            <p className="text-xs text-zinc-500 mb-1">Failed</p>
-            <p className="text-2xl font-bold text-red-600">{failedCount}</p>
-            <p className="text-xs text-zinc-400">payments</p>
+            <p className="text-xs text-zinc-500 mb-1">Failed / Cancelled</p>
+            <p className="text-2xl font-bold text-red-600">{failedCount} <span className="text-zinc-400 text-base font-medium">/ {cancelledCount}</span></p>
+            <p className="text-xs text-zinc-400">failed / user-cancelled</p>
           </div>
           <div className="bg-white border border-zinc-200 rounded-xl p-4">
             <p className="text-xs text-zinc-500 mb-1">Refunded</p>
