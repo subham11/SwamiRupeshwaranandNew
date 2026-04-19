@@ -755,8 +755,11 @@ function PaymentStep({
           category={formData.category}
           participant={{ name: formData.name, email: formData.email, phone: formData.mobile }}
           onSuccess={onSuccess}
-          onFailure={(e) => setError(e.message)}
-          onDismiss={() => setError(locale === "hi" ? "भुगतान रद्द किया गया। पुनः प्रयास करें।" : "Payment was cancelled. You can retry below.")}
+          onFailure={(e) => { setPaymentData(null); setError(e.message); }}
+          onDismiss={() => {
+              setPaymentData(null); // unmount checkout so autoOpen doesn't re-trigger
+              setError(locale === "hi" ? "भुगतान रद्द किया गया। पुनः प्रयास करें।" : "Payment was cancelled. You can retry below.");
+            }}
           autoOpen
         />
       )}
