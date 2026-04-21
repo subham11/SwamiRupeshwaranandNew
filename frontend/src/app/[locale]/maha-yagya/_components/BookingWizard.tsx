@@ -485,33 +485,35 @@ function SummaryStep({
         <h3 className="font-heading text-base font-semibold text-white/80 uppercase tracking-wide text-sm">
           {locale === "hi" ? "मूल्य विवरण" : "Price Breakdown"}
         </h3>
+        {/* Row: Base Amount */}
+        {!isMinBooking && tier && (
+          <div className="flex justify-between items-center">
+            <span className="text-white/60 text-sm">{locale === "hi" ? "आधार मूल्य" : "Base Amount"}</span>
+            <span className="text-white/80">{formatINR(tier.amount)}</span>
+          </div>
+        )}
+        {/* Row: Advance (50%) */}
+        {!isMinBooking && tier && (
+          <div className="flex justify-between items-center">
+            <span className="text-white/60 text-sm">{locale === "hi" ? "अग्रिम (50%)" : "Advance (50%)"}</span>
+            <span className="text-white/80">{formatINR(deposit)}</span>
+          </div>
+        )}
+        {/* Row: GST — only for stalls */}
         {!isMinBooking && (
           <div className="flex justify-between items-center">
-            <span className="text-white/70 text-sm">{locale === "hi" ? "कुल मूल्य" : "Total Amount"}</span>
-            <span className="text-white font-semibold">{tier ? formatINR(tier.amount) : "—"}</span>
+            <span className="text-white/60 text-sm">GST (18%)</span>
+            <span className="text-white/80">{hasGST ? formatINR(gstAmount) : <span className="text-white/40 text-xs">Nil</span>}</span>
           </div>
         )}
-        {!isMinBooking && (
-          <div className="flex justify-between items-center">
-            <span className="text-white/70 text-sm">{locale === "hi" ? "50% अग्रिम" : "50% Advance"}</span>
-            <span className="text-white/80 font-medium">{tier ? formatINR(deposit) : "—"}</span>
-          </div>
-        )}
-        {hasGST && !isMinBooking && (
-          <div className="flex justify-between items-center">
-            <span className="text-white/70 text-sm">+ {locale === "hi" ? "GST (18%)" : "GST (18%)"}</span>
-            <span className="text-white/80 font-medium">{formatINR(gstAmount)}</span>
-          </div>
-        )}
-        <div className="border-t border-white/15 pt-3">
+        {/* Divider + Total */}
+        <div className="border-t border-white/20 pt-3">
           <div className="flex justify-between items-center">
             <div>
               <span className="text-white font-bold text-lg">
                 {isMinBooking
                   ? (locale === "hi" ? "अभी बुक करें" : "Book Now")
-                  : hasGST
-                  ? (locale === "hi" ? "कुल देय (50% + GST)" : "Total Payable (50% + GST)")
-                  : (locale === "hi" ? "अभी देय (50%)" : "Payable Now (50%)")}
+                  : (locale === "hi" ? "कुल देय" : "Total Payable")}
               </span>
               <p className="text-white/50 text-xs mt-0.5">
                 {isMinBooking
