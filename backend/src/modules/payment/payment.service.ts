@@ -572,8 +572,8 @@ export class PaymentService {
     if (category === 'food-stall' || category === 'business-stall') return 'spiritual';
     if (category === 'shivirarthi' || category === 'yajaman') return 'ashram';
     if (category === 'sponsor') {
-      // Only Lead CSR Partner goes to Foundation (₹5L token); all other sponsors → Ashram
-      return tier === 'lead-csr-partner' ? 'foundation' : 'ashram';
+      // CSR + Green Partner → Foundation (₹5L token); all other sponsors → Ashram
+      return (tier === 'lead-csr-partner' || tier === 'green-partner') ? 'foundation' : 'ashram';
     }
     return 'ashram';
   }
