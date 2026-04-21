@@ -52,7 +52,7 @@ interface PaymentRecordEntity {
   razorpayPlanId?: string;
   amount: number;
   currency: string;
-  status: 'created' | 'authorized' | 'captured' | 'failed' | 'refunded';
+  status: 'created' | 'authorized' | 'captured' | 'failed' | 'refunded' | 'cancelled';
   failureReason?: string;
   errorCode?: string;
   method?: string; // upi, card, netbanking, etc.
@@ -568,10 +568,14 @@ export class PaymentService {
    * shivirarthi, yajaman            → Ashram account
    * anything else / unknown         → Foundation account  (default)
    */
-  private getYagyaAccountType(category: string): 'ashram' | 'foundation' | 'spiritual' {
+  private getYagyaAccountType(category: string, tier?: string): 'ashram' | 'foundation' | 'spiritual' {
     if (category === 'food-stall' || category === 'business-stall') return 'spiritual';
     if (category === 'shivirarthi' || category === 'yajaman') return 'ashram';
-    return 'foundation'; // sponsor, unknown, default
+    if (category === 'sponsor') {
+      // Only Lead CSR Partner goes to Foundation (₹5L token); all other sponsors → Ashram
+      return tier === 'lead-csr-partner' ? 'foundation' : 'ashram';
+    }
+    return 'ashram';
   }
 
   /**
@@ -579,7 +583,7 @@ export class PaymentService {
    * Uses the appropriate Razorpay account based on category.
    */
   async initiateYagyaPayment(dto: InitiateYagyaPaymentDto): Promise<YagyaPaymentResponseDto> {
-    const accountType = this.getYagyaAccountType(dto.category);
+    const accountType = this.getYagyaAccountType(dto.category, dto.tierId);
     const config = await this.settingsService.getRazorpayConfigForAccount(accountType);
 
     const Razorpay = require('razorpay');
@@ -639,7 +643,7 @@ export class PaymentService {
    * Uses the correct Razorpay key_secret based on category.
    */
   async verifyYagyaPayment(dto: VerifyYagyaPaymentDto): Promise<PaymentVerificationResponseDto> {
-    const accountType = this.getYagyaAccountType(dto.category);
+    const accountType = this.getYagyaAccountType(dto.category, dto.tier);
     const config = await this.settingsService.getRazorpayConfigForAccount(accountType);
 
     const generatedSignature = crypto
@@ -667,11 +671,11 @@ export class PaymentService {
 
   /**
    * Cancel a yagya payment (user dismissed Razorpay modal).
-   * Marks the payment record status as 'failed'.
+   * Marks the payment record status as 'cancelled'.
    */
   async cancelYagyaPayment(bookingId: string): Promise<void> {
     await this.updatePaymentByEntity(bookingId, {
-      status: 'failed',
+      status: 'cancelled',
       failureReason: 'Cancelled by user',
     });
     this.logger.log(`Yagya payment cancelled by user: ${bookingId}`);

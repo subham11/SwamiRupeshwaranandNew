@@ -183,6 +183,11 @@ export class VerifyYagyaPaymentDto {
   @ApiProperty({ enum: YagyaCategory, description: 'Category (needed for key selection)' })
   @IsEnum(YagyaCategory)
   category!: YagyaCategory;
+
+  @ApiPropertyOptional({ description: 'Tier ID (needed to distinguish CSR from other sponsor tiers)' })
+  @IsOptional()
+  @IsString()
+  tier?: string;
 }
 
 /**
