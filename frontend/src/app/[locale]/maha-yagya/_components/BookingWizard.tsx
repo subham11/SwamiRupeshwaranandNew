@@ -8,7 +8,7 @@ import RazorpayYagyaCheckout from "@/components/payment/RazorpayYagyaCheckout";
 import { categories, tiersByCategory, getTier, formatINR } from "./tierData";
 
 // ─── Types ───────────────────────────────────────────────────
-type Step = 0 | 1 | 2 | 3 | 4;
+type Step = 0 | 1 | 2 | 3 | 4 | 5; // 5 = enquiry-only confirmed
 
 interface FormData {
   name: string;
@@ -45,7 +45,7 @@ function ProgressBar({
   locale: AppLocale;
   onStepClick: (i: number) => void;
 }) {
-  if (step === 4) return null;
+  if (step === 4 || step === 5) return null;
   return (
     <div className="flex items-center gap-0 mb-8">
       {STEPS.map((s, i) => {
@@ -99,26 +99,42 @@ function EnquiryStep({
   locale,
   formData,
   onChange,
-  onCategoryChange,
-  onSubmit,
+  onEnquiry,
+  onBook,
   submitting,
 }: {
   locale: AppLocale;
   formData: FormData;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
-  onCategoryChange: (v: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onEnquiry: () => void;
+  onBook: () => void;
   submitting: boolean;
 }) {
+  const [error, setError] = useState<string | null>(null);
   const availableTiers = formData.category ? (tiersByCategory[formData.category] || []) : [];
 
+  function validate() {
+    if (!formData.name || !formData.mobile || !formData.email || !formData.category || !formData.tier) {
+      setError(locale === "hi" ? "कृपया सभी आवश्यक फ़ील्ड भरें।" : "Please fill in all required fields.");
+      return false;
+    }
+    setError(null);
+    return true;
+  }
+
   return (
-    <form onSubmit={onSubmit} className="space-y-4 sm:space-y-5">
+    <div className="space-y-4 sm:space-y-5">
+      {error && (
+        <div className="px-3 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
+          {error}
+        </div>
+      )}
+
       <div>
         <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
           {locale === "hi" ? "पूरा नाम" : "Full Name"} *
         </label>
-        <input type="text" name="name" required value={formData.name} onChange={onChange} className={inputClass} />
+        <input type="text" name="name" value={formData.name} onChange={onChange} className={inputClass} />
       </div>
 
       <div>
@@ -133,13 +149,13 @@ function EnquiryStep({
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
             {locale === "hi" ? "मोबाइल नंबर" : "Mobile Number"} *
           </label>
-          <input type="tel" name="mobile" required value={formData.mobile} onChange={onChange} placeholder="+91" className={inputClass} />
+          <input type="tel" name="mobile" value={formData.mobile} onChange={onChange} placeholder="+91" className={inputClass} />
         </div>
         <div>
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
             {locale === "hi" ? "ईमेल पता" : "Email Address"} *
           </label>
-          <input type="email" name="email" required value={formData.email} onChange={onChange} className={inputClass} />
+          <input type="email" name="email" value={formData.email} onChange={onChange} className={inputClass} />
         </div>
       </div>
 
@@ -148,18 +164,10 @@ function EnquiryStep({
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
             {locale === "hi" ? "भागीदारी श्रेणी" : "Participation Category"} *
           </label>
-          <select
-            name="category"
-            required
-            value={formData.category}
-            onChange={onChange}
-            className={inputClass}
-          >
+          <select name="category" value={formData.category} onChange={onChange} className={inputClass}>
             <option value="">{locale === "hi" ? "श्रेणी चुनें" : "Select Category"}</option>
             {categories.map((cat) => (
-              <option key={cat.value} value={cat.value}>
-                {locale === "en" ? cat.en : cat.hi}
-              </option>
+              <option key={cat.value} value={cat.value}>{locale === "en" ? cat.en : cat.hi}</option>
             ))}
           </select>
         </div>
@@ -167,19 +175,10 @@ function EnquiryStep({
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
             {locale === "hi" ? "पसंदीदा स्तर" : "Preferred Tier"} *
           </label>
-          <select
-            name="tier"
-            required
-            value={formData.tier}
-            onChange={onChange}
-            className={inputClass}
-            disabled={!formData.category}
-          >
+          <select name="tier" value={formData.tier} onChange={onChange} className={inputClass} disabled={!formData.category}>
             <option value="">{locale === "hi" ? "स्तर चुनें" : "Select Tier"}</option>
             {availableTiers.map((tier) => (
-              <option key={tier.value} value={tier.value}>
-                {locale === "en" ? tier.en : tier.hi}
-              </option>
+              <option key={tier.value} value={tier.value}>{locale === "en" ? tier.en : tier.hi}</option>
             ))}
           </select>
         </div>
@@ -192,22 +191,135 @@ function EnquiryStep({
         <textarea name="message" rows={3} value={formData.message} onChange={onChange} className={`${inputClass} resize-none`} />
       </div>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="w-full py-3 rounded-lg font-semibold text-white transition-all hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed"
-        style={{ background: "linear-gradient(135deg, var(--color-gold), var(--color-accent))" }}
-      >
-        {submitting ? (
-          <span className="flex items-center justify-center gap-2">
-            <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-            {locale === "hi" ? "सबमिट हो रहा है..." : "Submitting..."}
+      {/* Two action buttons */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+        {/* Enquiry only */}
+        <button
+          type="button"
+          disabled={submitting}
+          onClick={() => { if (validate()) onEnquiry(); }}
+          className="py-3 rounded-lg font-semibold border-2 transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-60 disabled:cursor-not-allowed"
+          style={{ borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
+        >
+          <span className="block text-sm font-bold">
+            {locale === "hi" ? "पूछताछ जमा करें" : "Submit Enquiry"}
           </span>
-        ) : (
-          <>{locale === "hi" ? "आगे बढ़ें →" : "Submit & Proceed →"}</>
-        )}
-      </button>
-    </form>
+          <span className="block text-xs mt-0.5 opacity-70">
+            {locale === "hi" ? "केवल जानकारी के लिए" : "Just for information"}
+          </span>
+        </button>
+
+        {/* Book now → proceed to payment */}
+        <button
+          type="button"
+          disabled={submitting}
+          onClick={() => { if (validate()) onBook(); }}
+          className="py-3 rounded-lg font-semibold text-white transition-all hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed"
+          style={{ background: "linear-gradient(135deg, var(--color-gold), var(--color-accent))" }}
+        >
+          {submitting ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+              {locale === "hi" ? "..." : "..."}
+            </span>
+          ) : (
+            <>
+              <span className="block text-sm font-bold">
+                {locale === "hi" ? "अभी बुक करें →" : "Book Now →"}
+              </span>
+              <span className="block text-xs mt-0.5 opacity-80">
+                {locale === "hi" ? "बुकिंग के लिए" : "Proceed to booking"}
+              </span>
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Step 5: Enquiry Confirmed ────────────────────────────────
+function EnquiryConfirmedStep({
+  locale,
+  formData,
+  onBook,
+}: {
+  locale: AppLocale;
+  formData: FormData;
+  onBook: () => void;
+}) {
+  const cat = categories.find((c) => c.value === formData.category);
+  const tier = getTier(formData.category, formData.tier);
+
+  return (
+    <div className="space-y-5">
+      {/* Success header */}
+      <div
+        className="rounded-xl p-5"
+        style={{ background: "linear-gradient(135deg, var(--color-primary), #1a0a00)" }}
+      >
+        <div className="flex items-start gap-3">
+          <div className="text-3xl mt-0.5">✅</div>
+          <div>
+            <p className="font-bold text-white text-lg">
+              {locale === "hi" ? "पूछताछ सफलतापूर्वक जमा हुई!" : "Enquiry Submitted Successfully!"}
+            </p>
+            <p className="text-white/70 text-sm mt-1">
+              {locale === "en"
+                ? `${cat?.en || formData.category} — ${tier?.en || formData.tier}`
+                : `${cat?.hi || formData.category} — ${tier?.hi || formData.tier}`}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Info */}
+      <div
+        className="rounded-xl p-5 space-y-3"
+        style={{ backgroundColor: "var(--color-secondary)", border: "1px solid var(--color-border)" }}
+      >
+        <p className="text-sm" style={{ color: "var(--color-text)" }}>
+          {locale === "hi"
+            ? `नमस्ते ${formData.name}, आपकी पूछताछ हमें प्राप्त हो गई है। हमारी टीम जल्द ही आपसे संपर्क करेगी।`
+            : `Hi ${formData.name}, we've received your enquiry. Our team will reach out to you within 24 hours.`}
+        </p>
+
+        <div className="flex flex-col gap-1 text-sm" style={{ color: "var(--color-muted)" }}>
+          {formData.mobile && <span>📞 {formData.mobile}</span>}
+          {formData.email && <span>✉️ {formData.email}</span>}
+        </div>
+      </div>
+
+      {/* Option to proceed to booking */}
+      <div
+        className="rounded-xl p-5 space-y-3"
+        style={{ backgroundColor: "var(--color-secondary)", border: "1px solid var(--color-border)" }}
+      >
+        <p className="font-semibold text-sm" style={{ color: "var(--color-primary)" }}>
+          {locale === "hi" ? "क्या आप अभी बुकिंग करना चाहते हैं?" : "Want to proceed with booking?"}
+        </p>
+        <p className="text-xs" style={{ color: "var(--color-muted)" }}>
+          {locale === "hi"
+            ? "आप अभी ऑनलाइन भुगतान करके अपनी सीट सुरक्षित कर सकते हैं।"
+            : "Secure your spot now with an online payment."}
+        </p>
+        <button
+          onClick={onBook}
+          className="w-full py-3 rounded-lg font-semibold text-white transition-all hover:brightness-110"
+          style={{ background: "linear-gradient(135deg, var(--color-gold), var(--color-accent))" }}
+        >
+          {locale === "hi" ? "बुकिंग के लिए आगे बढ़ें →" : "Proceed to Book →"}
+        </button>
+      </div>
+
+      <Link
+        href={`/${locale}/maha-yagya`}
+        className="block text-center text-sm underline"
+        style={{ color: "var(--color-muted)" }}
+      >
+        {locale === "hi" ? "मुख्य पृष्ठ पर वापस जाएं" : "Back to Maha Yagya"}
+      </Link>
+    </div>
   );
 }
 
@@ -1031,18 +1143,30 @@ export default function BookingWizard({ locale }: { locale: AppLocale }) {
     }
   }
 
-  async function handleEnquirySubmit(e: React.FormEvent) {
-    e.preventDefault();
+  // "Submit Enquiry" — just registers interest, shows confirmed screen
+  async function handleEnquiryOnly() {
     setSubmitting(true);
-    await fireTicket(formData); // path: Enquire Now → step 0 submit
+    await fireTicket(formData);
+    setSubmitting(false);
+    setStep(5);
+  }
+
+  // "Book Now" from step 0 — fires ticket then goes to Summary
+  async function handleBookFromEnquiry() {
+    setSubmitting(true);
+    await fireTicket(formData);
     setSubmitting(false);
     setStep(1);
   }
 
+  // "Proceed to Book" from enquiry confirmed screen (step 5) → Summary
+  function handleBookFromConfirmed() {
+    setStep(1);
+  }
+
   // Called when user advances from Summary (step 1) → Terms (step 2)
-  // Covers "Book Now" path which skips step 0 entirely
   async function handleSummaryNext() {
-    await fireTicket(formData); // no-op if already fired via Enquire Now
+    await fireTicket(formData); // no-op if already fired
     setStep(2);
   }
 
@@ -1060,9 +1184,17 @@ export default function BookingWizard({ locale }: { locale: AppLocale }) {
           locale={locale}
           formData={formData}
           onChange={handleChange}
-          onCategoryChange={(v) => setFormData((prev) => ({ ...prev, category: v, tier: "" }))}
-          onSubmit={handleEnquirySubmit}
+          onEnquiry={handleEnquiryOnly}
+          onBook={handleBookFromEnquiry}
           submitting={submitting}
+        />
+      )}
+
+      {step === 5 && (
+        <EnquiryConfirmedStep
+          locale={locale}
+          formData={formData}
+          onBook={handleBookFromConfirmed}
         />
       )}
 

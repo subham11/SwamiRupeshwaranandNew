@@ -1003,7 +1003,7 @@ export default async function MahaYagyaPage({
               {cat.id === "food-stall" && (
                 <FadeUp delay={0.1}>
                   <div className="relative rounded-2xl overflow-hidden mb-8 max-w-3xl mx-auto aspect-[16/9]">
-                    <img src="/images/food-stall.jpg" alt={locale === "hi" ? "राज्य खाद्य स्टॉल" : "State Food Stall"} className="w-full h-full object-cover" />
+                    <img src="/images/VaranasiMegaFood.jpeg" alt={locale === "hi" ? "राज्य खाद्य स्टॉल" : "State Food Stall"} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-4 left-4 right-4 text-white">
                       <p className="text-lg sm:text-xl font-bold drop-shadow-lg">
