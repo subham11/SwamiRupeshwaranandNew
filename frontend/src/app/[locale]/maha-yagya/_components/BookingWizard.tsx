@@ -342,7 +342,7 @@ function SummaryStep({
   const tier = getTier(formData.category, formData.tier);
   const deposit = tier ? Math.round(tier.amount / 2) : 0;
   // Only CSR Partner uses ₹5L token (Foundation Razorpay cap); all others pay 50%
-  const isMinBooking = formData.category === "sponsor" && (formData.tier === "lead-csr-partner" || formData.tier === "green-partner");
+  const isMinBooking = formData.category === "sponsor" && (formData.tier === "lead-csr-partner" || formData.tier === "green-partner" || formData.tier === "health-partner");
   // GST 18% applies only to stall categories
   const hasGST = formData.category === "food-stall" || formData.category === "business-stall";
   const gstAmount = hasGST ? Math.round(deposit * 0.18) : 0;
@@ -815,7 +815,7 @@ function PaymentStep({
   const tier = getTier(formData.category, formData.tier);
   const deposit = tier ? Math.round(tier.amount / 2) : 0;
   // Only CSR Partner uses ₹5L token (Foundation Razorpay cap); all others pay 50%
-  const isMinBooking = formData.category === "sponsor" && (formData.tier === "lead-csr-partner" || formData.tier === "green-partner");
+  const isMinBooking = formData.category === "sponsor" && (formData.tier === "lead-csr-partner" || formData.tier === "green-partner" || formData.tier === "health-partner");
   // GST 18% applies only to stall categories
   const hasGST = formData.category === "food-stall" || formData.category === "business-stall";
   const gstAmount = hasGST ? Math.round(deposit * 0.18) : 0;
