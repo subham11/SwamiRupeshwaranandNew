@@ -341,9 +341,12 @@ function SummaryStep({
   const cat = categories.find((c) => c.value === formData.category);
   const tier = getTier(formData.category, formData.tier);
   const deposit = tier ? Math.round(tier.amount / 2) : 0;
-  const MIN_BOOKING = 500000; // Foundation Razorpay cap = ₹5,00,000
-  const chargeAmount = Math.min(deposit, MIN_BOOKING);
-  const isMinBooking = deposit > MIN_BOOKING;
+  // Only CSR Partner uses ₹5L token (Foundation Razorpay cap); all others pay 50%
+  const isMinBooking = formData.category === "sponsor" && formData.tier === "lead-csr-partner";
+  // GST 18% applies only to stall categories
+  const hasGST = formData.category === "food-stall" || formData.category === "business-stall";
+  const gstAmount = hasGST ? Math.round(deposit * 0.18) : 0;
+  const chargeAmount = isMinBooking ? 500000 : deposit + gstAmount;
   const availableTiers = formData.category ? (tiersByCategory[formData.category] || []) : [];
 
   function handleNext() {
@@ -488,12 +491,26 @@ function SummaryStep({
             <span className="text-white font-semibold">{tier ? formatINR(tier.amount) : "—"}</span>
           </div>
         )}
+        {!isMinBooking && (
+          <div className="flex justify-between items-center">
+            <span className="text-white/70 text-sm">{locale === "hi" ? "50% अग्रिम" : "50% Advance"}</span>
+            <span className="text-white/80 font-medium">{tier ? formatINR(deposit) : "—"}</span>
+          </div>
+        )}
+        {hasGST && !isMinBooking && (
+          <div className="flex justify-between items-center">
+            <span className="text-white/70 text-sm">+ {locale === "hi" ? "GST (18%)" : "GST (18%)"}</span>
+            <span className="text-white/80 font-medium">{formatINR(gstAmount)}</span>
+          </div>
+        )}
         <div className="border-t border-white/15 pt-3">
           <div className="flex justify-between items-center">
             <div>
               <span className="text-white font-bold text-lg">
                 {isMinBooking
                   ? (locale === "hi" ? "अभी बुक करें" : "Book Now")
+                  : hasGST
+                  ? (locale === "hi" ? "कुल देय (50% + GST)" : "Total Payable (50% + GST)")
                   : (locale === "hi" ? "अभी देय (50%)" : "Payable Now (50%)")}
               </span>
               <p className="text-white/50 text-xs mt-0.5">
@@ -797,10 +814,12 @@ function PaymentStep({
 
   const tier = getTier(formData.category, formData.tier);
   const deposit = tier ? Math.round(tier.amount / 2) : 0;
-  // Cap at ₹5,00,000 — Foundation Razorpay limit. High-value partners pay ₹5L as token.
-  const MIN_BOOKING = 500000;
-  const chargeAmount = Math.min(deposit, MIN_BOOKING);
-  const isMinBooking = deposit > MIN_BOOKING;
+  // Only CSR Partner uses ₹5L token (Foundation Razorpay cap); all others pay 50%
+  const isMinBooking = formData.category === "sponsor" && formData.tier === "lead-csr-partner";
+  // GST 18% applies only to stall categories
+  const hasGST = formData.category === "food-stall" || formData.category === "business-stall";
+  const gstAmount = hasGST ? Math.round(deposit * 0.18) : 0;
+  const chargeAmount = isMinBooking ? 500000 : deposit + gstAmount;
   const cat = categories.find((c) => c.value === formData.category);
 
   // For high-value partners show info screen first; for others jump straight to Razorpay
@@ -962,6 +981,8 @@ function PaymentStep({
           <p className="text-white/70 text-sm">
             {isMinBooking
               ? (locale === "hi" ? "न्यूनतम बुकिंग राशि" : "Min. Booking Amount")
+              : hasGST
+              ? (locale === "hi" ? "अभी देय (50% + 18% GST)" : "Payable Now (50% + 18% GST)")
               : (locale === "hi" ? "अभी देय (50% अग्रिम)" : "Payable Now (50% Advance)")}
           </p>
           <p className="font-bold text-2xl" style={{ color: "var(--color-gold)" }}>
@@ -994,6 +1015,7 @@ function PaymentStep({
         <RazorpayYagyaCheckout
           paymentData={paymentData}
           category={formData.category}
+          tier={formData.tier}
           participant={{ name: formData.name, email: formData.email, phone: formData.mobile }}
           onSuccess={onSuccess}
           onFailure={(e) => { setPaymentData(null); setError(e.message); }}

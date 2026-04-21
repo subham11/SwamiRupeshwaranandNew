@@ -1634,6 +1634,7 @@ export async function verifyYagyaPayment(
     razorpaySignature: string;
     bookingId: string;
     category: string;
+    tier?: string;
   }
 ): Promise<PaymentVerificationResponse> {
   return apiRequest("/payments/yagya/verify", {

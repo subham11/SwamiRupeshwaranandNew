@@ -14,6 +14,8 @@ interface RazorpayYagyaCheckoutProps {
   paymentData: YagyaPaymentResponse;
   /** Booking category (needed for verification) */
   category: string;
+  /** Tier ID (needed to select correct Razorpay account for sponsor tiers) */
+  tier?: string;
   /** Participant info for prefill */
   participant: {
     name: string;
@@ -48,6 +50,7 @@ function loadRazorpayScript(): Promise<boolean> {
 export default function RazorpayYagyaCheckout({
   paymentData,
   category,
+  tier,
   participant,
   onSuccess,
   onFailure,
@@ -110,6 +113,7 @@ export default function RazorpayYagyaCheckout({
               razorpaySignature: response.razorpay_signature,
               bookingId: paymentData.bookingId,
               category,
+              tier: tier || paymentData.notes?.tierId,
             });
 
             if (result.success) {
@@ -147,7 +151,7 @@ export default function RazorpayYagyaCheckout({
         message: error?.message || 'Failed to open payment gateway.',
       });
     }
-  }, [scriptLoaded, paymentData, category, participant, onSuccess, onFailure, onDismiss]);
+  }, [scriptLoaded, paymentData, category, tier, participant, onSuccess, onFailure, onDismiss]);
 
   useEffect(() => {
     if (autoOpen && scriptLoaded && paymentData) {
