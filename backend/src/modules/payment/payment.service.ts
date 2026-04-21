@@ -566,15 +566,12 @@ export class PaymentService {
    * sponsor (CSR partners)          → Foundation account  (default)
    * food-stall, business-stall      → Spiritual account
    * shivirarthi, yajaman            → Ashram account
-   * anything else / unknown         → Foundation account  (default)
+   * anything else / unknown         → Ashram account  (default)
    */
   private getYagyaAccountType(category: string, tier?: string): 'ashram' | 'foundation' | 'spiritual' {
     if (category === 'food-stall' || category === 'business-stall') return 'spiritual';
     if (category === 'shivirarthi' || category === 'yajaman') return 'ashram';
-    if (category === 'sponsor') {
-      // CSR + Green + Health Partner → Foundation (₹5L token); all other sponsors → Ashram
-      return (tier === 'lead-csr-partner' || tier === 'green-partner' || tier === 'health-partner') ? 'foundation' : 'ashram';
-    }
+    if (category === 'sponsor') return 'foundation'; // ALL partner tiers → Foundation
     return 'ashram';
   }
 
