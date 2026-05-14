@@ -21,8 +21,8 @@ export default async function Page({ params }: { params: Promise<{ locale: AppLo
       <HeroSwiper locale={locale} slides={content.heroSlides} />
       <MahaYagyaBanner locale={locale} />
       <SacredTeachings locale={locale} content={content.sacredTeachings} />
-      <WordsOfWisdom locale={locale} quotes={content.quotes} />
       <FeaturedProducts locale={locale} />
+      <WordsOfWisdom locale={locale} quotes={content.quotes} />
       <HomeSections locale={locale} content={content} />
       <MahaYagyaPopup locale={locale} />
     </div>

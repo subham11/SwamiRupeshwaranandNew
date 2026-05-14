@@ -239,14 +239,21 @@ export default function FeaturedProducts({ locale }: FeaturedProductsProps) {
 
                       {/* Price */}
                       <div className="flex items-center gap-2">
+                        {product.variants && product.variants.length > 0 && (
+                          <span className="text-xs text-gray-500">
+                            {locale === "hi" ? "से" : "from"}
+                          </span>
+                        )}
                         <span className="text-lg font-bold" style={{ color: "var(--color-gold)" }}>
                           ₹{product.price}
                         </span>
-                        {product.originalPrice && product.originalPrice > product.price && (
-                          <span className="text-sm text-gray-400 line-through">
-                            ₹{product.originalPrice}
-                          </span>
-                        )}
+                        {(!product.variants || product.variants.length === 0) &&
+                          product.originalPrice &&
+                          product.originalPrice > product.price && (
+                            <span className="text-sm text-gray-400 line-through">
+                              ₹{product.originalPrice}
+                            </span>
+                          )}
                       </div>
 
                       {/* Rating */}
