@@ -13,13 +13,24 @@ import {
 // Entity Interfaces (DynamoDB Single-Table)
 // ============================================
 
+interface ProductVariant {
+  id: string;
+  label: string;
+  labelHi?: string;
+  price: number;
+  originalPrice?: number;
+}
+
 interface CartItemEntity {
   PK: string; // CART#<userId>
-  SK: string; // ITEM#<productId>
+  SK: string; // ITEM#<productId> or ITEM#<productId>#<variantId>
   GSI1PK: string; // CART
   GSI1SK: string; // USER#<userId>
   userId: string;
   productId: string;
+  variantId?: string;
+  variantLabel?: string;
+  variantLabelHi?: string;
   quantity: number;
   // Denormalized product fields (snapshot at add time)
   title: string;
@@ -44,6 +55,7 @@ interface ProductEntity {
   price: number;
   originalPrice?: number;
   discountPercent?: number;
+  variants?: ProductVariant[];
   images: string[];
   stockStatus: string;
   isActive: boolean;
@@ -77,6 +89,11 @@ export class CartService {
   // Cart Operations
   // ============================================
 
+  /** DynamoDB SK for a cart line. Variant products get a per-variant line. */
+  private itemSk(productId: string, variantId?: string): string {
+    return variantId ? `ITEM#${productId}#${variantId}` : `ITEM#${productId}`;
+  }
+
   async addToCart(userId: string, dto: AddToCartDto): Promise<CartResponseDto> {
     const quantity = dto.quantity || 1;
 
@@ -98,25 +115,44 @@ export class CartService {
       throw new BadRequestException('This product is out of stock');
     }
 
-    // Check if item already in cart
-    const existing = await this.databaseService.get<CartItemEntity>(
-      `CART#${userId}`,
-      `ITEM#${dto.productId}`,
-    );
+    // Resolve variant (if the product has size/price variants)
+    let variant: ProductVariant | undefined;
+    if (product.variants && product.variants.length > 0) {
+      if (!dto.variantId) {
+        throw new BadRequestException('Please select a size for this product');
+      }
+      variant = product.variants.find((v) => v.id === dto.variantId);
+      if (!variant) {
+        throw new BadRequestException('Selected size is not available');
+      }
+    } else if (dto.variantId) {
+      throw new BadRequestException('This product does not have selectable sizes');
+    }
+
+    const price = variant ? variant.price : product.price;
+    const originalPrice = variant ? variant.originalPrice : product.originalPrice;
+    const discountPercent =
+      originalPrice && originalPrice > price
+        ? Math.round(((originalPrice - price) / originalPrice) * 100)
+        : product.discountPercent;
+    const sk = this.itemSk(dto.productId, variant?.id);
+
+    // Check if this exact line (product + variant) is already in cart
+    const existing = await this.databaseService.get<CartItemEntity>(`CART#${userId}`, sk);
 
     const now = new Date().toISOString();
 
     if (existing) {
-      // Update quantity
+      // Update quantity + refresh price snapshot
       const newQty = existing.quantity + quantity;
       await this.databaseService.update('CART', {
-        key: { PK: `CART#${userId}`, SK: `ITEM#${dto.productId}` },
+        key: { PK: `CART#${userId}`, SK: sk },
         updateExpression:
           'SET quantity = :qty, updatedAt = :now, price = :price, title = :title, stockStatus = :stockStatus',
         expressionAttributeValues: {
           ':qty': newQty,
           ':now': now,
-          ':price': product.price,
+          ':price': price,
           ':title': product.title,
           ':stockStatus': product.stockStatus,
         },
@@ -127,18 +163,21 @@ export class CartService {
 
       const cartItem: CartItemEntity = {
         PK: `CART#${userId}`,
-        SK: `ITEM#${dto.productId}`,
+        SK: sk,
         GSI1PK: 'CART',
         GSI1SK: `USER#${userId}`,
         userId,
         productId: dto.productId,
+        variantId: variant?.id,
+        variantLabel: variant?.label,
+        variantLabelHi: variant?.labelHi,
         quantity,
         title: product.title,
         titleHi: product.titleHi,
         slug: product.slug,
-        price: product.price,
-        originalPrice: product.originalPrice,
-        discountPercent: product.discountPercent,
+        price,
+        originalPrice,
+        discountPercent,
         imageUrl,
         stockStatus: product.stockStatus,
         createdAt: now,
@@ -162,6 +201,9 @@ export class CartService {
 
     const items: CartItemResponseDto[] = result.items.map((item) => ({
       productId: item.productId,
+      variantId: item.variantId,
+      variantLabel: item.variantLabel,
+      variantLabelHi: item.variantLabelHi,
       title: item.title,
       titleHi: item.titleHi,
       slug: item.slug,
@@ -189,18 +231,17 @@ export class CartService {
     userId: string,
     productId: string,
     dto: UpdateCartItemDto,
+    variantId?: string,
   ): Promise<CartResponseDto> {
-    const existing = await this.databaseService.get<CartItemEntity>(
-      `CART#${userId}`,
-      `ITEM#${productId}`,
-    );
+    const sk = this.itemSk(productId, variantId);
+    const existing = await this.databaseService.get<CartItemEntity>(`CART#${userId}`, sk);
 
     if (!existing) {
       throw new NotFoundException('Item not found in cart');
     }
 
     await this.databaseService.update('CART', {
-      key: { PK: `CART#${userId}`, SK: `ITEM#${productId}` },
+      key: { PK: `CART#${userId}`, SK: sk },
       updateExpression: 'SET quantity = :qty, updatedAt = :now',
       expressionAttributeValues: {
         ':qty': dto.quantity,
@@ -211,8 +252,12 @@ export class CartService {
     return this.getCart(userId);
   }
 
-  async removeFromCart(userId: string, productId: string): Promise<CartResponseDto> {
-    await this.databaseService.delete(`CART#${userId}`, `ITEM#${productId}`);
+  async removeFromCart(
+    userId: string,
+    productId: string,
+    variantId?: string,
+  ): Promise<CartResponseDto> {
+    await this.databaseService.delete(`CART#${userId}`, this.itemSk(productId, variantId));
     return this.getCart(userId);
   }
 

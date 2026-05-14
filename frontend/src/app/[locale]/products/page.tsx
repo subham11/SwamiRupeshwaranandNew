@@ -273,6 +273,11 @@ export default function ProductsPage() {
                       <div className="mt-auto">
                         {/* Price */}
                         <div className="flex items-center gap-2">
+                          {product.variants && product.variants.length > 0 && (
+                            <span className="text-xs text-gray-500">
+                              {locale === "hi" ? "से" : "from"}
+                            </span>
+                          )}
                           <span
                             data-testid="card-price"
                             className="text-lg font-bold"
@@ -280,7 +285,8 @@ export default function ProductsPage() {
                           >
                             {format(product.price)}
                           </span>
-                          {product.originalPrice &&
+                          {(!product.variants || product.variants.length === 0) &&
+                            product.originalPrice &&
                             product.originalPrice > product.price && (
                               <span className="text-sm text-gray-400 line-through">
                                 {format(product.originalPrice)}

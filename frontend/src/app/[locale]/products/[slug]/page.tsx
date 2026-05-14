@@ -24,6 +24,7 @@ const TEXTS = {
     limited: "Limited Stock",
     off: "OFF",
     weight: "Weight",
+    size: "Size",
     tags: "Tags",
     description: "Description",
     reviews: "Reviews",
@@ -55,6 +56,7 @@ const TEXTS = {
     limited: "सीमित",
     off: "छूट",
     weight: "वजन",
+    size: "आकार",
     tags: "टैग",
     description: "विवरण",
     reviews: "समीक्षाएं",
@@ -101,6 +103,7 @@ export default function ProductDetailPage() {
   const [showVideo, setShowVideo] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [selectedVariantId, setSelectedVariantId] = useState<string | undefined>();
 
   // Reviews
   const [reviews, setReviews] = useState<ProductReview[]>([]);
@@ -128,6 +131,7 @@ export default function ProductDetailPage() {
       .then((p) => {
         setProduct(p);
         if (p.imageUrls?.[0]) setMainImage(p.imageUrls[0]);
+        if (p.variants && p.variants.length > 0) setSelectedVariantId(p.variants[0].id);
       })
       .catch(() => setProduct(null))
       .finally(() => setLoading(false));
@@ -228,6 +232,19 @@ export default function ProductDetailPage() {
   const purchaseLink = getLocaleField(product.purchaseLink, product.purchaseLinkHi);
   const stockStyle = STOCK_STYLES[product.stockStatus] || STOCK_STYLES.in_stock;
   const stockLabel = product.stockStatus === "in_stock" ? txt.inStock : product.stockStatus === "out_of_stock" ? txt.outOfStock : txt.limited;
+
+  const hasVariants = !!(product.variants && product.variants.length > 0);
+  const selectedVariant = hasVariants
+    ? product.variants!.find((v) => v.id === selectedVariantId) || product.variants![0]
+    : undefined;
+  const displayPrice = selectedVariant ? selectedVariant.price : product.price;
+  const displayOriginalPrice = selectedVariant
+    ? selectedVariant.originalPrice
+    : product.originalPrice;
+  const displayDiscount =
+    displayOriginalPrice && displayOriginalPrice > displayPrice
+      ? Math.round(((displayOriginalPrice - displayPrice) / displayOriginalPrice) * 100)
+      : 0;
 
   return (
     <div style={{ backgroundColor: "var(--color-background)" }}>
@@ -343,16 +360,40 @@ export default function ProductDetailPage() {
               </div>
             )}
 
+            {/* Size / Variant selector */}
+            {hasVariants && (
+              <div className="mb-4">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {txt.size}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {product.variants!.map((v) => (
+                    <button
+                      key={v.id}
+                      onClick={() => setSelectedVariantId(v.id)}
+                      className={`px-4 py-2 rounded-xl border-2 text-sm font-medium transition ${
+                        selectedVariant?.id === v.id
+                          ? "border-orange-500 text-orange-600 bg-orange-50 dark:bg-orange-900/20"
+                          : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300"
+                      }`}
+                    >
+                      {getLocaleField(v.label, v.labelHi)} · ₹{v.price}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Price */}
             <div className="flex items-center gap-3 mb-4">
               <span className="text-3xl font-bold" style={{ color: "var(--color-gold)" }}>
-                ₹{product.price}
+                ₹{displayPrice}
               </span>
-              {product.originalPrice && product.originalPrice > product.price && (
+              {displayOriginalPrice && displayOriginalPrice > displayPrice && (
                 <>
-                  <span className="text-xl text-gray-400 line-through">₹{product.originalPrice}</span>
+                  <span className="text-xl text-gray-400 line-through">₹{displayOriginalPrice}</span>
                   <span className="text-sm font-bold bg-green-100 text-green-700 px-2 py-1 rounded-lg dark:bg-green-900/30 dark:text-green-400">
-                    {Math.round(product.discountPercent || 0)}% {txt.off}
+                    {displayDiscount}% {txt.off}
                   </span>
                 </>
               )}
@@ -399,7 +440,7 @@ export default function ProductDetailPage() {
                     <button
                       onClick={async () => {
                         setAddingToCart(true);
-                        const success = await cartAdd(product.id);
+                        const success = await cartAdd(product.id, 1, selectedVariant?.id);
                         setAddingToCart(false);
                         if (success) {
                           setAddedToCart(true);

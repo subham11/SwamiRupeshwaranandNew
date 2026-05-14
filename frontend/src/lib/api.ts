@@ -1938,6 +1938,14 @@ export interface ProductCategory {
   updatedAt: string;
 }
 
+export interface ProductVariant {
+  id: string;
+  label: string;
+  labelHi?: string;
+  price: number;
+  originalPrice?: number;
+}
+
 export interface Product {
   id: string;
   title: string;
@@ -1953,6 +1961,7 @@ export interface Product {
   price: number;
   originalPrice?: number;
   discountPercent?: number;
+  variants?: ProductVariant[];
   images: string[];
   imageUrls: string[];
   videoKey?: string;
@@ -2201,6 +2210,9 @@ export async function deleteProductReview(reviewId: string, accessToken: string)
 
 export interface CartItem {
   productId: string;
+  variantId?: string;
+  variantLabel?: string;
+  variantLabelHi?: string;
   title: string;
   titleHi?: string;
   slug: string;
@@ -2241,11 +2253,12 @@ export async function addToCart(
   productId: string,
   quantity: number = 1,
   accessToken: string,
+  variantId?: string,
 ): Promise<Cart> {
   return apiRequest('/cart/items', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-    body: JSON.stringify({ productId, quantity }),
+    body: JSON.stringify({ productId, quantity, variantId }),
   });
 }
 
@@ -2253,16 +2266,23 @@ export async function updateCartItem(
   productId: string,
   quantity: number,
   accessToken: string,
+  variantId?: string,
 ): Promise<Cart> {
-  return apiRequest(`/cart/items/${productId}`, {
+  const qs = variantId ? `?variantId=${encodeURIComponent(variantId)}` : '';
+  return apiRequest(`/cart/items/${productId}${qs}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
     body: JSON.stringify({ quantity }),
   });
 }
 
-export async function removeFromCart(productId: string, accessToken: string): Promise<Cart> {
-  return apiRequest(`/cart/items/${productId}`, {
+export async function removeFromCart(
+  productId: string,
+  accessToken: string,
+  variantId?: string,
+): Promise<Cart> {
+  const qs = variantId ? `?variantId=${encodeURIComponent(variantId)}` : '';
+  return apiRequest(`/cart/items/${productId}${qs}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${accessToken}` },
   });
@@ -2306,6 +2326,9 @@ export interface OrderCheckoutResponse {
 
 export interface OrderItem {
   productId: string;
+  variantId?: string;
+  variantLabel?: string;
+  variantLabelHi?: string;
   title: string;
   titleHi?: string;
   slug: string;

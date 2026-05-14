@@ -45,6 +45,13 @@ interface ProductFormData {
   purchaseLinkHi: string;
 }
 
+interface VariantFormRow {
+  label: string;
+  labelHi: string;
+  price: string;
+  originalPrice: string;
+}
+
 interface CategoryFormData {
   name: string;
   nameHi: string;
@@ -120,6 +127,7 @@ export default function AdminProductsPage() {
   const [productImages, setProductImages] = useState<string[]>([]); // S3 keys
   const [productImageUrls, setProductImageUrls] = useState<string[]>([]); // preview URLs
   const [productVideoKey, setProductVideoKey] = useState<string>('');
+  const [productVariants, setProductVariants] = useState<VariantFormRow[]>([]);
   const [savingProduct, setSavingProduct] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -300,6 +308,7 @@ export default function AdminProductsPage() {
     setProductImages([]);
     setProductImageUrls([]);
     setProductVideoKey('');
+    setProductVariants([]);
     setShowProductForm(true);
     setError(null);
   };
@@ -329,14 +338,33 @@ export default function AdminProductsPage() {
     setProductImages(p.images || []);
     setProductImageUrls(p.imageUrls || []);
     setProductVideoKey(p.videoKey || '');
+    setProductVariants(
+      (p.variants || []).map((v) => ({
+        label: v.label,
+        labelHi: v.labelHi || '',
+        price: String(v.price),
+        originalPrice: v.originalPrice ? String(v.originalPrice) : '',
+      })),
+    );
     setShowProductForm(true);
     setError(null);
   };
 
   const handleSaveProduct = async () => {
     if (!accessToken) return;
-    if (!productForm.title || !productForm.price || !productForm.categoryId) {
-      setError('Title, price, and category are required');
+
+    // Variants (rows with a label + price)
+    const validVariants = productVariants.filter(
+      (v) => v.label.trim() && v.price.trim() && !isNaN(parseFloat(v.price)),
+    );
+    const hasVariants = validVariants.length > 0;
+
+    if (!productForm.title || !productForm.categoryId) {
+      setError('Title and category are required');
+      return;
+    }
+    if (!hasVariants && !productForm.price) {
+      setError('Price is required (or add at least one size variant)');
       return;
     }
 
@@ -344,6 +372,19 @@ export default function AdminProductsPage() {
     setError(null);
 
     try {
+      // When variants exist, the backend derives price from the lowest variant.
+      const variantsPayload = hasVariants
+        ? validVariants.map((v) => ({
+            label: v.label.trim(),
+            labelHi: v.labelHi.trim() || undefined,
+            price: parseFloat(v.price),
+            originalPrice: v.originalPrice ? parseFloat(v.originalPrice) : undefined,
+          }))
+        : undefined;
+      const derivedPrice = hasVariants
+        ? Math.min(...variantsPayload!.map((v) => v.price))
+        : parseFloat(productForm.price);
+
       const payload: Record<string, unknown> = {
         title: productForm.title,
         titleHi: productForm.titleHi || undefined,
@@ -352,8 +393,12 @@ export default function AdminProductsPage() {
         description: productForm.description,
         descriptionHi: productForm.descriptionHi || undefined,
         categoryId: productForm.categoryId,
-        price: parseFloat(productForm.price),
-        originalPrice: productForm.originalPrice ? parseFloat(productForm.originalPrice) : undefined,
+        price: derivedPrice,
+        originalPrice:
+          !hasVariants && productForm.originalPrice
+            ? parseFloat(productForm.originalPrice)
+            : undefined,
+        variants: variantsPayload,
         weight: productForm.weight || undefined,
         weightHi: productForm.weightHi || undefined,
         tags: productForm.tags ? productForm.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
@@ -381,6 +426,7 @@ export default function AdminProductsPage() {
       setProductImages([]);
       setProductImageUrls([]);
       setProductVideoKey('');
+      setProductVariants([]);
       await loadProducts();
     } catch {
       setError('Failed to save product. Please try again.');
@@ -886,11 +932,23 @@ export default function AdminProductsPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Price (₹) *</label>
                   <input
                     type="number"
-                    value={productForm.price}
+                    value={
+                      productVariants.length > 0
+                        ? Math.min(
+                            ...productVariants
+                              .map((v) => parseFloat(v.price))
+                              .filter((n) => !isNaN(n)),
+                          ) || ''
+                        : productForm.price
+                    }
                     onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
-                    className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                    disabled={productVariants.length > 0}
+                    className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-700"
                     placeholder="299"
                   />
+                  {productVariants.length > 0 && (
+                    <p className="text-xs text-gray-400 mt-1">Auto-set to lowest variant price</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Original Price (₹)</label>
@@ -898,10 +956,101 @@ export default function AdminProductsPage() {
                     type="number"
                     value={productForm.originalPrice}
                     onChange={(e) => setProductForm({ ...productForm, originalPrice: e.target.value })}
-                    className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                    disabled={productVariants.length > 0}
+                    className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-700"
                     placeholder="499 (for strikethrough)"
                   />
                 </div>
+              </div>
+
+              {/* Size / Price Variants */}
+              <div className="border rounded-lg p-4 dark:border-gray-600">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Size Variants
+                    <span className="text-xs text-gray-400 font-normal ml-2">
+                      (optional — for products sold in multiple sizes)
+                    </span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setProductVariants([
+                        ...productVariants,
+                        { label: '', labelHi: '', price: '', originalPrice: '' },
+                      ])
+                    }
+                    className="text-sm px-3 py-1 rounded-lg bg-orange-100 text-orange-700 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400"
+                  >
+                    + Add Variant
+                  </button>
+                </div>
+                {productVariants.length === 0 ? (
+                  <p className="text-xs text-gray-400">
+                    No variants — product uses the single Price above.
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {productVariants.map((v, i) => (
+                      <div key={i} className="grid grid-cols-12 gap-2 items-center">
+                        <input
+                          type="text"
+                          value={v.label}
+                          onChange={(e) => {
+                            const next = [...productVariants];
+                            next[i] = { ...next[i], label: e.target.value };
+                            setProductVariants(next);
+                          }}
+                          className="col-span-3 border rounded-lg px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                          placeholder="Label (e.g. 100ml)"
+                        />
+                        <input
+                          type="text"
+                          value={v.labelHi}
+                          onChange={(e) => {
+                            const next = [...productVariants];
+                            next[i] = { ...next[i], labelHi: e.target.value };
+                            setProductVariants(next);
+                          }}
+                          className="col-span-3 border rounded-lg px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                          placeholder="Label HI (वैकल्पिक)"
+                        />
+                        <input
+                          type="number"
+                          value={v.price}
+                          onChange={(e) => {
+                            const next = [...productVariants];
+                            next[i] = { ...next[i], price: e.target.value };
+                            setProductVariants(next);
+                          }}
+                          className="col-span-2 border rounded-lg px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                          placeholder="Price ₹"
+                        />
+                        <input
+                          type="number"
+                          value={v.originalPrice}
+                          onChange={(e) => {
+                            const next = [...productVariants];
+                            next[i] = { ...next[i], originalPrice: e.target.value };
+                            setProductVariants(next);
+                          }}
+                          className="col-span-3 border rounded-lg px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                          placeholder="MRP ₹ (optional)"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setProductVariants(productVariants.filter((_, idx) => idx !== i))
+                          }
+                          className="col-span-1 text-red-400 hover:text-red-600 text-lg"
+                          title="Remove variant"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Weight + Stock + Order */}

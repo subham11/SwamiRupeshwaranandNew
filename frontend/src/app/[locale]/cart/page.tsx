@@ -319,7 +319,7 @@ export default function CartPage() {
                 <div className="lg:col-span-2 space-y-4">
                   {items.map((item) => (
                     <div
-                      key={item.productId}
+                      key={`${item.productId}${item.variantId ? `#${item.variantId}` : ''}`}
                       data-testid="cart-item"
                       className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4 sm:p-6 flex gap-4"
                     >
@@ -337,6 +337,11 @@ export default function CartPage() {
                         <Link href={`/${locale}/products/${item.slug}`} className="font-semibold text-gray-900 dark:text-white hover:text-orange-600 transition line-clamp-1">
                           {getLocaleField(item.title, item.titleHi)}
                         </Link>
+                        {item.variantLabel && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            {getLocaleField(item.variantLabel, item.variantLabelHi)}
+                          </p>
+                        )}
                         <div className="flex items-center gap-2 mt-1">
                           <span className="text-lg font-bold" style={{ color: 'var(--color-gold)' }}>
                             {format(item.price)}
@@ -349,7 +354,7 @@ export default function CartPage() {
                         {/* Quantity controls */}
                         <div className="flex items-center gap-3 mt-3">
                           <button
-                            onClick={() => item.quantity > 1 ? updateQuantity(item.productId, item.quantity - 1) : removeItem(item.productId)}
+                            onClick={() => item.quantity > 1 ? updateQuantity(item.productId, item.quantity - 1, item.variantId) : removeItem(item.productId, item.variantId)}
                             data-testid="qty-decrease"
                             className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm font-bold"
                           >
@@ -357,7 +362,7 @@ export default function CartPage() {
                           </button>
                           <span data-testid="item-qty" className="w-8 text-center font-medium text-gray-900 dark:text-white">{item.quantity}</span>
                           <button
-                            onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.productId, item.quantity + 1, item.variantId)}
                             data-testid="qty-increase"
                             className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm font-bold"
                           >
@@ -369,7 +374,7 @@ export default function CartPage() {
 
                       {/* Remove */}
                       <button
-                        onClick={() => removeItem(item.productId)}
+                        onClick={() => removeItem(item.productId, item.variantId)}
                         className="flex-none text-red-400 hover:text-red-600 transition p-1 self-start"
                         title={txt.remove}
                       >
@@ -589,9 +594,16 @@ export default function CartPage() {
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4">{txt.orderSummary}</h3>
               <div className="space-y-3">
                 {items.map((item) => (
-                  <div key={item.productId} className="flex justify-between text-sm">
+                  <div
+                    key={`${item.productId}${item.variantId ? `#${item.variantId}` : ''}`}
+                    className="flex justify-between text-sm"
+                  >
                     <span className="text-gray-600 dark:text-gray-400">
-                      {getLocaleField(item.title, item.titleHi)} × {item.quantity}
+                      {getLocaleField(item.title, item.titleHi)}
+                      {item.variantLabel
+                        ? ` (${getLocaleField(item.variantLabel, item.variantLabelHi)})`
+                        : ''}{' '}
+                      × {item.quantity}
                     </span>
                     <span className="font-medium">{format(item.subtotal)}</span>
                   </div>

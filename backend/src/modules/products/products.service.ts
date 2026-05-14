@@ -12,6 +12,7 @@ import {
   ProductCategoryResponseDto,
   ProductCategoryListResponseDto,
   ProductListQueryDto,
+  ProductVariantDto,
   StockStatus,
 } from './dto';
 
@@ -40,6 +41,7 @@ interface ProductEntity {
   price: number;
   originalPrice?: number;
   discountPercent?: number;
+  variants?: ProductVariantDto[];
   images: string[];
   videoKey?: string;
   weight?: string;
@@ -91,6 +93,52 @@ export class ProductsService {
   // Slug helpers
   // ============================================
 
+  // ============================================
+  // Variant helpers
+  // ============================================
+
+  /**
+   * Normalize variants: derive a stable `id` from the label when missing.
+   * Returns the cleaned variants plus the product-level price/originalPrice
+   * derived from the lowest-priced variant (keeps listing/sort code working).
+   */
+  private normalizeVariants(variants?: ProductVariantDto[]): {
+    variants?: ProductVariantDto[];
+    derivedPrice?: number;
+    derivedOriginalPrice?: number;
+  } {
+    if (!variants || variants.length === 0) return {};
+
+    const seen = new Set<string>();
+    const normalized = variants.map((v) => {
+      let id = (v.id || v.label || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+      if (!id) id = uuidv4().slice(0, 6);
+      let unique = id;
+      let attempt = 1;
+      while (seen.has(unique)) {
+        unique = `${id}-${attempt++}`;
+      }
+      seen.add(unique);
+      return {
+        id: unique,
+        label: v.label,
+        labelHi: v.labelHi,
+        price: v.price,
+        originalPrice: v.originalPrice,
+      };
+    });
+
+    const cheapest = normalized.reduce((min, v) => (v.price < min.price ? v : min));
+    return {
+      variants: normalized,
+      derivedPrice: cheapest.price,
+      derivedOriginalPrice: cheapest.originalPrice,
+    };
+  }
+
   private generateSlug(title: string): string {
     return title
       .toLowerCase()
@@ -139,9 +187,14 @@ export class ProductsService {
     const id = uuidv4();
     const slug = await this.ensureUniqueSlug(this.generateSlug(dto.title));
     const now = new Date().toISOString();
+
+    // Variants drive product-level price/originalPrice when present
+    const { variants, derivedPrice, derivedOriginalPrice } = this.normalizeVariants(dto.variants);
+    const price = derivedPrice ?? dto.price;
+    const originalPrice = derivedOriginalPrice ?? dto.originalPrice;
     const discountPercent =
-      dto.originalPrice && dto.originalPrice > dto.price
-        ? Math.round(((dto.originalPrice - dto.price) / dto.originalPrice) * 100)
+      originalPrice && originalPrice > price
+        ? Math.round(((originalPrice - price) / originalPrice) * 100)
         : 0;
 
     const product: ProductEntity = {
@@ -162,9 +215,10 @@ export class ProductsService {
       categoryId: dto.categoryId,
       categoryName: category.name,
       categoryNameHi: category.nameHi,
-      price: dto.price,
-      originalPrice: dto.originalPrice,
+      price,
+      originalPrice,
       discountPercent,
+      variants,
       images: dto.images || [],
       videoKey: dto.videoKey,
       weight: dto.weight,
@@ -210,6 +264,26 @@ export class ProductsService {
     const expressionAttributeNames: Record<string, string> = {};
     const expressionAttributeValues: Record<string, any> = {};
 
+    // Variants: when provided, they drive product-level price/originalPrice.
+    let variantPrice: number | undefined;
+    let variantOriginalPrice: number | undefined;
+    if (dto.variants !== undefined) {
+      const { variants, derivedPrice, derivedOriginalPrice } = this.normalizeVariants(dto.variants);
+      updateExpressions.push('variants = :variants');
+      expressionAttributeValues[':variants'] = variants ?? null;
+      if (derivedPrice !== undefined) {
+        variantPrice = derivedPrice;
+        variantOriginalPrice = derivedOriginalPrice;
+        updateExpressions.push('price = :price');
+        expressionAttributeValues[':price'] = derivedPrice;
+        updateExpressions.push('originalPrice = :originalPrice');
+        expressionAttributeValues[':originalPrice'] = derivedOriginalPrice ?? null;
+      }
+      // Don't let the generic loop also write price/originalPrice
+      delete (dto as any).price;
+      delete (dto as any).originalPrice;
+    }
+
     const fieldsToUpdate = [
       'title',
       'titleHi',
@@ -251,16 +325,18 @@ export class ProductsService {
       }
     }
 
-    // Recalculate discount
-    const effectivePrice = dto.price ?? existing.price;
-    const effectiveOriginalPrice = dto.originalPrice ?? existing.originalPrice;
-    if (effectiveOriginalPrice && effectiveOriginalPrice > effectivePrice) {
-      const discount = Math.round(
-        ((effectiveOriginalPrice - effectivePrice) / effectiveOriginalPrice) * 100,
-      );
-      updateExpressions.push('discountPercent = :discountPercent');
-      expressionAttributeValues[':discountPercent'] = discount;
-    }
+    // Recalculate discount (variant-derived price wins when variants were provided)
+    const effectivePrice = variantPrice ?? dto.price ?? existing.price;
+    const effectiveOriginalPrice =
+      variantPrice !== undefined
+        ? variantOriginalPrice
+        : (dto.originalPrice ?? existing.originalPrice);
+    const discount =
+      effectiveOriginalPrice && effectiveOriginalPrice > effectivePrice
+        ? Math.round(((effectiveOriginalPrice - effectivePrice) / effectiveOriginalPrice) * 100)
+        : 0;
+    updateExpressions.push('discountPercent = :discountPercent');
+    expressionAttributeValues[':discountPercent'] = discount;
 
     // Update slug if title changed
     if (dto.title && dto.title !== existing.title) {
@@ -803,6 +879,7 @@ export class ProductsService {
       price: product.price,
       originalPrice: product.originalPrice,
       discountPercent: product.discountPercent,
+      variants: product.variants,
       images: product.images,
       imageUrls: product.images?.map((key) => this.storageService.getPublicUrl(key)) || [],
       videoKey: product.videoKey,

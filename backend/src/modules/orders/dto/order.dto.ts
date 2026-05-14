@@ -90,6 +90,9 @@ export class OrderPaymentVerificationResponseDto {
 
 export class OrderItemResponseDto {
   productId: string;
+  variantId?: string;
+  variantLabel?: string;
+  variantLabelHi?: string;
   title: string;
   titleHi?: string;
   slug: string;

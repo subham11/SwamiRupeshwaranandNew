@@ -10,6 +10,14 @@ export class AddToCartDto {
   @IsString()
   productId: string;
 
+  @ApiPropertyOptional({
+    description: 'Variant id (required for products that have size/price variants)',
+    example: '100ml',
+  })
+  @IsOptional()
+  @IsString()
+  variantId?: string;
+
   @ApiPropertyOptional({ description: 'Quantity to add', default: 1 })
   @IsOptional()
   @IsNumber()
@@ -28,6 +36,9 @@ export class UpdateCartItemDto {
 
 export class CartItemResponseDto {
   @ApiProperty() productId: string;
+  @ApiPropertyOptional() variantId?: string;
+  @ApiPropertyOptional() variantLabel?: string;
+  @ApiPropertyOptional() variantLabelHi?: string;
   @ApiProperty() title: string;
   @ApiProperty() titleHi?: string;
   @ApiProperty() slug: string;

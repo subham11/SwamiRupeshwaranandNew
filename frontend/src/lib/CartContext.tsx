@@ -16,9 +16,9 @@ interface CartContextType {
   cart: Cart | null;
   loading: boolean;
   error: string | null;
-  addToCart: (productId: string, quantity?: number) => Promise<boolean>;
-  updateQuantity: (productId: string, quantity: number) => Promise<void>;
-  removeItem: (productId: string) => Promise<void>;
+  addToCart: (productId: string, quantity?: number, variantId?: string) => Promise<boolean>;
+  updateQuantity: (productId: string, quantity: number, variantId?: string) => Promise<void>;
+  removeItem: (productId: string, variantId?: string) => Promise<void>;
   clearAll: () => Promise<void>;
   refreshCart: () => Promise<void>;
   totalItems: number;
@@ -71,11 +71,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated, accessToken, refreshCart]);
 
   const addToCart = useCallback(
-    async (productId: string, quantity: number = 1): Promise<boolean> => {
+    async (productId: string, quantity: number = 1, variantId?: string): Promise<boolean> => {
       if (!accessToken) return false;
       try {
         setError(null);
-        const data = await apiAddToCart(productId, quantity, accessToken);
+        const data = await apiAddToCart(productId, quantity, accessToken, variantId);
         setCart(data);
         return true;
       } catch (err: any) {
@@ -87,11 +87,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const updateQuantity = useCallback(
-    async (productId: string, quantity: number) => {
+    async (productId: string, quantity: number, variantId?: string) => {
       if (!accessToken) return;
       try {
         setError(null);
-        const data = await apiUpdateCartItem(productId, quantity, accessToken);
+        const data = await apiUpdateCartItem(productId, quantity, accessToken, variantId);
         setCart(data);
       } catch (err: any) {
         setError(err.message || 'Failed to update quantity');
@@ -101,11 +101,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const removeItem = useCallback(
-    async (productId: string) => {
+    async (productId: string, variantId?: string) => {
       if (!accessToken) return;
       try {
         setError(null);
-        const data = await apiRemoveFromCart(productId, accessToken);
+        const data = await apiRemoveFromCart(productId, accessToken, variantId);
         setCart(data);
       } catch (err: any) {
         setError(err.message || 'Failed to remove item');

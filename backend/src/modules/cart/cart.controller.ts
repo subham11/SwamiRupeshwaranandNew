@@ -1,5 +1,12 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { CartService } from './cart.service';
 import {
   AddToCartDto,
@@ -42,24 +49,28 @@ export class CartController {
   @Put('items/:productId')
   @ApiOperation({ summary: 'Update cart item quantity' })
   @ApiParam({ name: 'productId', description: 'Product ID' })
+  @ApiQuery({ name: 'variantId', required: false, description: 'Variant id (for variant products)' })
   @ApiResponse({ status: 200, description: 'Cart item updated', type: CartResponseDto })
   async updateCartItem(
     @Param('productId') productId: string,
     @Body() dto: UpdateCartItemDto,
     @CurrentUser() user: CurrentUserData,
+    @Query('variantId') variantId?: string,
   ): Promise<CartResponseDto> {
-    return this.cartService.updateCartItem(user.sub, productId, dto);
+    return this.cartService.updateCartItem(user.sub, productId, dto, variantId);
   }
 
   @Delete('items/:productId')
   @ApiOperation({ summary: 'Remove item from cart' })
   @ApiParam({ name: 'productId', description: 'Product ID' })
+  @ApiQuery({ name: 'variantId', required: false, description: 'Variant id (for variant products)' })
   @ApiResponse({ status: 200, description: 'Item removed from cart', type: CartResponseDto })
   async removeFromCart(
     @Param('productId') productId: string,
     @CurrentUser() user: CurrentUserData,
+    @Query('variantId') variantId?: string,
   ): Promise<CartResponseDto> {
-    return this.cartService.removeFromCart(user.sub, productId);
+    return this.cartService.removeFromCart(user.sub, productId, variantId);
   }
 
   @Delete()

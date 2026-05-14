@@ -30,6 +30,9 @@ import {
 // ============================================
 interface OrderItemSnapshot {
   productId: string;
+  variantId?: string;
+  variantLabel?: string;
+  variantLabelHi?: string;
   title: string;
   titleHi?: string;
   slug: string;
@@ -37,6 +40,14 @@ interface OrderItemSnapshot {
   quantity: number;
   imageUrl?: string;
   subtotal: number;
+}
+
+interface ProductVariant {
+  id: string;
+  label: string;
+  labelHi?: string;
+  price: number;
+  originalPrice?: number;
 }
 
 interface ShippingAddress {
@@ -169,17 +180,53 @@ export class OrdersService {
       throw new BadRequestException('Shipping address is required. Please add an address first.');
     }
 
-    // 3. Snapshot cart items
-    const items: OrderItemSnapshot[] = cart.items.map((item) => ({
-      productId: item.productId,
-      title: item.title,
-      titleHi: item.titleHi,
-      slug: item.slug,
-      price: item.price,
-      quantity: item.quantity,
-      imageUrl: item.imageUrl,
-      subtotal: item.price * item.quantity,
-    }));
+    // 3. Re-validate each cart line against the current product/variant price,
+    //    then snapshot. Closes the gap where a stale cart price could be paid.
+    const items: OrderItemSnapshot[] = [];
+    for (const item of cart.items) {
+      const product = await this.db.get<{
+        price: number;
+        isActive: boolean;
+        variants?: ProductVariant[];
+      }>(`PRODUCT#${item.productId}`, `PRODUCT#${item.productId}`);
+
+      if (!product || !product.isActive) {
+        throw new BadRequestException(
+          `"${item.title}" is no longer available. Please remove it from your cart.`,
+        );
+      }
+
+      let currentPrice = product.price;
+      if (item.variantId) {
+        const variant = product.variants?.find((v) => v.id === item.variantId);
+        if (!variant) {
+          throw new BadRequestException(
+            `The selected size for "${item.title}" is no longer available. Please update your cart.`,
+          );
+        }
+        currentPrice = variant.price;
+      }
+
+      if (currentPrice !== item.price) {
+        throw new BadRequestException(
+          `The price of "${item.title}" has changed. Please review your cart and try again.`,
+        );
+      }
+
+      items.push({
+        productId: item.productId,
+        variantId: item.variantId,
+        variantLabel: item.variantLabel,
+        variantLabelHi: item.variantLabelHi,
+        title: item.title,
+        titleHi: item.titleHi,
+        slug: item.slug,
+        price: item.price,
+        quantity: item.quantity,
+        imageUrl: item.imageUrl,
+        subtotal: item.price * item.quantity,
+      });
+    }
 
     const totalAmount = items.reduce((sum, i) => sum + i.subtotal, 0);
     const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
@@ -517,7 +564,7 @@ export class OrdersService {
         (item) => `
       <tr>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-          ${item.title}
+          ${item.title}${item.variantLabel ? ` <span style="color:#6b7280;">(${item.variantLabel})</span>` : ''}
         </td>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">
           ${item.quantity}
@@ -635,7 +682,7 @@ Dear ${addr.fullName},
 Thank you for your order! Your purchase has been confirmed.
 
 Order ID: ${order.id.substring(0, 8).toUpperCase()}
-Items: ${order.items.map((i) => `${i.title} × ${i.quantity} = ₹${i.subtotal}`).join(', ')}
+Items: ${order.items.map((i) => `${i.title}${i.variantLabel ? ` (${i.variantLabel})` : ''} × ${i.quantity} = ₹${i.subtotal}`).join(', ')}
 Total: ₹${order.totalAmount}
 
 Shipping to: ${addr.fullName}, ${addr.addressLine1}, ${addr.city}, ${addr.state} - ${addr.pincode}

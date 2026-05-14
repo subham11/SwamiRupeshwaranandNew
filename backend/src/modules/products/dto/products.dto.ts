@@ -12,7 +12,9 @@ import {
   MaxLength,
   IsInt,
   ArrayMaxSize,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 // ============================================
 // Enums
@@ -22,6 +24,44 @@ export enum StockStatus {
   IN_STOCK = 'in_stock',
   OUT_OF_STOCK = 'out_of_stock',
   LIMITED = 'limited',
+}
+
+// ============================================
+// Product Variant DTO
+// ============================================
+
+export class ProductVariantDto {
+  @ApiPropertyOptional({
+    description: 'Variant id (auto-derived from label if omitted)',
+    example: '100ml',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  id?: string;
+
+  @ApiProperty({ description: 'Variant label (English)', example: '100ml' })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(50)
+  label!: string;
+
+  @ApiPropertyOptional({ description: 'Variant label (Hindi)', example: '100 मि.ली.' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  labelHi?: string;
+
+  @ApiProperty({ description: 'Variant selling price in INR', example: 450 })
+  @IsNumber()
+  @Min(0)
+  price!: number;
+
+  @ApiPropertyOptional({ description: 'Variant original / MRP price in INR', example: 599 })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  originalPrice?: number;
 }
 
 // ============================================
@@ -67,7 +107,10 @@ export class CreateProductDto {
   @IsString()
   categoryId!: string;
 
-  @ApiProperty({ description: 'Selling price in INR', example: 499 })
+  @ApiProperty({
+    description: 'Selling price in INR. For products with variants, this is auto-set to the lowest variant price.',
+    example: 499,
+  })
   @IsNumber()
   @Min(0)
   price!: number;
@@ -77,6 +120,17 @@ export class CreateProductDto {
   @IsNumber()
   @Min(0)
   originalPrice?: number;
+
+  @ApiPropertyOptional({
+    description: 'Per-size price variants. When present, price/originalPrice are derived from the lowest variant.',
+    type: [ProductVariantDto],
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(10)
+  @ValidateNested({ each: true })
+  @Type(() => ProductVariantDto)
+  variants?: ProductVariantDto[];
 
   @ApiPropertyOptional({ description: 'Image S3 keys (max 5)', type: [String] })
   @IsOptional()
@@ -290,6 +344,7 @@ export class ProductResponseDto {
   @ApiProperty() price!: number;
   @ApiPropertyOptional() originalPrice?: number;
   @ApiPropertyOptional() discountPercent?: number;
+  @ApiPropertyOptional({ type: [ProductVariantDto] }) variants?: ProductVariantDto[];
   @ApiPropertyOptional({ type: [String] }) images?: string[];
   @ApiPropertyOptional({ type: [String] }) imageUrls?: string[];
   @ApiPropertyOptional() videoKey?: string;
