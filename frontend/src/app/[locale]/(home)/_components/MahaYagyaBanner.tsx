@@ -21,7 +21,7 @@ const content = {
   },
   sub1: { en: "Global Health and Wellness Mega Expo", hi: "वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो" },
   sub2: { en: "Launching of Mega Environmental Project", hi: "मेगा पर्यावरण परियोजना का शुभारंभ" },
-  location: { en: "📍 Varanasi, UP  •  3–7 June 2026", hi: "📍 वाराणसी, UP  •  3–7 जून 2026" },
+  location: { en: "📍 Varanasi, UP  •  Shravan  •  16–25 Aug 2026", hi: "📍 वाराणसी, UP  •  श्रावण  •  16–25 अगस्त 2026" },
   highlights: [
     { en: "25,000+ Daily Visitors", hi: "25,000+ दैनिक आगंतुक" },
     { en: "2 Cr+ Digital Reach", hi: "2 करोड़+ डिजिटल पहुंच" },

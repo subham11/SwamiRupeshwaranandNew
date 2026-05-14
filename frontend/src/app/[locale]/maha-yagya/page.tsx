@@ -28,7 +28,7 @@ import {
 } from "./_components/ScrollAnimations";
 
 // ─── Constants ───────────────────────────────────────────────
-const EVENT_DATE = "2026-06-03T06:00:00+05:30"; // June 3, 2026
+const EVENT_DATE = "2026-08-16T06:00:00+05:30"; // August 16, 2026
 const WHATSAPP_NUMBER = "917718075180"; // WhatsApp: 77180 75180
 const PHONE_NUMBER = "+91-63890 28886";
 const EMAIL_ADDRESS = "official@brahmavadini.org";
@@ -43,14 +43,14 @@ const hero = {
     hi: "108 कुंड विश्व शांति महा यज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ",
   },
   subtitle: {
-    en: "The Holy City of Varanasi, Uttar Pradesh • 3–7 June 2026",
-    hi: "पवित्र नगरी वाराणसी, उत्तर प्रदेश • 3–7 जून 2026",
+    en: "The Holy City of Varanasi, Uttar Pradesh • Shravan Month • 16–25 August 2026",
+    hi: "पवित्र नगरी वाराणसी, उत्तर प्रदेश • श्रावण माह • 16–25 अगस्त 2026",
   },
   cta: { en: "Enquire Now", hi: "अभी पूछताछ करें" },
   ctaCall: { en: "Call Now", hi: "अभी कॉल करें" },
   tagline: {
-    en: "A sacred confluence of spirituality, wellness & commerce — 25,000+ daily footfall, 5 divine days",
-    hi: "अध्यात्म, स्वास्थ्य और व्यापार का पवित्र संगम — 25,000+ दैनिक उपस्थिति, 5 दिव्य दिन",
+    en: "A sacred confluence of spirituality, wellness & commerce — 25,000+ daily footfall, 10 divine days",
+    hi: "अध्यात्म, स्वास्थ्य और व्यापार का पवित्र संगम — 25,000+ दैनिक उपस्थिति, 10 दिव्य दिन",
   },
   initiative: {
     en: "An initiative by Brahmavadini Foundation, Brahmavadini Spiritual Services Pvt. Ltd., Swami Rupeshwaranand Ashram & Youth4Nation",
@@ -70,8 +70,8 @@ const keyBenefits = {
       value: { en: "25,000+", hi: "25,000+" },
       title: { en: "Per Day Gathering", hi: "प्रतिदिन उपस्थिति" },
       desc: {
-        en: "Over 25,000 visitors per day across 5 divine days — a massive, engaged audience for your brand",
-        hi: "5 दिव्य दिनों में प्रतिदिन 25,000+ आगंतुक — आपके ब्रांड के लिए विशाल, सक्रिय दर्शक",
+        en: "Over 25,000 visitors per day across 10 divine days — a massive, engaged audience for your brand",
+        hi: "10 दिव्य दिनों में प्रतिदिन 25,000+ आगंतुक — आपके ब्रांड के लिए विशाल, सक्रिय दर्शक",
       },
     },
     {
@@ -169,7 +169,7 @@ const whyParticipate = {
     hi: "आध्यात्मिक और स्वास्थ्य-जागरूक दर्शकों के बीच ब्रांड की अद्वितीय पहचान का अवसर",
   },
   benefits: [
-    { icon: "🏪", title: { en: "Brand Visibility", hi: "ब्रांड दृश्यता" }, desc: { en: "Showcase your products to 25,000+ visitors per day over 5 days", hi: "5 दिनों में प्रतिदिन 25,000+ आगंतुकों को अपने उत्पाद प्रदर्शित करें" } },
+    { icon: "🏪", title: { en: "Brand Visibility", hi: "ब्रांड दृश्यता" }, desc: { en: "Showcase your products to 25,000+ visitors per day over 10 days", hi: "10 दिनों में प्रतिदिन 25,000+ आगंतुकों को अपने उत्पाद प्रदर्शित करें" } },
     { icon: "👥", title: { en: "Targeted Audience", hi: "लक्षित दर्शक" }, desc: { en: "Health-conscious families, spiritual seekers & wellness enthusiasts", hi: "स्वास्थ्य-जागरूक परिवार, आध्यात्मिक साधक और कल्याण प्रेमी" } },
     { icon: "📺", title: { en: "Media Coverage", hi: "मीडिया कवरेज" }, desc: { en: "National & regional media, live streaming, social media promotion", hi: "राष्ट्रीय और क्षेत्रीय मीडिया, लाइव स्ट्रीमिंग, सोशल मीडिया प्रचार" } },
     { icon: "🤝", title: { en: "Networking", hi: "नेटवर्किंग" }, desc: { en: "Connect with VIPs, government officials & industry leaders", hi: "VIP, सरकारी अधिकारियों और उद्योग जगत से जुड़ें" } },
@@ -527,7 +527,7 @@ const highlights = {
   stats: [
     { value: "108", label: { en: "Sacred Kunds", hi: "पवित्र कुंड" } },
     { value: "25,000+", label: { en: "Daily Footfall", hi: "दैनिक उपस्थिति" } },
-    { value: "5", label: { en: "Divine Days", hi: "दिव्य दिन" } },
+    { value: "10", label: { en: "Divine Days", hi: "दिव्य दिन" } },
     { value: "300+", label: { en: "Exhibition Stalls", hi: "प्रदर्शनी स्टॉल" } },
     { value: "2 Cr+", label: { en: "Digital Reach", hi: "डिजिटल पहुंच" } },
     { value: "Free", label: { en: "Health Checkup", hi: "स्वास्थ्य जांच" } },
@@ -595,16 +595,16 @@ const cmsFallbackSections = [
     id: "about-event",
     title: { en: "About the Event", hi: "कार्यक्रम के बारे में" },
     content: {
-      en: "The 108 Kund World Peace Maha Yagya is a grand spiritual ceremony performed with 108 sacred fire pits (kunds) simultaneously. This rare and auspicious event brings together thousands of devotees, spiritual leaders, and wellness practitioners for 5 days of prayers, rituals, health expo, and cultural programs in the holy city of Varanasi.",
-      hi: "108 कुंड विश्व शांति महा यज्ञ एक भव्य आध्यात्मिक समारोह है जो एक साथ 108 पवित्र अग्नि कुंडों के साथ किया जाता है। यह दुर्लभ और शुभ आयोजन हजारों भक्तों, आध्यात्मिक नेताओं और कल्याण साधकों को पवित्र वाराणसी में 5 दिनों की प्रार्थना, अनुष्ठान, स्वास्थ्य एक्सपो और सांस्कृतिक कार्यक्रमों के लिए एक साथ लाता है।",
+      en: "The 108 Kund World Peace Maha Yagya is a grand spiritual ceremony performed with 108 sacred fire pits (kunds) simultaneously. This rare and auspicious event brings together thousands of devotees, spiritual leaders, and wellness practitioners for 10 days of prayers, rituals, health expo, and cultural programs in the holy city of Varanasi.",
+      hi: "108 कुंड विश्व शांति महा यज्ञ एक भव्य आध्यात्मिक समारोह है जो एक साथ 108 पवित्र अग्नि कुंडों के साथ किया जाता है। यह दुर्लभ और शुभ आयोजन हजारों भक्तों, आध्यात्मिक नेताओं और कल्याण साधकों को पवित्र वाराणसी में 10 दिनों की प्रार्थना, अनुष्ठान, स्वास्थ्य एक्सपो और सांस्कृतिक कार्यक्रमों के लिए एक साथ लाता है।",
     },
   },
   {
     id: "venue-info",
     title: { en: "Venue & Location", hi: "स्थान और लोकेशन" },
     content: {
-      en: "📍 Varanasi, Uttar Pradesh, India\n🕐 June 3–7, 2026\n🏛️ A sprawling venue with dedicated zones for yagya, exhibition stalls, cultural stage, food court, and VIP seating.",
-      hi: "📍 वाराणसी, उत्तर प्रदेश, भारत\n🕐 3–7 जून 2026\n🏛️ यज्ञ, प्रदर्शनी स्टॉल, सांस्कृतिक मंच, फूड कोर्ट और VIP बैठक के लिए समर्पित क्षेत्रों के साथ विशाल स्थान।",
+      en: "📍 Varanasi, Uttar Pradesh, India\n🕐 August 16–25, 2026 (Shravan Month)\n🏛️ A sprawling venue with dedicated zones for yagya, exhibition stalls, cultural stage, food court, and VIP seating.",
+      hi: "📍 वाराणसी, उत्तर प्रदेश, भारत\n🕐 16–25 अगस्त 2026 (श्रावण माह)\n🏛️ यज्ञ, प्रदर्शनी स्टॉल, सांस्कृतिक मंच, फूड कोर्ट और VIP बैठक के लिए समर्पित क्षेत्रों के साथ विशाल स्थान।",
     },
   },
 ];
@@ -642,7 +642,7 @@ export async function generateMetadata({
   };
 
   const descriptions: Record<AppLocale, string> = {
-    en: "Book your exhibition stall at the 108 Kund World Peace Maha Yagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project in Varanasi. 25,000+ daily visitors, 5 days, 300+ stalls. Standard ₹50K, Premium ₹1L, Prime ₹2L.",
+    en: "Book your exhibition stall at the 108 Kund World Peace Maha Yagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project in Varanasi. 25,000+ daily visitors, 10 days, 300+ stalls. Standard ₹50K, Premium ₹1L, Prime ₹2L.",
     hi: "वाराणसी में 108 कुंड विश्व शांति महा यज्ञ एवं वैश्विक स्वास्थ्य और कल्याण मेगा एक्सपो एवं मेगा पर्यावरण परियोजना का शुभारंभ में अपना प्रदर्शनी स्टॉल बुक करें। 25,000+ दैनिक आगंतुक, 5 दिन, 300+ स्टॉल।",
   };
 
@@ -694,7 +694,7 @@ export default async function MahaYagyaPage({
             name: "108 Kund World Peace Maha Yagya & Global Health and Wellness Mega Expo with Launching of Mega Environmental Project",
             description: t(hero.tagline, "en"),
             startDate: EVENT_DATE,
-            endDate: "2026-06-07T20:00:00+05:30",
+            endDate: "2026-08-25T20:00:00+05:30",
             eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
             eventStatus: "https://schema.org/EventScheduled",
             location: {

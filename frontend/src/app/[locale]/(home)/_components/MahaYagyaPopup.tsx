@@ -23,8 +23,8 @@ const content = {
     hi: "✨ श्री बगलामुखी यंत्र — असली स्वर्ण / रजत / ताम्र निर्मित",
   },
   location: {
-    en: "📍 Varanasi, UP • 3–7 June 2026",
-    hi: "📍 वाराणसी, UP • 3–7 जून 2026",
+    en: "📍 Varanasi, UP • Shravan • 16–25 Aug 2026",
+    hi: "📍 वाराणसी, UP • श्रावण • 16–25 अगस्त 2026",
   },
   highlights: [
     { en: "25,000+ Daily Visitors", hi: "25,000+ दैनिक आगंतुक" },
